@@ -6,14 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
-import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -29,17 +27,19 @@ import com.wipro.fhir.r4.data.atoms.feed.bahmni.encounter.ClinicalFeedDataLog;
 import com.wipro.fhir.r4.data.atoms.feed.bahmni.encounter.EncounterFullRepresentation;
 import com.wipro.fhir.r4.repo.atoms.feed.bahmni.encounter.ClinicalFeedDataLogRepo;
 import com.wipro.fhir.r4.repo.atoms.feed.bahmni.encounter.EncounterFullRepresentationRepo;
-import com.wipro.fhir.r4.utils.config.ConfigProperties;
+import com.wipro.fhir.r4.utils.CryptoUtil;
 import com.wipro.fhir.r4.utils.exception.FHIRException;
 import com.wipro.fhir.r4.utils.http.HttpUtils;
 import com.wipro.fhir.r4.utils.mapper.InputMapper;
 
 @Service
-@Component
 @PropertySource("classpath:application.properties")
 public class ClinicalFeedWorker {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+
+	@Autowired
+	private CryptoUtil cryptoUtil;
 
 	@Value("${atomsFeedStartPage}")
 	private int atomsFeedStartPage;
@@ -65,8 +65,6 @@ public class ClinicalFeedWorker {
 	private EncounterFullRepresentationRepo encounterFullRepresentationRepo;
 
 	public String encounterFeedManager() throws IllegalArgumentException, FeedException, IOException, FHIRException {
-//		String parentUrl = "https://demo.mybahmni.org";
-//		String atomFeedURL = "/openmrs/ws/atomfeed/patient/";
 		int pointer = 0;
 		// 1. read last successed feed entry
 		// feedDataLogRepo
@@ -283,13 +281,9 @@ public class ClinicalFeedWorker {
 	}
 
 	public HttpHeaders getHeaders() {
-		StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
-		encryptor.setAlgorithm("PBEWithMD5AndDES");
+		String decryptUserName = cryptoUtil.decrypt(userName);
+		String decryptPassword = cryptoUtil.decrypt(password);
 
-		encryptor.setPassword("dev-env-secret");
-		String decryptUserName = encryptor.decrypt(userName);
-		String decryptPassword = encryptor.decrypt(password);
-		
 		if (headers != null)
 			return headers;
 		else {

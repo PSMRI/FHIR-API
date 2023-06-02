@@ -10,8 +10,6 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import com.wipro.fhir.r4.utils.config.ConfigProperties;
 import com.wipro.fhir.r4.utils.gateway.email.EmailService;
 import com.wipro.fhir.r4.utils.gateway.email.GenericEmailServiceImpl;
-import com.wipro.fhir.r4.utils.km.KMService;
-import com.wipro.fhir.r4.utils.km.openkm.OpenKMServiceImpl;
 import com.wipro.fhir.r4.utils.redis.RedisStorage;
 import com.wipro.fhir.r4.utils.sessionobject.SessionObject;
 import com.wipro.fhir.r4.utils.validator.Validator;
@@ -21,12 +19,6 @@ public class IEMRApplBeans {
 
 	private @Value("${spring.redis.host}") String redisHost;
 	private @Value("${spring.redis.port}") int redisPort;
-
-	@Bean
-	public KMService getOpenKMService() {
-		KMService kmService = new OpenKMServiceImpl();
-		return kmService;
-	}
 
 	@Bean
 	public Validator getVaidator() {
@@ -61,16 +53,10 @@ public class IEMRApplBeans {
 		return new RedisStorage();
 	}
 
-	// @Beanss
-	// public RedisConnection redisConnection()
-	// {
-	// return new RedisConnection();
-	// }
-
-	// @Configuration
-	// @EnableRedisHttpSession
-	// public class Config
-	//// {
+	@Bean
+	public CryptoUtil cryptoUtil() {
+		return new CryptoUtil();
+	}
 
 	@Bean
 	public LettuceConnectionFactory connectionFactory() {
@@ -79,24 +65,4 @@ public class IEMRApplBeans {
 		return new LettuceConnectionFactory(redisHost, redisPort);
 	}
 
-	/*
-	 * @Bean public RedisHttpSessionConfiguration redisSession() { return new
-	 * RedisHttpSessionConfiguration(); }
-	 */
-
-	// @Bean
-	// public HTTPRequestInterceptor myInterceptor()
-	// {
-	// return new HTTPRequestInterceptor();
-	// }
-	// @Bean
-	// public KMService getOpenKMService()
-	// {
-	// KMService kmService = new OpenKMServiceImpl();
-	// return kmService;
-	// }
-
-	// public static void main(String[] args) {
-	// SpringApplication.run(CommonMain.class, args);
-	// }
 }

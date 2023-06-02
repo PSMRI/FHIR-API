@@ -4,11 +4,7 @@
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
-<<<<<<< HEAD
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
-=======
->>>>>>> d0dd2f1dc766f8dd51fe2c0661148eeb62a4bbca
         <property name="context-root" value="fhirapi-v1.0"/>
-        <property name="java-output-path" value="/FHIR_API/target/classes"/>
+        <property name="java-output-path" value="/FHIR-API/target/classes"/>
     </wb-module>
 </project-modules>
