@@ -36,8 +36,6 @@ This service has been tested on Wildfly as the application server.
 * Redis
 * MySQL Database
 
-## Integrations
-* Video Consultation
 
 ## Usage
 All features have been exposed as REST endpoints. Refer to the SWAGGER API specification for details.
