@@ -16,14 +16,13 @@ public class SwaggerConfig {
 	@Bean
 	public Docket productApi() {
 		return new Docket(DocumentationType.SWAGGER_2).select()
-				.apis(RequestHandlerSelectors.basePackage("com.wipro.fhir.r4.controller")).build()
-				.apiInfo(metaData());
+				.apis(RequestHandlerSelectors.basePackage("com.wipro.fhir.r4.controller")).build().apiInfo(metaData());
 	}
 
 	private ApiInfo metaData() {
-		ApiInfo apiInfo = new ApiInfo("Spring Boot REST API", "Spring Boot REST API for Piramal HWC FHIR application",
-				"1.0", "Terms of service", new Contact("Wipro HCIT", "https://www.wipro.com", "mywipro@wipro.com"), "",
-				"");
+		ApiInfo apiInfo = new ApiInfo("AMRIT FHIR Service", "REST endpoints for AMRIT FHIR application", "1.0",
+				"Terms of service",
+				new Contact("AMRIT Source Code", "https://github.com/PSMRI/FHIR-API", "amrit@amrit.com"), "", "");
 		return apiInfo;
 	}
 }

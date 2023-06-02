@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
-import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,7 @@ import com.wipro.fhir.r4.data.atoms.feed.bahmni.encounter.ClinicalFeedDataLog;
 import com.wipro.fhir.r4.data.atoms.feed.bahmni.encounter.EncounterFullRepresentation;
 import com.wipro.fhir.r4.repo.atoms.feed.bahmni.encounter.ClinicalFeedDataLogRepo;
 import com.wipro.fhir.r4.repo.atoms.feed.bahmni.encounter.EncounterFullRepresentationRepo;
-import com.wipro.fhir.r4.utils.config.ConfigProperties;
+import com.wipro.fhir.r4.utils.CryptoUtil;
 import com.wipro.fhir.r4.utils.exception.FHIRException;
 import com.wipro.fhir.r4.utils.http.HttpUtils;
 import com.wipro.fhir.r4.utils.mapper.InputMapper;
@@ -55,6 +54,9 @@ public class ClinicalFeedWorker {
 	private String atomFeedURLPatientEncounter;
 
 	HttpHeaders headers;
+
+	@Autowired
+	private CryptoUtil cryptoUtil;
 
 	@Autowired
 	HttpUtils httpUtils;
@@ -283,13 +285,10 @@ public class ClinicalFeedWorker {
 	}
 
 	public HttpHeaders getHeaders() {
-		StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
-		encryptor.setAlgorithm("PBEWithMD5AndDES");
 
-		encryptor.setPassword("dev-env-secret");
-		String decryptUserName = encryptor.decrypt(userName);
-		String decryptPassword = encryptor.decrypt(password);
-		
+		String decryptUserName = cryptoUtil.decrypt(userName);
+		String decryptPassword = cryptoUtil.decrypt(password);
+
 		if (headers != null)
 			return headers;
 		else {
