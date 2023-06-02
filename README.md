@@ -1,4 +1,6 @@
 # FHIR-API
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)  ![branch parameter](https://github.com/PSMRI/HWC-API/actions/workflows/sast-and-package.yml/badge.svg)
+
 FHIR (Fast Healthcare Interoperability Resources) standard defines how healthcare information can be exchanged between different computer systems reagrdless of how it is stored in those system
 
 ## Features
