@@ -86,9 +86,9 @@ public class CommonServiceImpl implements CommonService {
 	private static String authKey;
 	private UUID uuid;
 
-	public static String NDHM_AUTH_TOKEN;
-	public static Long NDHM_TOKEN_EXP;
-	public static String NDHM_OTP_TOKEN;
+	//public static String NDHM_AUTH_TOKEN;
+	//public static Long NDHM_TOKEN_EXP;
+	//public static String NDHM_OTP_TOKEN;
 
 	@Value("${clientID}")
 	private String clientID;
@@ -384,7 +384,7 @@ public class CommonServiceImpl implements CommonService {
 				JsonParser jsnParser = new JsonParser();
 				JsonElement jsnElmnt = jsnParser.parse(responseStrLogin);
 				jsnOBJ = jsnElmnt.getAsJsonObject();
-				NDHM_AUTH_TOKEN = "Bearer" + " " + jsnOBJ.get("accessToken").getAsString();
+				//NDHM_AUTH_TOKEN = "Bearer" + " " + jsnOBJ.get("accessToken").getAsString();
 				Integer expiry = jsnOBJ.get("expiresIn").getAsInt();
 				double time = expiry / 60;
 				Date date = new Date();
@@ -393,7 +393,7 @@ public class CommonServiceImpl implements CommonService {
 				ndhmCalendar.setTime(sqlDate);
 				ndhmCalendar.add(Calendar.MINUTE, (int) time);
 				Date ndhmTokenEndTime = ndhmCalendar.getTime();
-				NDHM_TOKEN_EXP = ndhmTokenEndTime.getTime();
+				//NDHM_TOKEN_EXP = ndhmTokenEndTime.getTime();
 				res = "success";
 			} else
 				res = "Error while accessing authenticate API";

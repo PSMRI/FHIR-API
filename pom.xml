@@ -43,6 +43,7 @@
 		<server-id>wildfly-${environment}</server-id>
 		<server-hostname>{hostname-${environment}}</server-hostname>
 		<server-port>{port-${environment}}</server-port>
+		<sonar.java.binaries>target</sonar.java.binaries>
 	</properties>
 
 	<dependencies>
