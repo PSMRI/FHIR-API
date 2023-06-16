@@ -41,9 +41,10 @@ public class SwaggerConfig {
 	}
 
 	private ApiInfo metaData() {
-		ApiInfo apiInfo = new ApiInfo("AMRIT FHIR Service", "REST endpoints for AMRIT FHIR application", "1.0",
-				"Terms of service", new Contact("AMRIT", "https://github.com/PSMRI/FHIR-API", "amrit@amrit.com"), "",
-				"");
+		ApiInfo apiInfo = new ApiInfo("FHIR API",
+				"Service that implements FHIR standard for healthcare information exchange between various systems that are used by clinicians and organisations.",
+				"1.0", "Terms of service",
+				new Contact("AMRIT", "https://psmri.github.io/PSMRI/", "amrit@piramalswasthya.org"), "", "");
 		return apiInfo;
 	}
 }
