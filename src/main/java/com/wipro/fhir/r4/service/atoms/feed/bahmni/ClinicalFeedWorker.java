@@ -48,7 +48,6 @@ import com.wipro.fhir.r4.data.atoms.feed.bahmni.encounter.ClinicalFeedDataLog;
 import com.wipro.fhir.r4.data.atoms.feed.bahmni.encounter.EncounterFullRepresentation;
 import com.wipro.fhir.r4.repo.atoms.feed.bahmni.encounter.ClinicalFeedDataLogRepo;
 import com.wipro.fhir.r4.repo.atoms.feed.bahmni.encounter.EncounterFullRepresentationRepo;
-import com.wipro.fhir.r4.utils.CryptoUtil;
 import com.wipro.fhir.r4.utils.exception.FHIRException;
 import com.wipro.fhir.r4.utils.http.HttpUtils;
 import com.wipro.fhir.r4.utils.mapper.InputMapper;
@@ -58,9 +57,6 @@ import com.wipro.fhir.r4.utils.mapper.InputMapper;
 public class ClinicalFeedWorker {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-
-	@Autowired
-	private CryptoUtil cryptoUtil;
 
 	@Value("${atomsFeedStartPage}")
 	private int atomsFeedStartPage;
@@ -302,8 +298,8 @@ public class ClinicalFeedWorker {
 	}
 
 	public HttpHeaders getHeaders() {
-		String decryptUserName = cryptoUtil.decrypt(userName);
-		String decryptPassword = cryptoUtil.decrypt(password);
+		String decryptUserName = userName;
+		String decryptPassword = password;
 
 		if (headers != null)
 			return headers;

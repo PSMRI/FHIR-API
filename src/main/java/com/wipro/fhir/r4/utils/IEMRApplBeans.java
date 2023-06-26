@@ -75,11 +75,6 @@ public class IEMRApplBeans {
 	}
 
 	@Bean
-	public CryptoUtil cryptoUtil() {
-		return new CryptoUtil();
-	}
-
-	@Bean
 	public LettuceConnectionFactory connectionFactory() {
 		System.out.print("Connecting to Redis " + redisHost + ":" + redisPort);
 

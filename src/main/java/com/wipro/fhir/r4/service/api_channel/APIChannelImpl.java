@@ -24,7 +24,6 @@ package com.wipro.fhir.r4.service.api_channel;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
@@ -37,7 +36,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.wipro.fhir.r4.data.request_handler.ResourceRequestHandler;
 import com.wipro.fhir.r4.data.request_handler.UserAuthAPIResponse;
-import com.wipro.fhir.r4.utils.CryptoUtil;
 import com.wipro.fhir.r4.utils.exception.FHIRException;
 import com.wipro.fhir.r4.utils.mapper.InputMapper;
 
@@ -45,9 +43,6 @@ import com.wipro.fhir.r4.utils.mapper.InputMapper;
 @PropertySource("classpath:application.properties")
 public class APIChannelImpl implements APIChannel {
 	static RestTemplate restTemplate;
-
-	@Autowired
-	private CryptoUtil cryptoUtil;
 
 	@Value("${benSearchByBenIDURL}")
 	private String benSearchByBenIDURL;
@@ -94,8 +89,8 @@ public class APIChannelImpl implements APIChannel {
 		String authKey = null;
 
 		Map<String, String> userDetails = new HashMap<String, String>();
-		String decryptUserName = cryptoUtil.decrypt(fhirUserName);
-		String decryptPassword = cryptoUtil.decrypt(fhirPassword);
+		String decryptUserName = fhirUserName;
+		String decryptPassword = fhirPassword;
 
 		userDetails.put("userName", decryptUserName);
 		userDetails.put("password", decryptPassword);
