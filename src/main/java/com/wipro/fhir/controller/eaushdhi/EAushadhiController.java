@@ -135,7 +135,7 @@ public class EAushadhiController {
 	}
 
 	@CrossOrigin
-	@ApiOperation(value = "Updating e-aushadhi sync status for patient issue details", consumes = "application/json", produces = "application/json")
+	@ApiOperation(value = "Sync e-aushadhi for patient issue details", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = { "/updatePatientIssueSyncStatus" }, method = { RequestMethod.POST })
 	public String addFacility(@RequestBody String request) {
 
