@@ -43,7 +43,7 @@ public class HigherHealthFacilityController {
 	private HigherHealthFacilityServiceImpl higherHealthFacilityServiceImpl;
 
 	@CrossOrigin
-	@ApiOperation(value = "Update bengenid for higher health facility beneficiary", consumes = "application/json", produces = "application/json")
+	@ApiOperation(value = "Update beneficiary id for higher health facility beneficiary", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = { "/update/bengenid" }, method = { RequestMethod.POST })
 	public String feedPatientDemographicData(@RequestBody ResourceRequestHandler resourceRequestHandler) {
 
