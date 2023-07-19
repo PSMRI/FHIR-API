@@ -95,7 +95,7 @@ public class CareContextController {
 	}
 
 	@CrossOrigin
-	@ApiOperation(value = "Add care context to mongo", consumes = "application/json", produces = "application/json")
+	@ApiOperation(value = "Add care context to Mongo", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = { "/addCarecontextToMongo" }, method = { RequestMethod.POST })
 	public String saveCareContextToMongo(@ApiParam(value = "{}") @RequestBody String request,
 			@RequestHeader(value = "Authorization") String Authorization) {
