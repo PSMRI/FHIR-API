@@ -1,7 +1,10 @@
 name: Static Code Analysis and Packaging Prod
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master"]
+    
+env:
+  ENV_VAR: prod    
     
 jobs:
   CodeQL:
@@ -30,7 +33,7 @@ jobs:
         languages: Java    
 
     - name: Build with Maven
-      run: mvn clean install -Denvironment=prod
+      run: mvn clean install -DENV_VAR=${{ env.ENV_VAR }}
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
