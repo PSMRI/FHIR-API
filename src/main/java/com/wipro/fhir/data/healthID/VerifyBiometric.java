@@ -19,17 +19,35 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
-package com.wipro.fhir.service.ndhm;
+package com.wipro.fhir.data.healthID;
 
+public class VerifyBiometric {
 
-import com.wipro.fhir.utils.exception.FHIRException;
+	String aadhaar;
+	String pid;
+	String bioType;
 
-public interface GenerateHealthID_CardService {
-	public String generateOTP(String request) throws FHIRException;
+	public String getAadhaar() {
+		return this.aadhaar;
+	}
 
-	public String validateOTP(String request) throws FHIRException;
+	public void setAadhaar(String aadhaar) {
+		this.aadhaar = aadhaar;
+	}
 
-	public String generateCard(String requestOBJ, String NDHM_Auth_TOKEN) throws FHIRException;
+	public String getPid() {
+		return this.pid;
+	}
 
-	public String generateHealthCardForBio(String requestOBJ, String x_Token) throws FHIRException;
+	public void setPid(String pid) {
+		this.pid = pid;
+	}
+
+	public String getBioType() {
+		return this.bioType;
+	}
+
+	public void setBioType(String bioType) {
+		this.bioType = bioType;
+	}
 }

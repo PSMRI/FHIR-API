@@ -35,4 +35,5 @@ public interface Common_NDHMService {
 	public String getBody(ResponseEntity<String> res) throws FHIRException;
 	public String getStatusCode(ResponseEntity<String> res) throws FHIRException;
 	public HttpHeaders getHeadersWithXtoken(String ndhmAuthToken,String X_Token);
+	public HttpHeaders getHeadersWithAadhaarBioXtoken(String ndhmAuthToken, String X_Token);
 }

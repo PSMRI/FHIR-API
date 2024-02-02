@@ -61,6 +61,8 @@ public class GenerateHealthID_CardServiceImpl implements GenerateHealthID_CardSe
 	private String verifyOTP_ForCard_Aadhaar;
 	@Value("${generateHealthCard}")
 	private String generateHealthCard;
+	@Value("${generateHealthIDCard}")
+	private String generateHealthIDCard;
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 	@Autowired
 	HttpUtils httpUtils;
@@ -259,6 +261,46 @@ public class GenerateHealthID_CardServiceImpl implements GenerateHealthID_CardSe
 		else
 			throw new FHIRException("NDHM_FHIR Error while accessing ABHA card API ");
 
+	}
+
+	@Override
+	public String generateHealthCardForBio(String req, String NDHM_X_TOKEN) throws FHIRException {
+		String res = null;
+		try {
+			String ndhmAuthToken = this.generateSession_NDHM.getNDHMAuthToken();
+			HttpHeaders headers = this.common_NDHMService.getHeadersWithAadhaarBioXtoken(ndhmAuthToken, NDHM_X_TOKEN);
+			ResponseEntity<byte[]> responseEntity = this.httpUtils.getWithResponseEntityByte(generateHealthIDCard, headers);
+			byte[] ar = responseEntity.getBody();
+			if (ar != null) {
+				res = Base64.getEncoder().encodeToString(ar);
+			} else {
+				throw new FHIRException("NDHM_FHIR Error while accessing generate card API");
+			} 
+		} catch (HttpClientErrorException e) {
+			String message = null;
+			if (e.getResponseBodyAsString() != null) {
+				HealthIDException exception = (HealthIDException)InputMapper.gson().fromJson(e.getResponseBodyAsString(), HealthIDException.class);
+				if (exception.getDetails() != null && (exception.getDetails()).length > 0) {
+					Details[] details = exception.getDetails();
+					if (details[0] != null && details[0].getAttribute() != null && details[0]
+						.getAttribute().getKey() != null) {
+						message = details[0].getMessage() + " :" + details[0].getAttribute().getKey();
+					} else if (details[0] != null) {
+						message = details[0].getMessage();
+					} 
+				} else if (exception.getMessage() != null) {
+					message = exception.getMessage();
+				} 
+			} 
+			if (message != null)
+				throw new FHIRException("NDHM_FHIR Error while generating ABHA card : " + message); 
+			throw new FHIRException("NDHM_FHIR Error while generating ABHA card : " + e.getMessage());
+		} catch (Exception e) {
+			throw new FHIRException("NDHM_FHIR Error while accessing ABHA card API " + e);
+		} 
+		if (res != null)
+			return res; 
+		throw new FHIRException("NDHM_FHIR Error while accessing ABHA card API ");
 	}
 
 }

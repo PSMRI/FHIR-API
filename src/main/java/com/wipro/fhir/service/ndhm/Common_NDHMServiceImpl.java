@@ -74,6 +74,16 @@ public class Common_NDHMServiceImpl implements Common_NDHMService {
 		headers.set("X-Token", X_Token);
 		return headers;
 	}
+	
+	@Override
+	public HttpHeaders getHeadersWithAadhaarBioXtoken(String ndhmAuthToken, String X_Token) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		if (ndhmAuthToken != null)
+			headers.set("Authorization", ndhmAuthToken); 
+		headers.set("X-Token", "Bearer " + X_Token);
+		return headers;
+	}
 
 	/***
 	 * @author SH20094090

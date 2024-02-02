@@ -181,4 +181,12 @@ public class HttpUtils {
 	public void setStatus(HttpStatus status) {
 		this.status = status;
 	}
+	
+	public ResponseEntity<String> postWithResponseEntity(String abdmConfirmAadhaarBio, HttpEntity<String> httpEntity, Class<String> class1) {
+		ResponseEntity<String> responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		responseEntity = this.rest.exchange(abdmConfirmAadhaarBio, HttpMethod.POST, httpEntity, String.class, new Object[0]);
+		setStatus(responseEntity.getStatusCode());
+		String body = responseEntity.getBody();
+		return responseEntity;
+	}
 }

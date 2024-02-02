@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -93,6 +94,9 @@ public class CreateHealthID_Aadhaar_NDHMServiceImpl implements CreateHealthID_Aa
 	private Common_NDHMService common_NDHMService;
 	@Autowired
 	private GenerateSession_NDHMService generateSession_NDHM;
+	
+	@Autowired
+	private GenerateHealthID_CardService generateHealthID_CardService;
 
 	@Override
 	public String generateOTP(String request) throws FHIRException {
@@ -386,8 +390,9 @@ public class CreateHealthID_Aadhaar_NDHMServiceImpl implements CreateHealthID_Aa
 				String requestOBJ = new Gson().toJson(obj);
 				logger.info("NDHM_FHIR-confirm Aadhaar bio API request Obj " + requestOBJ);
 				HttpHeaders headers = common_NDHMService.getHeaders(ndhmAuthToken);
+				HttpEntity<String> httpEntity = new HttpEntity<>(requestOBJ, headers);
 				ResponseEntity<String> responseEntity = httpUtils.postWithResponseEntity(abdmConfirmAadhaarBio,
-						requestOBJ, headers);
+						httpEntity, String.class);
 				String responseStrLogin = common_NDHMService.getBody(responseEntity);
 				if (responseStrLogin != null) {
 					JsonObject jsnOBJ = new JsonObject();
@@ -396,10 +401,13 @@ public class CreateHealthID_Aadhaar_NDHMServiceImpl implements CreateHealthID_Aa
 					jsnOBJ = jsnElmnt.getAsJsonObject();
 					String X_Token = jsnOBJ.get("x-token").getAsString();
 					//responseMap.put("aadhaar", obj.getAadhaar());
-					responseMap.put("x-token", X_Token);
-					res = new Gson().toJson(responseMap);
-				} else
+//					responseMap.put("x-token", X_Token);
+//					res = new Gson().toJson(responseMap);
+					if (null != X_Token)
+						res = this.generateHealthID_CardService.generateHealthCardForBio(requestOBJ, X_Token);
+				} else {
 					res = "NDHM_FHIR Error while confirm Aadhaar bio";// throw w
+				}
 			}
 			/**
 			 * @author SH20094090
