@@ -25,10 +25,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -40,7 +40,7 @@ import com.wipro.fhir.service.resource_gateway.PrescriptionRecordBundleImpl;
 import com.wipro.fhir.utils.http.HttpUtils;
 import com.wipro.fhir.utils.response.OutputResponse;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 
 @CrossOrigin
 @RestController
@@ -49,39 +49,24 @@ public class Test {
 	@Autowired
 	HttpUtils httpUtils;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-	private RestTemplate rest;
-
-	@Autowired
-	private ClinicalFeedWorker clinicalFeedWorker;
-
-	@Autowired
-	private PrescriptionRecordBundleImpl prescriptionRecordBundleImpl;
-
-	@Autowired
-	private OPConsultRecordBundle o;
+	
 	@Autowired
 	private OPConsultRecordBundleImpl oPConsultRecordBundleImpl;
 
-	// @Deprecated
 	@CrossOrigin
-	@ApiOperation(value = "Test parse ATOM Feeds", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/parse/feed/ATOM" }, method = { RequestMethod.POST })
+	@Operation(summary = "Test parse ATOM Feeds")
+	@PostMapping(value = { "/parse/feed/ATOM" })
 	public String parseFeeds(@RequestBody ResourceRequestHandler resourceRequestHandler,
 			@RequestHeader(value = "Authorization") String Authorization) {
 		OutputResponse response = new OutputResponse();
 		String s = null;
 		try {
-
 			s = oPConsultRecordBundleImpl.getOPConsultRecordBundle(resourceRequestHandler, null);
-
 			response.setResponse(s);
 		} catch (Exception e) {
-			
 			logger.error("Unexpected error:" , e);
 			System.out.println(e);
 		}
 		return response.toString();
-
 	}
-
 }

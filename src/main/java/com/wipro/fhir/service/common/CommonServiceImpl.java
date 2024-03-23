@@ -63,8 +63,6 @@ import com.wipro.fhir.data.patient_data_handler.PatientDemographicModel_NDHM_Pat
 import com.wipro.fhir.data.request_handler.PatientEligibleForResourceCreation;
 import com.wipro.fhir.data.request_handler.ResourceRequestHandler;
 import com.wipro.fhir.repo.common.PatientEligibleForResourceCreationRepo;
-import com.wipro.fhir.repo.healthID.BenHealthIDMappingRepo;
-import com.wipro.fhir.repo.healthID.HealthIDRepo;
 import com.wipro.fhir.repo.mongo.amrit_resource.AMRIT_ResourceMongoRepo;
 import com.wipro.fhir.repo.mongo.amrit_resource.PatientCareContextsMongoRepo;
 import com.wipro.fhir.repo.mongo.amrit_resource.TempCollectionRepo;
@@ -125,10 +123,7 @@ public class CommonServiceImpl implements CommonService {
 	private APIChannel aPIChannel;
 	@Autowired
 	private AMRIT_ResourceMongoRepo aMRIT_ResourceMongoRepo;
-	@Autowired
-	private BenHealthIDMappingRepo benHealthIDMappingRepo;
-	@Autowired
-	private HealthIDRepo healthIDRepo;
+	
 
 	@Autowired
 	private PatientCareContextsMongoRepo patientCareContextsMongoRepo;
@@ -407,8 +402,7 @@ public class CommonServiceImpl implements CommonService {
 				Calendar ndhmCalendar = Calendar.getInstance();
 				ndhmCalendar.setTime(sqlDate);
 				ndhmCalendar.add(Calendar.MINUTE, (int) time);
-				Date ndhmTokenEndTime = ndhmCalendar.getTime();
-				//NDHM_TOKEN_EXP = ndhmTokenEndTime.getTime();
+			
 				res = "success";
 			} else
 				res = "Error while accessing authenticate API";
@@ -539,7 +533,7 @@ public class CommonServiceImpl implements CommonService {
 			List<PatientDemographicModel_NDHM_Patient_Profile> patientProfile_list) throws FHIRException {
 
 		List<PatientDemographicModel_NDHM_Patient_Profile> resultSet = patientDemographicModel_NDHM_Patient_Profile_Repo
-				.save(patientProfile_list);
+				.saveAll(patientProfile_list);
 
 		return resultSet;
 	}
@@ -551,9 +545,9 @@ public class CommonServiceImpl implements CommonService {
 		if (resourceRequestHandler.getPageNo() != null && resourceRequestHandler.getPageNo() >= 0) {
 			PageRequest pr;
 			if (patient_search_page_size != null)
-				pr = new PageRequest(resourceRequestHandler.getPageNo(), Integer.valueOf(patient_search_page_size));
+				pr = PageRequest.of(resourceRequestHandler.getPageNo(), Integer.valueOf(patient_search_page_size));
 			else
-				pr = new PageRequest(resourceRequestHandler.getPageNo(), 10);
+				pr = PageRequest.of(resourceRequestHandler.getPageNo(), 10);
 
 			if (resourceRequestHandler != null && resourceRequestHandler.getHealthId() != null)
 				return patientDemographicModel_NDHM_Patient_Profile_Repo

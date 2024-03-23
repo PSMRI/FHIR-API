@@ -58,7 +58,7 @@ public class HigherHealthFacilityServiceImpl {
 			obj.setAmritId(reqObj.getAmritId());
 			obj.getProfile().getPatient().getIdentifiers().add(identifier);
 		}
-		patientProfileRepo.save(resultSet);
+		patientProfileRepo.saveAll(resultSet);
 		return "Beneficiary ID updated successfully";
 	}
 
@@ -156,22 +156,7 @@ public class HigherHealthFacilityServiceImpl {
 		return visitList;
 	}
 
-	/// ---------------------------------------------------------------------------------------------------
-
-	@Deprecated
-	private boolean checkIfVisitExist(List<EncounterFullRepresentation> resultList, String visitID) {
-		for (EncounterFullRepresentation obj : resultList) {
-			if (visitID.equalsIgnoreCase(obj.getVisitUuid())) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-
-
 	List<GroupMembers> finalfamilymember = new ArrayList<GroupMembers>();
-	// List<GroupMembers> prevFamilyMember;
 
 	private List<GroupMembers> getSerializedGroupMembersNew(List<GroupMembers> groupMembers) {
 		

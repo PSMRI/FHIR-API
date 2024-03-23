@@ -33,7 +33,7 @@ import com.wipro.fhir.data.e_aushdhi.ItemStockExit;
 @RestResource(exported = false)
 public interface ItemStockExitRepo extends CrudRepository<ItemStockExit, Long> {
 	
-	@Query("SELECT f FROM ItemStockExit f WHERE f.exitTypeID = :patientIssueID AND f.itemStockEntryID = :itemStockEntryID AND deleted=0")
+	@Query("SELECT f FROM ItemStockExit f WHERE f.exitTypeID = :patientIssueID AND f.itemStockEntryID = :itemStockEntryID AND deleted=false")
 	public ItemStockExit getItemExitDetails(@Param("patientIssueID") Long patientIssueID, @Param("itemStockEntryID") Integer itemStockEntryID);
 
 }

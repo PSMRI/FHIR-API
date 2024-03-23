@@ -33,7 +33,7 @@ import com.wipro.fhir.data.e_aushdhi.M_Uom;
 @RestResource(exported = false)
 public interface UomRepo extends CrudRepository<M_Uom, Integer> {
 	
-	@Query("SELECT f FROM M_Uom f WHERE f.uOMName = :uomName AND f.providerServiceMapID = :providerServiceMapID AND deleted=0")
+	@Query("SELECT f FROM M_Uom f WHERE f.uOMName = :uomName AND f.providerServiceMapID = :providerServiceMapID AND deleted=false")
     public M_Uom getUOMID(@Param("uomName") String uomName, @Param("providerServiceMapID") Integer providerServiceMapID);
 
 }

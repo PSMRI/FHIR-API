@@ -28,10 +28,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
@@ -40,8 +40,8 @@ import com.wipro.fhir.service.e_aushdhi.EAushadhiService;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.response.OutputResponse;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.lettuce.core.dynamic.annotation.Param;
+import io.swagger.v3.oas.annotations.Operation;
 
 /**
  * @author DE40034072 Date 01-12-2021
@@ -49,7 +49,7 @@ import io.swagger.annotations.ApiParam;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = "/eAushadhi", headers = "Authorization")
+@RequestMapping(value = "/eAushadhi", headers = "Authorization", consumes = "application/json", produces = "application/json")
 public class EAushadhiController {
 
 	@Autowired
@@ -57,9 +57,9 @@ public class EAushadhiController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
 	@CrossOrigin
-	@ApiOperation(value = "Getting store stock details from e-aushadhi", produces = "application/json")
-	@RequestMapping(value = { "/getStoreStockDetails" }, method = { RequestMethod.POST })
-	public String getStoreStockDetails(@ApiParam(value = "{\"facilityID\":\"Integer\"}") @RequestBody String request,
+	@Operation(summary = "Getting store stock details from e-aushadhi")
+	@PostMapping(value = { "/getStoreStockDetails" })
+	public String getStoreStockDetails(@Param(value = "{\"facilityID\":\"Integer\"}") @RequestBody String request,
 			@RequestHeader(value = "Authorization") String Authorization) {
 
 		OutputResponse response = new OutputResponse();
@@ -91,10 +91,10 @@ public class EAushadhiController {
 	 * @return sync dispense data and patient information to E-Aushadhi.
 	 */
 	@CrossOrigin
-	@ApiOperation(value = "Sync drug dispense data and patient details with e-aushadhi", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/syncDrugDispenseDetails" }, method = { RequestMethod.POST })
+	@Operation(summary = "Sync drug dispense data and patient details with e-aushadhi")
+	@PostMapping(value = { "/syncDrugDispenseDetails" })
 	public String syncDrugDispenseAndPatientDetails(
-			@ApiParam(value = "{\"eAushadhiFacilityId\":\"Integer\",\"pageNo\":\"Integer\"}") @RequestBody String request,
+			@Param(value = "{\"eAushadhiFacilityId\":\"Integer\",\"pageNo\":\"Integer\"}") @RequestBody String request,
 			@RequestHeader(value = "Authorization") String Authorization) {
 
 		OutputResponse response = new OutputResponse();
@@ -114,8 +114,8 @@ public class EAushadhiController {
 	}
 
 	@CrossOrigin
-	@ApiOperation(value = "Get log for stock processing", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/getFacilityStockProcessLog" }, method = { RequestMethod.POST })
+	@Operation(summary = "Get log for stock processing")
+	@PostMapping(value = { "/getFacilityStockProcessLog" })
 	public String getFacilityStockProcessLog(@RequestBody String request) {
 
 		OutputResponse response = new OutputResponse();
@@ -135,8 +135,8 @@ public class EAushadhiController {
 	}
 
 	@CrossOrigin
-	@ApiOperation(value = "Sync e-aushadhi for patient issue details", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/updatePatientIssueSyncStatus" }, method = { RequestMethod.POST })
+	@Operation(summary = "Sync e-aushadhi for patient issue details")
+	@PostMapping(value = { "/updatePatientIssueSyncStatus" })
 	public String addFacility(@RequestBody String request) {
 
 		OutputResponse response = new OutputResponse();

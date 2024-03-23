@@ -25,18 +25,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wipro.fhir.service.healthID_validate.HealthIDValidationService;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.response.OutputResponse;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.lettuce.core.dynamic.annotation.Param;
+import io.swagger.v3.oas.annotations.Operation;
 
 @CrossOrigin
 @RestController
@@ -48,10 +48,10 @@ public class HealthIDValidateController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
 	@CrossOrigin
-	@ApiOperation(value = "Generate OTP for ABHA validation", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/generateOTPForHealthIDValidation" }, method = { RequestMethod.POST })
+	@Operation(summary = "Generate OTP for ABHA validation")
+	@PostMapping(value = { "/generateOTPForHealthIDValidation" })
 	public String generateOTPForHealthIDValidation(
-			@ApiParam(value = "{\"healthID\":\"String\",\"isValidate\":\"Boolean\",\"authenticationMode\":\"String\"}") @RequestBody String request,
+			@Param(value = "{\"healthID\":\"String\",\"isValidate\":\"Boolean\",\"authenticationMode\":\"String\"}") @RequestBody String request,
 			@RequestHeader(value = "Authorization") String Authorization) {
 
 		OutputResponse response = new OutputResponse();
@@ -71,10 +71,10 @@ public class HealthIDValidateController {
 	}
 
 	@CrossOrigin
-	@ApiOperation(value = "Verify OTP for ABHA validation", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/verifyOTPForHealthIDValidation" }, method = { RequestMethod.POST })
+	@Operation(summary = "Verify OTP for ABHA validation")
+	@PostMapping(value = { "/verifyOTPForHealthIDValidation" })
 	public String verifyOTPForHealthIDValidation(
-			@ApiParam(value = "{\"otp\":\"String\",\"txnId\":\"String\",\"healthID\":\"String\"}") @RequestBody String request,
+			@Param(value = "{\"otp\":\"String\",\"txnId\":\"String\",\"healthID\":\"String\"}") @RequestBody String request,
 			@RequestHeader(value = "Authorization") String Authorization) {
 
 		OutputResponse response = new OutputResponse();

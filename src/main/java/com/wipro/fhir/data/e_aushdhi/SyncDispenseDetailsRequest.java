@@ -21,8 +21,6 @@
 */
 package com.wipro.fhir.data.e_aushdhi;
 
-import java.sql.Timestamp;
-
 public class SyncDispenseDetailsRequest {
 	
 	String drug_id;

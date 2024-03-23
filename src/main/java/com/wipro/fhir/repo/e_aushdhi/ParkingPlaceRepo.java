@@ -33,6 +33,6 @@ import com.wipro.fhir.data.e_aushdhi.M_Parkingplace;
 @RestResource(exported = false)
 public interface ParkingPlaceRepo extends CrudRepository<M_Parkingplace, Integer> {
 
-	@Query("SELECT f.parkingPlaceID FROM M_Parkingplace f WHERE f.facilityID = :facilityID AND deleted=0")
+	@Query("SELECT f.parkingPlaceID FROM M_Parkingplace f WHERE f.facilityID = :facilityID AND deleted=false")
 	public Integer getParkingPlaceID(@Param("facilityID") Integer facilityID);
 }

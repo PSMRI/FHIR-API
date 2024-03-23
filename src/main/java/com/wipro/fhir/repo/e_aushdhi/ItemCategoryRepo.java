@@ -35,7 +35,7 @@ import com.wipro.fhir.data.e_aushdhi.M_ItemCategory;
 @RestResource(exported = false)
 public interface ItemCategoryRepo extends CrudRepository<M_ItemCategory, Integer> {
 	
-	@Query("SELECT f FROM M_ItemCategory f WHERE f.itemCategoryName = :itemCategoryName AND f.providerServiceMapID = :providerServiceMapID AND deleted=0")
+	@Query("SELECT f FROM M_ItemCategory f WHERE f.itemCategoryName = :itemCategoryName AND f.providerServiceMapID = :providerServiceMapID AND deleted=false")
     public M_ItemCategory getItemCategoryID(@Param("itemCategoryName") String itemCategoryName, @Param("providerServiceMapID") Integer providerServiceMapID);
 
 }

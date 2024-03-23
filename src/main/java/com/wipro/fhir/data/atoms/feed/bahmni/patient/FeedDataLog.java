@@ -21,7 +21,7 @@
 */
 package com.wipro.fhir.data.atoms.feed.bahmni.patient;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

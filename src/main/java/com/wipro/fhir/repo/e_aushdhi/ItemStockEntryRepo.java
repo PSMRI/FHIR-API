@@ -37,7 +37,7 @@ import com.wipro.fhir.data.e_aushdhi.ItemStockEntry;
 @RestResource(exported = false)
 public interface ItemStockEntryRepo extends CrudRepository<ItemStockEntry, Integer> {
 
-	@Query("SELECT f FROM ItemStockEntry f WHERE f.facilityID = :amritFacilityID AND f.itemID = :itemId AND f.batchNo = :batchno AND deleted=0")
+	@Query("SELECT f FROM ItemStockEntry f WHERE f.facilityID = :amritFacilityID AND f.itemID = :itemId AND f.batchNo = :batchno AND deleted=false")
 	public ItemStockEntry checkItemEntryExits(@Param("amritFacilityID") Integer amritFacilityID,
 			@Param("itemId") Integer itemId, @Param("batchno") String batchno);
 

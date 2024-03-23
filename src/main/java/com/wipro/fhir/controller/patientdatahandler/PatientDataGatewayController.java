@@ -25,30 +25,31 @@ import javax.ws.rs.core.MediaType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wipro.fhir.data.request_handler.ResourceRequestHandler;
 import com.wipro.fhir.service.patient_data_handler.PatientDataGatewayService;
 import com.wipro.fhir.utils.response.OutputResponse;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = "/patient/data", headers = "Authorization")
+@RequestMapping(value = "/patient/data", headers = "Authorization", consumes = "application/json", produces = "application/json")
 public class PatientDataGatewayController {
 
 	@Autowired
 	private PatientDataGatewayService patientDataGatewayService;
 
 	@CrossOrigin
-	@ApiOperation(value = "Patient profile search from Mongo, search parameter - healthId, healthIdNo, amritId, externalId, phoneNo, state, district, village", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/profile/search/demographic" }, method = { RequestMethod.POST })
+	@Operation(summary = "Patient profile search from Mongo, search parameter - healthId, healthIdNo, amritId, externalId, phoneNo, state, district, village")
+	@PostMapping(value = { "/profile/search/demographic" })
 	public String patientDataSearchFromMongo(@RequestBody ResourceRequestHandler resourceRequestHandler,
 			@RequestHeader(value = "Authorization") String Authorization) {
 
@@ -68,9 +69,8 @@ public class PatientDataGatewayController {
 	}
 
 	@CrossOrigin
-	@ApiOperation(value = "Patient profile search from Mongo, all data based on page no", produces = "application/json")
-	@RequestMapping(value = { "/searchWithPagination/{pageNo}" }, method = {
-			RequestMethod.GET }, produces = MediaType.APPLICATION_JSON)
+	@Operation(summary = "Patient profile search from Mongo, all data based on page no")
+	@GetMapping(value = { "/searchWithPagination/{pageNo}" }, produces = MediaType.APPLICATION_JSON)
 	public String patientDataSearchFromMongoPagination(@PathVariable("pageNo") Integer pageNo) {
 
 		OutputResponse response = new OutputResponse();

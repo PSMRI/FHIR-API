@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +39,6 @@ import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.mapper.InputMapper;
 
 @Service
-@PropertySource("classpath:application.properties")
 public class APIChannelImpl implements APIChannel {
 	static RestTemplate restTemplate;
 

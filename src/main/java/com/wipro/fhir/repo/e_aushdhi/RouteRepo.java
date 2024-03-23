@@ -34,6 +34,6 @@ import com.wipro.fhir.data.e_aushdhi.M_Route;
 @RestResource(exported = false)
 public interface RouteRepo extends CrudRepository<M_Route, Integer> {
 
-	@Query("SELECT f FROM M_Route f WHERE f.routeName = :routeName AND deleted=0")
+	@Query("SELECT f FROM M_Route f WHERE f.routeName = :routeName AND deleted=false")
     public M_Route getItemRouteID(@Param("routeName") String routeName);
 }

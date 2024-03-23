@@ -36,7 +36,7 @@ import com.wipro.fhir.data.e_aushdhi.M_Van;
 @RestResource(exported = false)
 public interface VanMasterRepo extends CrudRepository<M_Van, Integer>{
 	
-	@Query("SELECT f.vanID FROM M_Van f WHERE f.facilityID = :facilityID AND deleted=0")
+	@Query("SELECT f.vanID FROM M_Van f WHERE f.facilityID = :facilityID AND deleted=false")
 	public Integer getvanID(@Param("facilityID") Integer facilityID);
 
 }

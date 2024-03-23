@@ -42,7 +42,7 @@ import com.wipro.fhir.data.e_aushdhi.T_PatientIssue;
 @RestResource(exported = false)
 public interface PatientIssueRepo extends CrudRepository<T_PatientIssue, Long> {
 	
-	@Query("SELECT f FROM T_PatientIssue f WHERE f.facilityID = :facilityID AND deleted=0 order by createdDate desc")
+	@Query("SELECT f FROM T_PatientIssue f WHERE f.facilityID = :facilityID AND deleted=false order by createdDate desc")
 	public Page<T_PatientIssue> getPatientIssueDetails(@Param("facilityID") Integer facilityID, Pageable pageable);
 	
 	
@@ -52,7 +52,7 @@ public interface PatientIssueRepo extends CrudRepository<T_PatientIssue, Long> {
 	public String getBenFatherName(@Param("BenRegId") Long BenRegId);
 	
 	@Query(value = "select f.BeneficiaryID from db_identity.m_beneficiaryregidmapping f "
-			+ "where f.BenRegId=:BenRegId AND Deleted=0", nativeQuery = true)
+			+ "where f.BenRegId=:BenRegId AND Deleted=false", nativeQuery = true)
 	public Long getBenID(@Param("BenRegId") Long BenRegId);
 	
 	
@@ -71,7 +71,7 @@ public interface PatientIssueRepo extends CrudRepository<T_PatientIssue, Long> {
 	public Page<T_PatientIssue> getIssueDetailsForEAushadhiForAllFacility(Pageable pageable);
 	
 	
-	@Query(value = "SELECT ben_age FROM db_iemr.i_ben_flow_outreach where beneficiary_reg_id=:BenRegId and Deleted=0 order by created_date desc limit 1", nativeQuery = true)
+	@Query(value = "SELECT ben_age FROM db_iemr.i_ben_flow_outreach where beneficiary_reg_id=:BenRegId and Deleted=false order by created_date desc limit 1", nativeQuery = true)
 	public String getBenAge(@Param("BenRegId") Long BenRegId);
 	
 	

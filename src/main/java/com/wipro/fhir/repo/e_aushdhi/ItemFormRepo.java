@@ -34,7 +34,7 @@ import com.wipro.fhir.data.e_aushdhi.M_ItemForm;
 @RestResource(exported = false)
 public interface ItemFormRepo extends CrudRepository<M_ItemForm, Integer> {
 	
-	@Query("SELECT f FROM M_ItemForm f WHERE f.itemForm = :itemtypename AND deleted=0")
+	@Query("SELECT f FROM M_ItemForm f WHERE f.itemForm = :itemtypename AND deleted=false")
     public M_ItemForm getItemFormID(@Param("itemtypename") String itemtypename);
 
 }

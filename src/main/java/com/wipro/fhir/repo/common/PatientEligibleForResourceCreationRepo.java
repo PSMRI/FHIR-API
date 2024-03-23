@@ -43,7 +43,7 @@ public interface PatientEligibleForResourceCreationRepo
 		extends CrudRepository<PatientEligibleForResourceCreation, Long> {
 
 	@Query(" SELECT p FROM PatientEligibleForResourceCreation p "
-			+ " WHERE (p.processed is null OR p.processed is false) AND p.visitDate >= :fromDate ")
+			+ " WHERE (p.processed is null OR p.processed = false) AND p.visitDate >= :fromDate ")
 	List<PatientEligibleForResourceCreation> getPatientListForResourceCreation(@Param("fromDate") Timestamp fromDate);
 
 	// sp calling

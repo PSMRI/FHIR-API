@@ -25,32 +25,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wipro.fhir.service.care_context.CareContextService;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.response.OutputResponse;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.lettuce.core.dynamic.annotation.Param;
+import io.swagger.v3.oas.annotations.Operation;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = "/careContext", headers = "Authorization")
+@RequestMapping(value = "/careContext", headers = "Authorization", consumes = "application/json", produces = "application/json")
 public class CareContextController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 	@Autowired
 	private CareContextService careContextService;
 
 	@CrossOrigin
-	@ApiOperation(value = "Generate OTP for care context linking", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/generateOTPForCareContext" }, method = { RequestMethod.POST })
+	@Operation(summary = "Generate OTP for care context linking")
+	@PostMapping(value = { "/generateOTPForCareContext" })
 	public String generateOTP(
-			@ApiParam(value = "{\"healthID\":\"String\",\"authenticationMode\":\"String\",\"healthIdNumber\":\"String\"}") @RequestBody String request,
+			@Param(value = "{\"healthID\":\"String\",\"authenticationMode\":\"String\",\"healthIdNumber\":\"String\"}") @RequestBody String request,
 			@RequestHeader(value = "Authorization") String Authorization) {
 
 		OutputResponse response = new OutputResponse();
@@ -70,10 +70,10 @@ public class CareContextController {
 	}
 
 	@CrossOrigin
-	@ApiOperation(value = "Validate OTP and create care context", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/validateOTPAndCreateCareContext" }, method = { RequestMethod.POST })
+	@Operation(summary = "Validate OTP and create care context")
+	@PostMapping(value = { "/validateOTPAndCreateCareContext" })
 	public String validateOTPAndCreateCareContext(
-			@ApiParam(value = "{\"healthID\":\"String\",\"visitCode\\\":\\\"String\\\",\"beneficiaryID\\\":\\\"String\\\""
+			@Param(value = "{\"healthID\":\"String\",\"visitCode\\\":\\\"String\\\",\"beneficiaryID\\\":\\\"String\\\""
 					+ ",\"beneficiaryRegID\\\":\\\"String\\\",\"otp\\\":\\\"String\\\""
 					+ ",\\\"txnId\\\":\\\"String\\\",\\\"visitcategory\\\":\\\"String\\\",\"healthIdNumber\":\"String\"}") @RequestBody String request,
 			@RequestHeader(value = "Authorization") String Authorization) {
@@ -95,9 +95,9 @@ public class CareContextController {
 	}
 
 	@CrossOrigin
-	@ApiOperation(value = "Add care context to Mongo", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/addCarecontextToMongo" }, method = { RequestMethod.POST })
-	public String saveCareContextToMongo(@ApiParam(value = "{}") @RequestBody String request,
+	@Operation(summary = "Add care context to Mongo")
+	@PostMapping(value = { "/addCarecontextToMongo" })
+	public String saveCareContextToMongo(@Param(value = "{}") @RequestBody String request,
 			@RequestHeader(value = "Authorization") String Authorization) {
 
 		OutputResponse response = new OutputResponse();

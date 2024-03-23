@@ -36,6 +36,6 @@ import com.wipro.fhir.data.e_aushdhi.M_itemfacilitymapping;
 public interface M_itemfacilitymappingRepo extends CrudRepository<M_itemfacilitymapping, Integer>{
 	
 
-	@Query("SELECT f FROM M_itemfacilitymapping f WHERE f.itemID = :itemID AND f.facilityID = :facilityID AND f.providerServiceMapID = :providerServiceMapID AND deleted=0")
+	@Query("SELECT f FROM M_itemfacilitymapping f WHERE f.itemID = :itemID AND f.facilityID = :facilityID AND f.providerServiceMapID = :providerServiceMapID AND deleted=false")
 	public M_itemfacilitymapping checkItemFacilityMapping(@Param("itemID") Integer itemID, @Param("facilityID") Integer facilityID, @Param("providerServiceMapID") Integer providerServiceMapID);
 }

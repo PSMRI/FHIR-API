@@ -26,10 +26,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wipro.fhir.service.healthID.HealthIDService;
@@ -37,12 +37,12 @@ import com.wipro.fhir.service.healthID.HealthID_WithMobileOTPService;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.response.OutputResponse;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.lettuce.core.dynamic.annotation.Param;
+import io.swagger.v3.oas.annotations.Operation;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = "/healthID", headers = "Authorization")
+@RequestMapping(value = "/healthID", headers = "Authorization", consumes = "application/json", produces = "application/json")
 public class CreateHealthIDWithMobileOTP {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 	@Autowired
@@ -57,9 +57,9 @@ public class CreateHealthIDWithMobileOTP {
 	 * @return NDHM transactionID
 	 */
 	@CrossOrigin
-	@ApiOperation(value = "generate OTP", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/generateOTP" }, method = { RequestMethod.POST })
-	public String generateOTP(@ApiParam(value = "{\"mobile\":\"String\"}") @RequestBody String request,
+	@Operation(summary = "generate OTP")
+	@PostMapping(value = { "/generateOTP" })
+	public String generateOTP(@Param(value = "{\"mobile\":\"String\"}") @RequestBody String request,
 			@RequestHeader(value = "Authorization") String Authorization) {
 
 		OutputResponse response = new OutputResponse();
@@ -85,10 +85,10 @@ public class CreateHealthIDWithMobileOTP {
 	 * @return Generated ABHA for Beneficiary
 	 */
 	@CrossOrigin
-	@ApiOperation(value = "verify OTP and generate ABHA", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/verifyOTPAndGenerateHealthID" }, method = { RequestMethod.POST })
+	@Operation(summary = "verify OTP and generate ABHA")
+	@PostMapping(value = { "/verifyOTPAndGenerateHealthID" })
 	public String verifyOTPAndGenerateHealthID(
-			@ApiParam(value = "{\"otp\":\"String\",\"txnId\":\"String\",\"address\":\"String\",\"dayOfBirth\":\"String\",\"email\":\"String\","
+			@Param(value = "{\"otp\":\"String\",\"txnId\":\"String\",\"address\":\"String\",\"dayOfBirth\":\"String\",\"email\":\"String\","
 					+ "\"healthId\":\"String\",\"healthIdNumber\":\"String\",\"firstName\":\"String\",\"gender\":\"String\",\"lastName\":\"String\",\"monthOfBirth\":\"String\","
 					+ "\"name\":\"String\",\"pincode\":\"Integer\",\"yearOfBirth\":\"String\",\"providerServiceMapId\":\"Integer\",\"createdBy\":\"String\"}") @RequestBody String request,
 			@RequestHeader(value = "Authorization") String Authorization) {
@@ -116,10 +116,10 @@ public class CreateHealthIDWithMobileOTP {
 	 * @return BenRegID of beneficiary after mapping
 	 */
 	@CrossOrigin
-	@ApiOperation(value = "Map ABHA to beneficiary", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/mapHealthIDToBeneficiary" }, method = { RequestMethod.POST })
+	@Operation(summary = "Map ABHA to beneficiary")
+	@PostMapping(value = { "/mapHealthIDToBeneficiary" })
 	public String mapHealthIDToBeneficiary(
-			@ApiParam(value = "{\"beneficiaryRegID\":\"Long\",\"beneficiaryID\":\"Long\",\"healthId\":\"String\",\"healthIdNumber\":\"String\""
+			@Param(value = "{\"beneficiaryRegID\":\"Long\",\"beneficiaryID\":\"Long\",\"healthId\":\"String\",\"healthIdNumber\":\"String\""
 					+ "providerServiceMapId\":\"Integer\",\"createdBy\":\"String\"}") @RequestBody String request,
 			@RequestHeader(value = "Authorization") String Authorization) {
 		logger.info("NDHM_FHIR Map ABHA to beneficiary API request " + request);
@@ -144,10 +144,10 @@ public class CreateHealthIDWithMobileOTP {
 	 * @return ABHA of Beneficiary
 	 */
 	@CrossOrigin()
-	@ApiOperation(value = "Get Beneficiary ABHA details", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/getBenhealthID" }, method = { RequestMethod.POST })
+	@Operation(summary = "Get Beneficiary ABHA details")
+	@PostMapping(value = { "/getBenhealthID" })
 	public String getBenhealthID(
-			@ApiParam(value = "{\"beneficiaryRegID\":\"Long\"}") @RequestBody String comingRequest) {
+			@Param(value = "{\"beneficiaryRegID\":\"Long\"}") @RequestBody String comingRequest) {
 		OutputResponse response = new OutputResponse();
 
 		logger.info("NDHM_FHIR Request obj to fetch beneficiary ABHA details :" + comingRequest);

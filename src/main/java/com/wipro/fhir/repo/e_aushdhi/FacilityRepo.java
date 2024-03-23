@@ -37,14 +37,14 @@ import com.wipro.fhir.data.e_aushdhi.M_Facility;
 public interface FacilityRepo extends CrudRepository<M_Facility, Integer>{
 	
 	
-	@Query("SELECT f FROM M_Facility f WHERE f.eAushadhiFacilityId = :eAushadhiFacilityId AND deleted=0")
+	@Query("SELECT f FROM M_Facility f WHERE f.eAushadhiFacilityId = :eAushadhiFacilityId AND deleted=false")
 	public M_Facility getAmritFacilityID(@Param("eAushadhiFacilityId") Integer eAushadhiFacilityId);
 	
-	@Query("SELECT f FROM M_Facility f WHERE f.facilityID = :facilityID AND deleted=0")
+	@Query("SELECT f FROM M_Facility f WHERE f.facilityID = :facilityID AND deleted=false")
 	public M_Facility geteAushadhiFacilityID(@Param("facilityID") Integer facilityID);
 	
 	
-	@Query("SELECT f FROM M_Facility f WHERE f.eAushadhiFacilityId IS NOT NULL AND deleted=0")
+	@Query("SELECT f FROM M_Facility f WHERE f.eAushadhiFacilityId IS NOT NULL AND deleted=false")
 	public ArrayList<M_Facility> getFacilityDetails();
 
 }

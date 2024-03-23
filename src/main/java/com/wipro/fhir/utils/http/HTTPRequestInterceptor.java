@@ -21,23 +21,23 @@
 */
 package com.wipro.fhir.utils.http;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.wipro.fhir.utils.response.OutputResponse;
 import com.wipro.fhir.utils.sessionobject.SessionObject;
 import com.wipro.fhir.utils.validator.Validator;
 
 @Component
-public class HTTPRequestInterceptor extends HandlerInterceptorAdapter {
+public class HTTPRequestInterceptor implements HandlerInterceptor {
 	private Validator validator;
 
 	Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());

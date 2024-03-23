@@ -23,18 +23,14 @@ package com.wipro.fhir.data.e_aushdhi;
 
 import java.sql.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 import com.google.gson.annotations.Expose;
-
-
-
 
 @Entity
 @Table(name="m_van")
@@ -42,7 +38,7 @@ import com.google.gson.annotations.Expose;
 public class M_Van {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Expose
 	@Column(name="VanID")
 	private Integer vanID;

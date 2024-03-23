@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +39,7 @@ import com.wipro.fhir.service.resource_gateway.PrescriptionRecordBundle;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.response.OutputResponse;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 
 /***
  * 
@@ -50,7 +51,7 @@ import io.swagger.annotations.ApiOperation;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = "/get/resource", headers = "Authorization")
+@RequestMapping(value = "/get/resource", headers = "Authorization", consumes = "application/json", produces = "application/json")
 public class ResourceRequestGateway {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
@@ -73,8 +74,8 @@ public class ResourceRequestGateway {
 	 * 
 	 */
 	@CrossOrigin
-	@ApiOperation(value = "Get OP consult record bundle", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/OPConsultRecord" }, method = { RequestMethod.POST })
+	@Operation(summary = "Get OP consult record bundle")
+	@PostMapping(value = { "/OPConsultRecord" })
 	public String getPatientResource(@RequestBody ResourceRequestHandler patientResourceRequest,
 			@RequestHeader(value = "Authorization") String Authorization) {
 
@@ -100,8 +101,8 @@ public class ResourceRequestGateway {
 	 * 
 	 */
 	@CrossOrigin
-	@ApiOperation(value = "Get diagnostic report record bundle", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/DiagnosticReportRecord" }, method = { RequestMethod.POST })
+	@Operation(summary = "Get diagnostic report record bundle")
+	@PostMapping(value = { "/DiagnosticReportRecord" })
 	public String getDiagnosticReportRecord(@RequestBody ResourceRequestHandler patientResourceRequest,
 			@RequestHeader(value = "Authorization") String Authorization) {
 
@@ -126,8 +127,8 @@ public class ResourceRequestGateway {
 	 * 
 	 */
 	@CrossOrigin
-	@ApiOperation(value = "Get prescription record", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/PrescriptionRecord" }, method = { RequestMethod.POST })
+	@Operation(summary = "Get prescription record")
+	@PostMapping(value = { "/PrescriptionRecord" })
 	public String getPrescriptionRecord(@RequestBody ResourceRequestHandler patientResourceRequest,
 			@RequestHeader(value = "Authorization") String Authorization) {
 

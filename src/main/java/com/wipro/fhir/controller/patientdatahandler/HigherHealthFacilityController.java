@@ -23,28 +23,28 @@ package com.wipro.fhir.controller.patientdatahandler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wipro.fhir.data.request_handler.ResourceRequestHandler;
 import com.wipro.fhir.service.patient_data_handler.HigherHealthFacilityServiceImpl;
 import com.wipro.fhir.utils.response.OutputResponse;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = "/higher/health/facility", headers = "Authorization")
+@RequestMapping(value = "/higher/health/facility", headers = "Authorization", consumes = "application/json", produces = "application/json")
 public class HigherHealthFacilityController {
 
 	@Autowired
 	private HigherHealthFacilityServiceImpl higherHealthFacilityServiceImpl;
 
 	@CrossOrigin
-	@ApiOperation(value = "Update beneficiary id for higher health facility", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/update/bengenid" }, method = { RequestMethod.POST })
+	@Operation(summary = "Update beneficiary id for higher health facility")
+	@PostMapping(value = { "/update/bengenid" })
 	public String feedPatientDemographicData(@RequestBody ResourceRequestHandler resourceRequestHandler) {
 
 		OutputResponse response = new OutputResponse();
@@ -65,8 +65,8 @@ public class HigherHealthFacilityController {
 	}
 
 	@CrossOrigin
-	@ApiOperation(value = "Get clinical data from higher health facility", consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = { "/get/clinical/data" }, method = { RequestMethod.POST })
+	@Operation(summary = "Get clinical data from higher health facility")
+	@PostMapping(value = { "/get/clinical/data" })
 	public String getCLinicalDataHigherhealthFacility(@RequestBody ResourceRequestHandler resourceRequestHandler) {
 
 		OutputResponse response = new OutputResponse();

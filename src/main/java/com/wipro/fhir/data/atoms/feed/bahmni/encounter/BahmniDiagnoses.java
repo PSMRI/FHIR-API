@@ -21,7 +21,6 @@
 */
 package com.wipro.fhir.data.atoms.feed.bahmni.encounter;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.stereotype.Component;

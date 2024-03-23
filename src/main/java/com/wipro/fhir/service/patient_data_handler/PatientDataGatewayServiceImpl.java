@@ -322,7 +322,7 @@ public class PatientDataGatewayServiceImpl implements PatientDataGatewayService 
 		List<PatientDemographicModel_NDHM_Patient_Profile> resultSet = null;
 		Page<PatientDemographicModel_NDHM_Patient_Profile> p = null;
 		if (pageNo != null) {
-			PageRequest pr = new PageRequest(pageNo, pageSize);
+			PageRequest pr = PageRequest.of(pageNo, pageSize);
 
 			p = patientDemographicModel_NDHM_Patient_Profile_Repo.findAll(pr);
 			if (p != null) {

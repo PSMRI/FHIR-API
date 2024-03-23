@@ -22,7 +22,6 @@
 package com.wipro.fhir.repo.e_aushdhi;
 
 
-import java.util.ArrayList;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -37,7 +36,7 @@ import com.wipro.fhir.data.e_aushdhi.ItemMaster;
 @RestResource(exported = false)
 public interface ItemRepo extends CrudRepository<ItemMaster, Integer> {
 	
-	@Query("SELECT f FROM ItemMaster f WHERE f.itemName = :drugname AND f.providerServiceMapID = :providerServiceMapID AND itemCode = :brandid AND deleted=0")
+	@Query("SELECT f FROM ItemMaster f WHERE f.itemName = :drugname AND f.providerServiceMapID = :providerServiceMapID AND itemCode = :brandid AND deleted=false")
      public ItemMaster checkItemExists(@Param("drugname") String drugname, @Param("providerServiceMapID") Integer providerServiceMapID, @Param("brandid") String brandid);
 	
 
@@ -45,7 +44,7 @@ public interface ItemRepo extends CrudRepository<ItemMaster, Integer> {
 	@Query(value = "select * from m_item f "
 			+ "join m_itemfacilitymapping g on f.itemID=g.itemID "
 			+ "where g.facilityID=:mainFacilityID and f.itemName=:drugname "
-			+ " and f.itemCode=:brandid and f.deleted=0 and g.deleted=0 ", nativeQuery = true)
+			+ " and f.itemCode=:brandid and f.deleted=false and g.deleted=false ", nativeQuery = true)
 	public ItemMaster checkItemExistForMainFacility(@Param("mainFacilityID") Integer mainFacilityID, @Param("drugname") String drugname, @Param("brandid") String brandid);
 //	
 

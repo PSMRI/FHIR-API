@@ -24,8 +24,6 @@ package com.wipro.fhir.config.quartz;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.annotation.PostConstruct;
-
 import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +39,8 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.wipro.fhir.utils.config.ConfigProperties;
+
+import jakarta.annotation.PostConstruct;
 
 /***
  * 

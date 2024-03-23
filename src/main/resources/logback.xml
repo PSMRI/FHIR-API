@@ -17,7 +17,7 @@
         </rollingPolicy>
 
         <encoder>
-            <pattern>%d %p %c{1.} [%t] %m%n</pattern>
+            <pattern>%d %-5p [%X{sessionId}] [%X{userId}] %C{1}.%M:%L] %m%n</pattern>
         </encoder>
     </appender>
 

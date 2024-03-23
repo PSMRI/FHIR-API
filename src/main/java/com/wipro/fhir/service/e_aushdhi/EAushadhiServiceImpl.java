@@ -49,7 +49,6 @@ import com.wipro.fhir.data.e_aushdhi.EAushadhiResponse;
 import com.wipro.fhir.data.e_aushdhi.E_AusdhFacilityProcessLog;
 import com.wipro.fhir.data.e_aushdhi.ItemMaster;
 import com.wipro.fhir.data.e_aushdhi.ItemStockEntry;
-import com.wipro.fhir.data.e_aushdhi.ItemStockExit;
 import com.wipro.fhir.data.e_aushdhi.M_Facility;
 import com.wipro.fhir.data.e_aushdhi.M_ItemCategory;
 import com.wipro.fhir.data.e_aushdhi.M_ItemForm;
@@ -126,12 +125,6 @@ public class EAushadhiServiceImpl implements EAushadhiService {
 
 	@Autowired
 	private PatientIssueRepo patientIssueRepo;
-
-	@Autowired
-	private ItemStockExitRepo itemStockExitRepo;
-
-	@Autowired
-	private BenHealthIDMappingRepo benHealthIDMappingRepo;
 
 	@Autowired
 	private E_AusdhFacilityProcessLogRepo e_AusdhFacilityProcessLogRepo;
@@ -691,7 +684,7 @@ public class EAushadhiServiceImpl implements EAushadhiService {
 		try {
 			M_Facility facilityDetails = InputMapper.gson().fromJson(request, M_Facility.class);
 			Integer pageSize = Integer.valueOf(eAushadhiDispensePageSize);
-			PageRequest pageReq = new PageRequest(facilityDetails.getPageNo(), pageSize);
+			PageRequest pageReq = PageRequest.of(facilityDetails.getPageNo(), pageSize);
 
 			if (facilityDetails != null && !Objects.equals(facilityDetails.geteAushadhiFacilityId(), null)) {
 				M_Facility facilityDet = facilityRepo.getAmritFacilityID(facilityDetails.geteAushadhiFacilityId());
@@ -974,7 +967,6 @@ public class EAushadhiServiceImpl implements EAushadhiService {
 			logger.info("E-aushadhi stock addition acknowledgement api response" + responseEntity);
 
 			if (responseEntity.getStatusCodeValue() == 200 && responseEntity.hasBody()) {
-//			String responseEAushadhi = responseEntity.getBody();
 				JSONArray json = new JSONArray(responseEntity.getBody());
 				if (json.length() > 0) {
 					if (json.getJSONObject(0).get("trans_RESULT").equals("1")) {
