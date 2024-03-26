@@ -33,7 +33,7 @@ import com.wipro.fhir.data.healthID.HealthIDResponse;
 
 @Repository
 @RestResource(exported = false)
-public interface HealthIDRepo extends CrudRepository<HealthIDResponse, Long> {
+public interface HealthIDRepo extends CrudRepository<HealthIDResponse, Integer> {
 
 	@Query(" SELECT HIDR from HealthIDResponse HIDR WHERE HIDR.healthId = :healthId")
 	public ArrayList<HealthIDResponse> getHealthIDDetails(@Param("healthId") String healthId);
