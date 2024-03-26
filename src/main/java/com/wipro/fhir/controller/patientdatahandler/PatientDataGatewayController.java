@@ -23,6 +23,8 @@ package com.wipro.fhir.controller.patientdatahandler;
 
 import javax.ws.rs.core.MediaType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,6 +48,8 @@ public class PatientDataGatewayController {
 
 	@Autowired
 	private PatientDataGatewayService patientDataGatewayService;
+	
+	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
 	@CrossOrigin
 	@Operation(summary = "Patient profile search from Mongo, search parameter - healthId, healthIdNo, amritId, externalId, phoneNo, state, district, village")

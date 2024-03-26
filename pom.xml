@@ -93,14 +93,9 @@
 		<dependency>
     		<groupId>org.springframework.boot</groupId>
     		<artifactId>spring-boot-starter-data-mongodb</artifactId>
-    		<version>3.2.4</version>
+    		
 		</dependency>
-		<dependency>
-    		<groupId>org.mongodb</groupId>
-    		<artifactId>mongo-java-driver</artifactId>
-    		<version>3.12.14</version>
-		</dependency>
-
+		
 
 		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
 		<dependency>

@@ -532,7 +532,7 @@ public class CommonServiceImpl implements CommonService {
 	public List<PatientDemographicModel_NDHM_Patient_Profile> savePatientProfileDataToMongo(
 			List<PatientDemographicModel_NDHM_Patient_Profile> patientProfile_list) throws FHIRException {
 
-		List<PatientDemographicModel_NDHM_Patient_Profile> resultSet = patientDemographicModel_NDHM_Patient_Profile_Repo
+		List<PatientDemographicModel_NDHM_Patient_Profile> resultSet = (List<PatientDemographicModel_NDHM_Patient_Profile>) patientDemographicModel_NDHM_Patient_Profile_Repo
 				.saveAll(patientProfile_list);
 
 		return resultSet;
