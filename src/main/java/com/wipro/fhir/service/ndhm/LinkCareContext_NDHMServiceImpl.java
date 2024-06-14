@@ -116,7 +116,8 @@ public class LinkCareContext_NDHMServiceImpl implements LinkCareContext_NDHMServ
 					requestOBJ, headers);
 			String responseStrLogin = common_NDHMService.getStatusCode(responseEntity);
 			String txnID = null;
-			if (Integer.parseInt(responseStrLogin) == ACCEPTED) {
+			String[] split = responseStrLogin.split(" ");
+			if (Integer.parseInt(split[0]) == ACCEPTED) {
 				String mongoResponse = common_NDHMService.getMongoNDHMResponse(obj.getRequestId());
 				if (!mongoResponse.equalsIgnoreCase("failure")) {
 					JsonElement jsnElmnt1 = jsnParser.parse(mongoResponse);

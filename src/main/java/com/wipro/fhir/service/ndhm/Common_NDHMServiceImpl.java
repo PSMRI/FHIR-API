@@ -161,7 +161,7 @@ public class Common_NDHMServiceImpl implements Common_NDHMService {
 	@Override
 	public String getStatusCode(ResponseEntity<String> res) throws FHIRException {
 		if (res != null)
-			return res.getStatusCode().toString();
+			return String.valueOf(res.getStatusCode());   
 		else
 			throw new FHIRException("NDHM_FHIR Null response returned from API");
 	}
