@@ -230,7 +230,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>fhirapi-v1.0</finalName>
+		<finalName>fhirapi-v3.0.0</finalName>
 
 		<plugins>
 			<plugin>
