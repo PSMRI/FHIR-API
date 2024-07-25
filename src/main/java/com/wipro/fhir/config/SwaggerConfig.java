@@ -1,3 +1,4 @@
+
 package com.wipro.fhir.config;
 
 import org.springframework.context.annotation.Bean;
@@ -22,3 +23,4 @@ public class SwaggerConfig {
     }
 
 }
+
