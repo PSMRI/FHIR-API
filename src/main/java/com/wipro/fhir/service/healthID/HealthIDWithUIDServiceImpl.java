@@ -21,10 +21,13 @@
 */
 package com.wipro.fhir.service.healthID;
 
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.google.gson.Gson;
 import com.wipro.fhir.data.healthID.HealthIDRequestAadhar;
@@ -107,7 +110,14 @@ public class HealthIDWithUIDServiceImpl implements HealthIDWithUIDService {
 			HealthIDRequestAadhar obj = InputMapper.gson().fromJson(request, HealthIDRequestAadhar.class);
 			HealthIDResponse health = createHealthID_Aadhaar_NDHMService.createHealthIDWithUID(request);
 			if (health != null) {
-				HealthIDResponse health1 = saveHealthIDResponse(health, obj);
+				ArrayList<HealthIDResponse> healthIDDetails = healthIDRepo.getHealthIDDetails(health.getHealthId());
+				HealthIDResponse health1 = null;
+				if (CollectionUtils.isEmpty(healthIDDetails)) {
+					health1 = saveHealthIDResponse(health, obj);
+				} else {
+					health1 = health;
+					health1.setABHAAlreadyExist(true);
+				}
 				res = new Gson().toJson(health1);
 			} else
 				throw new FHIRException("NDHM_FHIR Error while creating ABHA");
