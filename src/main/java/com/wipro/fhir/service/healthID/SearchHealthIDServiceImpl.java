@@ -28,9 +28,9 @@ public class SearchHealthIDServiceImpl implements SearchHealthIDService{
 	@Override
 	public String searchHealthIdWithMobile(String mobileSearchDTO) throws FHIRException {
 		String searchWithMobileNumber = null;
-		if(null != mobileSearchDTO) {
+		if(null != mobileSearchDTO){
 			searchWithMobileNumber = searchHealthIdNDHMService.searchWithMobileNumber(mobileSearchDTO);
-		}else {
+		}else{
 			throw new FHIRException("NDHM_FHIR Error Invalid Mobile Number : "+mobileSearchDTO);
 		}
 		return searchWithMobileNumber;

@@ -34,7 +34,7 @@ public class SearchHealthIDController {
 			String resp = searchHealthIDService.searchHealthId(healthId);
 			response.setResponse(resp);
 		} catch (Exception e) {
-			response.setError(5000, e.getMessage());
+			response.setError(500, e.getMessage());
 			logger.error(e.getMessage());
 		}
 		return response.toString();
@@ -49,8 +49,8 @@ public class SearchHealthIDController {
 			logger.info("Search ABHA With Mobile request {} : ", mobileSearchDTO);
 			String resp = searchHealthIDService.searchHealthIdWithMobile(mobileSearchDTO);
 			response.setResponse(resp);
-		} catch (Exception e) {
-			response.setError(5000, e.getMessage());
+		}catch(Exception e){
+			response.setError(500, e.getMessage());
 			logger.error(e.getMessage());
 		}
 		return response.toString();

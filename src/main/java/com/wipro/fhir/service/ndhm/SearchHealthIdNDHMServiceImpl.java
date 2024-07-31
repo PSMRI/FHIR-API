@@ -56,7 +56,7 @@ public class SearchHealthIdNDHMServiceImpl implements SearchHealthIdNDHMService 
 			responseEntity = httpUtils.postWithResponseEntity(searchByMobile,
 					mobileSearchDTO, headers);
 			res = common_NDHMService.getBody(responseEntity);
-		}catch (Exception e) {
+		}catch (Exception e){
 			throw new FHIRException("NDHM_FHIR Error while accessing ABHA Search with Mobile Number API" + e);
 		}
 		return res;
