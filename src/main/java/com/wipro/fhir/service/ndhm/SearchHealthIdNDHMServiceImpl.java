@@ -14,22 +14,22 @@ import com.wipro.fhir.utils.http.HttpUtils;
 
 @Service
 public class SearchHealthIdNDHMServiceImpl implements SearchHealthIdNDHMService {
-	
+
 	@Value("${searchByHealthId}")
 	private String searchByHealthId;
-	
+
 	@Value("${searchByMobile}")
 	private String searchByMobile;
-	
+
 	@Autowired
 	private Common_NDHMService common_NDHMService;
-	
+
 	@Autowired
 	private GenerateSession_NDHMService generateSession_NDHM;
-	
+
 	@Autowired
 	private HttpUtils httpUtils;
-	
+
 	@Override
 	public String searchHealthId(String healthId) throws FHIRException {
 		String res = null;
@@ -37,10 +37,9 @@ public class SearchHealthIdNDHMServiceImpl implements SearchHealthIdNDHMService 
 		try {
 			String ndhmAuthToken = generateSession_NDHM.getNDHMAuthToken();
 			HttpHeaders headers = common_NDHMService.getHeaders(ndhmAuthToken);
-			responseEntity = httpUtils.postWithResponseEntity(searchByHealthId,
-					healthId, headers);
+			responseEntity = httpUtils.postWithResponseEntity(searchByHealthId, healthId, headers);
 			res = common_NDHMService.getBody(responseEntity);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			throw new FHIRException("NDHM_FHIR Error while accessing ABHA Search API" + e);
 		}
 		return res;
@@ -53,10 +52,9 @@ public class SearchHealthIdNDHMServiceImpl implements SearchHealthIdNDHMService 
 		try {
 			String ndhmAuthToken = generateSession_NDHM.getNDHMAuthToken();
 			HttpHeaders headers = common_NDHMService.getHeaders(ndhmAuthToken);
-			responseEntity = httpUtils.postWithResponseEntity(searchByMobile,
-					mobileSearchDTO, headers);
+			responseEntity = httpUtils.postWithResponseEntity(searchByMobile, mobileSearchDTO, headers);
 			res = common_NDHMService.getBody(responseEntity);
-		}catch (Exception e){
+		} catch (Exception e) {
 			throw new FHIRException("NDHM_FHIR Error while accessing ABHA Search with Mobile Number API" + e);
 		}
 		return res;

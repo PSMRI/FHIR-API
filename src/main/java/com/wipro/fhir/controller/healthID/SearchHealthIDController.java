@@ -15,22 +15,19 @@ import com.wipro.fhir.utils.response.OutputResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/search", headers = "Authorization")
 public class SearchHealthIDController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-	
+
 	@Autowired
 	private SearchHealthIDService searchHealthIDService;
-	
-	@CrossOrigin
+
 	@Operation(summary = "Search ABHA With Health ID")
 	@PostMapping(value = { "/searchByHealthId" })
 	public String searchHealthID(@RequestBody String healthId) throws FHIRException {
 		OutputResponse response = new OutputResponse();
 		try {
-			logger.info("Search ABHA With Health Id request {} : ", healthId);
 			String resp = searchHealthIDService.searchHealthId(healthId);
 			response.setResponse(resp);
 		} catch (Exception e) {
@@ -40,16 +37,14 @@ public class SearchHealthIDController {
 		return response.toString();
 	}
 
-	@CrossOrigin
 	@Operation(summary = "Search ABHA With Mobile Number")
 	@PostMapping(value = { "/searchByMobile" })
 	public String searchHealthIDWithMobile(@RequestBody String mobileSearchDTO) throws FHIRException {
 		OutputResponse response = new OutputResponse();
 		try {
-			logger.info("Search ABHA With Mobile request {} : ", mobileSearchDTO);
 			String resp = searchHealthIDService.searchHealthIdWithMobile(mobileSearchDTO);
 			response.setResponse(resp);
-		}catch(Exception e){
+		} catch (Exception e) {
 			response.setError(500, e.getMessage());
 			logger.error(e.getMessage());
 		}
