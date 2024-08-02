@@ -131,6 +131,16 @@ public class HealthIDResponse {
 	@Column(name = "TxnID")
 	String txnId;
 	
+	private boolean isABHAAlreadyExist;
+	
+	public boolean isABHAAlreadyExist() {
+		return isABHAAlreadyExist;
+	}
+	public void setABHAAlreadyExist(boolean isABHAAlreadyExist) {
+		this.isABHAAlreadyExist = isABHAAlreadyExist;
+	}
+	
+	
     public String getHealthId() {
 		return healthId;
 	}
