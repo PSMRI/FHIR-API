@@ -131,6 +131,7 @@ public class HealthIDResponse {
 	@Column(name = "TxnID")
 	String txnId;
 	
+	@Transient
 	private boolean isABHAAlreadyExist;
 	
 	public boolean isABHAAlreadyExist() {
