@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -115,9 +116,13 @@ public class LinkCareContext_NDHMServiceImpl implements LinkCareContext_NDHMServ
 			ResponseEntity<String> responseEntity = httpUtils.postWithResponseEntity(generateOTPForCareContext,
 					requestOBJ, headers);
 			String responseStrLogin = common_NDHMService.getStatusCode(responseEntity);
+			String numericStatusCodeStr = responseStrLogin.split(" ")[0]; // Extracts "202" from "202 ACCEPTED"
+			int numericStatusCode = Integer.parseInt(numericStatusCodeStr);
 			String txnID = null;
-			String[] split = responseStrLogin.split(" ");
-			if (Integer.parseInt(split[0]) == ACCEPTED) {
+
+		//	if (Integer.parseInt(responseStrLogin) == ACCEPTED) {
+			if (numericStatusCode == HttpStatus.ACCEPTED.value()) {
+
 				String mongoResponse = common_NDHMService.getMongoNDHMResponse(obj.getRequestId());
 				if (!mongoResponse.equalsIgnoreCase("failure")) {
 					JsonElement jsnElmnt1 = jsnParser.parse(mongoResponse);
@@ -167,7 +172,10 @@ public class LinkCareContext_NDHMServiceImpl implements LinkCareContext_NDHMServ
 					requestOBJ, headers);
 			logger.info("NDHM_FHIR Carecontext validateOTP API Response " + responseEntity);
 			String responseStrLogin = common_NDHMService.getStatusCode(responseEntity);
-			if (Integer.parseInt(responseStrLogin) == ACCEPTED) {
+			String numericStatusCodeStr = responseStrLogin.split(" ")[0]; // Extracts "202" from "202 ACCEPTED"
+			int numericStatusCode = Integer.parseInt(numericStatusCodeStr);
+	//		if (Integer.parseInt(responseStrLogin) == ACCEPTED) {
+			if (numericStatusCode == HttpStatus.ACCEPTED.value()) {
 				String mongoResponse = common_NDHMService.getMongoNDHMResponse(obj.getRequestId());
 				if (!mongoResponse.equalsIgnoreCase("failure")) {
 					JsonElement jsnElmnt1 = jsnParser.parse(mongoResponse);
@@ -244,8 +252,10 @@ public class LinkCareContext_NDHMServiceImpl implements LinkCareContext_NDHMServ
 					headers);
 			logger.info("NDHM_FHIR add care context response " + responseEntity);
 			String responseStrLogin = common_NDHMService.getStatusCode(responseEntity);
-			if (Integer.parseInt(responseStrLogin) == ACCEPTED) {
-
+			String numericStatusCodeStr = responseStrLogin.split(" ")[0]; // Extracts "202" from "202 ACCEPTED"
+			int numericStatusCode = Integer.parseInt(numericStatusCodeStr);
+	//		if (Integer.parseInt(responseStrLogin) == ACCEPTED) {
+			if (numericStatusCode == HttpStatus.ACCEPTED.value()) {
 				// fetching the care context response from MongoDB
 				String addCareContextResponse = common_NDHMService.getMongoNDHMResponse(obj.getRequestId());
 				logger.info("Mongo add CareContext Response " + addCareContextResponse);
