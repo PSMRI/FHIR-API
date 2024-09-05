@@ -1,7 +1,7 @@
 name: Build On Pull Request
 on:
   pull_request:
-    branches: [ "feature/version/upgrade" ]
+    branches: [ "master","develop" ]
     
 jobs:
   Build:
