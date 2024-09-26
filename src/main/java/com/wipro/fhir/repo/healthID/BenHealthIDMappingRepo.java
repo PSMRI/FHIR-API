@@ -46,19 +46,19 @@ public interface BenHealthIDMappingRepo extends CrudRepository<BenHealthIDMappin
 	
 	@Transactional
 	@Modifying
-	@Query(value = "UPDATE db_iemr.t_benvisitdetail SET HealthID= :healthID,HealthIdNumber= :healthIdNumber,CarecontextLinkDate=CURRENT_TIMESTAMP() WHERE VisitCode= :visitCode ", nativeQuery = true)
-	Integer updateHealthIDAndHealthIDNumberForCareContext(@Param("healthID") String healthID, @Param("healthIdNumber") String healthIdNumber, @Param("visitCode") String visitCode);
+	@Query(value = "UPDATE db_iemr.t_benvisitdetail SET HealthID= :healthID,HealthIdNumber= :healthIdNumber,CarecontextLinkDate=CURRENT_TIMESTAMP(), AbdmFacilityID= :abdmFacilityId WHERE VisitCode= :visitCode ", nativeQuery = true)
+	Integer updateHealthIDAndHealthIDNumberForCareContext(@Param("healthID") String healthID, @Param("healthIdNumber") String healthIdNumber, @Param("visitCode") String visitCode, @Param("abdmFacilityId") String abdmFacilityID);
 
 
 	@Transactional
 	@Modifying
-	@Query(value = "UPDATE db_iemr.t_benvisitdetail SET HealthID= :healthID,CarecontextLinkDate=CURRENT_TIMESTAMP() WHERE VisitCode= :visitCode ", nativeQuery = true)
-	Integer updateHealthIDForCareContext(@Param("healthID") String healthID, @Param("visitCode") String visitCode);
+	@Query(value = "UPDATE db_iemr.t_benvisitdetail SET HealthID= :healthID,CarecontextLinkDate=CURRENT_TIMESTAMP(), AbdmFacilityID= :abdmFacilityId WHERE VisitCode= :visitCode ", nativeQuery = true)
+	Integer updateHealthIDForCareContext(@Param("healthID") String healthID, @Param("visitCode") String visitCode, @Param("abdmFacilityId") String abdmFacilityID);
 	
 	@Transactional
 	@Modifying
-	@Query(value = "UPDATE db_iemr.t_benvisitdetail SET HealthIdNumber = :healthIdNumber,CarecontextLinkDate=CURRENT_TIMESTAMP() WHERE VisitCode= :visitCode ", nativeQuery = true)
-	Integer updateHealthIDNumberForCareContext(@Param("healthIdNumber") String healthIdNumber, @Param("visitCode") String visitCode);
+	@Query(value = "UPDATE db_iemr.t_benvisitdetail SET HealthIdNumber = :healthIdNumber,CarecontextLinkDate=CURRENT_TIMESTAMP(), AbdmFacilityID= :abdmFacilityId WHERE VisitCode= :visitCode ", nativeQuery = true)
+	Integer updateHealthIDNumberForCareContext(@Param("healthIdNumber") String healthIdNumber, @Param("visitCode") String visitCode, @Param("abdmFacilityId") String abdmFacilityID);
 
 	@Query(nativeQuery = true, value = " SELECT HealthID FROM t_benvisitdetail t WHERE t.VisitCode = :visitCode")
 	public List<String> getLinkedHealthIDForVisit(@Param("visitCode") Long visitCode);
@@ -66,4 +66,8 @@ public interface BenHealthIDMappingRepo extends CrudRepository<BenHealthIDMappin
 	@Query(value = "SELECT beneficiaryid FROM db_identity.m_beneficiaryregidmapping "
 			+ " WHERE BenRegId= :BenRegId ", nativeQuery = true)
 	Long getBenID(@Param("BenRegId") Long BenRegId);
+	
+	@Query(value = "SELECT AbdmFacilityID, CarecontextLinkDate FROM db_iemr.t_benvisitdetail WHERE VisitCode= :visitCode ", nativeQuery = true)
+	String getAbdmFacilityAndlinkedDate(@Param("visitCode") Long visitCode);
+
 }

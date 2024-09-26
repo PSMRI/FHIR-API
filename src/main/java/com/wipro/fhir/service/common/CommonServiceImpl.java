@@ -63,6 +63,7 @@ import com.wipro.fhir.data.patient_data_handler.PatientDemographicModel_NDHM_Pat
 import com.wipro.fhir.data.request_handler.PatientEligibleForResourceCreation;
 import com.wipro.fhir.data.request_handler.ResourceRequestHandler;
 import com.wipro.fhir.repo.common.PatientEligibleForResourceCreationRepo;
+import com.wipro.fhir.repo.healthID.BenHealthIDMappingRepo;
 import com.wipro.fhir.repo.mongo.amrit_resource.AMRIT_ResourceMongoRepo;
 import com.wipro.fhir.repo.mongo.amrit_resource.PatientCareContextsMongoRepo;
 import com.wipro.fhir.repo.mongo.amrit_resource.TempCollectionRepo;
@@ -152,6 +153,9 @@ public class CommonServiceImpl implements CommonService {
 	private PatientDemographic patientDemographic;
 	@Autowired
 	private Common_NDHMService common_NDHMService;
+	
+	@Autowired
+	private BenHealthIDMappingRepo benHealthIDMappingRepo;
 
 	@Override
 	public String processResourceOperation() throws FHIRException {
@@ -310,7 +314,14 @@ public class CommonServiceImpl implements CommonService {
 			// get benid
 //			if (benRegID != null)
 //				benID = benHealthIDMappingRepo.getBenID(benRegID);
-
+			
+			// fetch abdm facility id  
+			String res = benHealthIDMappingRepo.getAbdmFacilityAndlinkedDate(pVisit.getVisitCode());
+			JsonObject jsnOBJ = new JsonObject();
+			JsonParser jsnParser = new JsonParser();
+			JsonElement jsnElmnt = jsnParser.parse(res);
+			jsnOBJ = jsnElmnt.getAsJsonObject();
+			
 			// check care context record in mongo against beneficiaryID
 			ArrayList<CareContexts> ccList = new ArrayList<>();
 
@@ -318,7 +329,17 @@ public class CommonServiceImpl implements CommonService {
 
 			cc.setReferenceNumber(pVisit.getVisitCode() != null ? pVisit.getVisitCode().toString() : null);
 			cc.setDisplay(pVisit.getVisitCategory() != null ? pVisit.getVisitCategory().toString() : null);
-
+			
+			if (jsnOBJ.has("AbdmFacilityID") && jsnOBJ.get("AbdmFacilityID").isJsonNull() && 
+					jsnOBJ.get("AbdmFacilityID").getAsString().isEmpty()) {
+				cc.setAbdmFacilityId(jsnOBJ.get("AbdmFacilityID").toString());
+			}
+			if (jsnOBJ.has("CarecontextLinkDate") && jsnOBJ.get("CarecontextLinkDate").isJsonNull() && 
+					jsnOBJ.get("CarecontextLinkDate").getAsString().isEmpty()) {
+				cc.setCareContextLinkedDate(jsnOBJ.get("CarecontextLinkDate").toString());
+			}
+			
+			
 			PatientCareContexts pcc;
 
 			if (pDemo.getBeneficiaryID() != null) {

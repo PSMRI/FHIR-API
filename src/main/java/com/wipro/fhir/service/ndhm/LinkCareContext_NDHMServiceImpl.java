@@ -55,8 +55,8 @@ import com.wipro.fhir.utils.mapper.InputMapper;
 @Service
 public class LinkCareContext_NDHMServiceImpl implements LinkCareContext_NDHMService {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-	@Value("${clientID}")
-	private String clientID;
+	@Value("${abdmFacilityId}")
+	private String abdmFacilityId;
 	@Value("${abhaMode}")
 	private String abhaMode;
 	@Value("${clientSecret}")
@@ -85,7 +85,11 @@ public class LinkCareContext_NDHMServiceImpl implements LinkCareContext_NDHMServ
 			NDHMRequest obj = common_NDHMService.getRequestIDAndTimeStamp();
 
 			Requester requester = new Requester();
-			requester.setId(clientID);
+			if(null != genOTP.getAbdmFacilityId() && null != genOTP.getAbdmFacilityName()) {
+				requester.setId(genOTP.getAbdmFacilityId());
+			} else {
+			requester.setId(abdmFacilityId);
+			}
 			requester.setType("HIP");
 			JsonParser jsnParser = new JsonParser();
 			Query query = new Query();

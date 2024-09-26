@@ -50,7 +50,7 @@ public class CareContextController {
 	@Operation(summary = "Generate OTP for care context linking")
 	@PostMapping(value = { "/generateOTPForCareContext" })
 	public String generateOTP(
-			@Param(value = "{\"healthID\":\"String\",\"authenticationMode\":\"String\",\"healthIdNumber\":\"String\"}") @RequestBody String request,
+			@Param(value = "{\"healthID\":\"String\",\"authenticationMode\":\"String\",\"healthIdNumber\":\"String\", \"abdmFacilityId\":\"String\", \"abdmFacilityName\":\"String\"  }") @RequestBody String request,
 			@RequestHeader(value = "Authorization") String Authorization) {
 
 		OutputResponse response = new OutputResponse();
@@ -75,7 +75,8 @@ public class CareContextController {
 	public String validateOTPAndCreateCareContext(
 			@Param(value = "{\"healthID\":\"String\",\"visitCode\\\":\\\"String\\\",\"beneficiaryID\\\":\\\"String\\\""
 					+ ",\"beneficiaryRegID\\\":\\\"String\\\",\"otp\\\":\\\"String\\\""
-					+ ",\\\"txnId\\\":\\\"String\\\",\\\"visitcategory\\\":\\\"String\\\",\"healthIdNumber\":\"String\"}") @RequestBody String request,
+					+ ",\\\"txnId\\\":\\\"String\\\",\\\"visitcategory\\\":\\\"String\\\",\"healthIdNumber\":\"String\", "
+					+ "\\\"abdmFacilityId\\\":\\\"String\\\", \\\"abdmFacilityName\\\":\\\"String\\\"}") @RequestBody String request,
 			@RequestHeader(value = "Authorization") String Authorization) {
 
 		OutputResponse response = new OutputResponse();

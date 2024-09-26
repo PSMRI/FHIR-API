@@ -30,6 +30,12 @@ public class CareContexts {
 
 	@Expose
 	private String Display;
+	
+	@Expose
+	private String careContextLinkedDate;
+	
+	@Expose
+	private String abdmFacilityId;
 
 	public String getReferenceNumber() {
 		return ReferenceNumber;
@@ -45,6 +51,22 @@ public class CareContexts {
 
 	public void setDisplay(String display) {
 		Display = display;
+	}
+
+	public String getCareContextLinkedDate() {
+		return careContextLinkedDate;
+	}
+
+	public void setCareContextLinkedDate(String careContextLinkedDate) {
+		this.careContextLinkedDate = careContextLinkedDate;
+	}
+
+	public String getAbdmFacilityId() {
+		return abdmFacilityId;
+	}
+
+	public void setAbdmFacilityId(String abdmFacilityId) {
+		this.abdmFacilityId = abdmFacilityId;
 	}
 
 }
