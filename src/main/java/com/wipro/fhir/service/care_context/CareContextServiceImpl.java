@@ -105,11 +105,6 @@ public class CareContextServiceImpl implements CareContextService {
 		jsnOBJ = jsnElmnt.getAsJsonObject();
 		Integer result = 0;
 		
-		if (!jsnOBJ.has("abdmFacilityId") || jsnOBJ.get("abdmFacilityId").isJsonNull() || 
-				jsnOBJ.get("abdmFacilityId").getAsString().isEmpty()) {
-			jsnOBJ.addProperty("abdmFacilityId", abdmFacilityId);
-		}
-		logger.info("after care context data to be updated in DB - " + jsnOBJ);
 
 		if ((jsnOBJ.has("healthID") && jsnOBJ.get("healthID") != null && !jsnOBJ.get("healthID").isJsonNull())
 				&& (jsnOBJ.has("healthIdNumber") && jsnOBJ.get("healthIdNumber") != null
@@ -117,18 +112,17 @@ public class CareContextServiceImpl implements CareContextService {
 
 			result = benHealthIDMappingRepo.updateHealthIDAndHealthIDNumberForCareContext(
 					jsnOBJ.get("healthID").getAsString(), jsnOBJ.get("healthIdNumber").getAsString(),
-					jsnOBJ.get("visitCode").getAsString(), jsnOBJ.get("abdmFacilityId").getAsString());
+					jsnOBJ.get("visitCode").getAsString());
 		} else if (jsnOBJ.has("healthID") && jsnOBJ.get("healthID") != null && !jsnOBJ.get("healthID").isJsonNull()) {
 
 			System.out.println("Passing ABHA" + jsnOBJ.get("healthID"));
 			result = benHealthIDMappingRepo.updateHealthIDForCareContext(jsnOBJ.get("healthID").getAsString(),
-					jsnOBJ.get("visitCode").getAsString(), jsnOBJ.get("abdmFacilityId").getAsString());
+					jsnOBJ.get("visitCode").getAsString());
 		} else if (jsnOBJ.has("healthIdNumber") && jsnOBJ.get("healthIdNumber") != null
 				&& !jsnOBJ.get("healthIdNumber").isJsonNull()) {
 
 			result = benHealthIDMappingRepo.updateHealthIDNumberForCareContext(
-					jsnOBJ.get("healthIdNumber").getAsString(), jsnOBJ.get("visitCode").getAsString(), 
-					jsnOBJ.get("abdmFacilityId").getAsString());
+					jsnOBJ.get("healthIdNumber").getAsString(), jsnOBJ.get("visitCode").getAsString());
 		} else {
 			logger.info("ABHA/ABHA Number is null or invalid");
 		}

@@ -21,6 +21,7 @@
 */
 package com.wipro.fhir.data.mongo.amrit_resource;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,10 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.google.gson.annotations.Expose;
 
+import lombok.Data;
+
 @Document(collection = "AMRIT_TempStorage")
+@Data
 public class TempCollection {
 
 	@Id
@@ -41,11 +45,11 @@ public class TempCollection {
 
 	@Expose
 	@Field(value = "BeneficiaryRegID")
-	private Long beneficiaryRegID;
+	private BigInteger beneficiaryRegID;
 
 	@Expose
 	@Field(value = "VisitCode")
-	private Long visitCode;
+	private BigInteger visitCode;
 
 	@Expose
 	@Field(value = "DataType")
@@ -62,61 +66,5 @@ public class TempCollection {
 	@Expose
 	@Field(value = "CreateBy")
 	private String createBy;
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public Long getBeneficiaryRegID() {
-		return beneficiaryRegID;
-	}
-
-	public void setBeneficiaryRegID(Long beneficiaryRegID) {
-		this.beneficiaryRegID = beneficiaryRegID;
-	}
-
-	public Long getVisitCode() {
-		return visitCode;
-	}
-
-	public void setVisitCode(Long visitCode) {
-		this.visitCode = visitCode;
-	}
-
-	public String getDataType() {
-		return dataType;
-	}
-
-	public void setDataType(String dataType) {
-		this.dataType = dataType;
-	}
-
-	public Map<Integer, List<String>> getDataJson() {
-		return dataJson;
-	}
-
-	public void setDataJson(Map<Integer, List<String>> dataJson) {
-		this.dataJson = dataJson;
-	}
-
-	public Date getCreateDate() {
-		return createDate;
-	}
-
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
-
-	public String getCreateBy() {
-		return createBy;
-	}
-
-	public void setCreateBy(String createBy) {
-		this.createBy = createBy;
-	}
 
 }

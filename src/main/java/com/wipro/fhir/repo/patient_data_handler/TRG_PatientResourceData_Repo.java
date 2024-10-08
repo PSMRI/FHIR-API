@@ -21,6 +21,7 @@
 */
 package com.wipro.fhir.repo.patient_data_handler;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Modifying;
@@ -43,7 +44,7 @@ public interface TRG_PatientResourceData_Repo extends CrudRepository<TRG_Patient
 
 	@Query(nativeQuery = true, value = " SELECT * FROM db_identity.trg_patientresourcedata "
 			+ " WHERE beneficiaryID  =:benId  AND (processed is null OR processed is false) ORDER BY id desc LIMIT 1")
-	List<TRG_PatientResourceData> getByBenIdLatestRecord(@Param("benId") Long benId);
+	List<TRG_PatientResourceData> getByBenIdLatestRecord(@Param("benId")BigInteger benId);
 
 	@Transactional
 	@Modifying

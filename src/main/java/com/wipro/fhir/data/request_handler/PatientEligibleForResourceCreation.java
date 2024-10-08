@@ -21,6 +21,7 @@
 */
 package com.wipro.fhir.data.request_handler;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 
 import jakarta.persistence.Column;
@@ -29,24 +30,26 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Data;
 
 import com.google.gson.annotations.Expose;
 
 @Entity
 @Table(name = "ndhm_trg_visitdata")
+@Data
 public class PatientEligibleForResourceCreation {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Expose
 	@Column(name = "id")
-	private Long id;
+	private BigInteger id;
 	@Expose
 	@Column(name = "BeneficiaryRegID")
-	private Long beneficiaryRegID;
+	private BigInteger beneficiaryRegID;
 	@Expose
 	@Column(name = "beneficiary_id")
-	private Long beneficiaryId;
+	private BigInteger beneficiaryId;
 	@Expose
 	@Column(name = "visit_reason")
 	private String visitReason;
@@ -55,7 +58,7 @@ public class PatientEligibleForResourceCreation {
 	private String visitCategory;
 	@Expose
 	@Column(name = "VisitCode")
-	private Long visitCode;
+	private BigInteger visitCode;
 	@Expose
 	@Column(name = "visitdate")
 	private Timestamp visitDate;
@@ -65,77 +68,5 @@ public class PatientEligibleForResourceCreation {
 	@Expose
 	@Column(name = "Processed_Flag")
 	private Boolean processed;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public Long getBeneficiaryRegID() {
-		return beneficiaryRegID;
-	}
-
-	public void setBeneficiaryRegID(Long beneficiaryRegID) {
-		this.beneficiaryRegID = beneficiaryRegID;
-	}
-
-	public Long getBeneficiaryId() {
-		return beneficiaryId;
-	}
-
-	public void setBeneficiaryId(Long beneficiaryId) {
-		this.beneficiaryId = beneficiaryId;
-	}
-
-	public String getVisitReason() {
-		return visitReason;
-	}
-
-	public void setVisitReason(String visitReason) {
-		this.visitReason = visitReason;
-	}
-
-	public String getVisitCategory() {
-		return visitCategory;
-	}
-
-	public void setVisitCategory(String visitCategory) {
-		this.visitCategory = visitCategory;
-	}
-
-	public Long getVisitCode() {
-		return visitCode;
-	}
-
-	public void setVisitCode(Long visitCode) {
-		this.visitCode = visitCode;
-	}
-
-	public Timestamp getVisitDate() {
-		return visitDate;
-	}
-
-	public void setVisitDate(Timestamp visitDate) {
-		this.visitDate = visitDate;
-	}
-
-	public Timestamp getCreatedDate() {
-		return createdDate;
-	}
-
-	public void setCreatedDate(Timestamp createdDate) {
-		this.createdDate = createdDate;
-	}
-
-	public Boolean getProcessed() {
-		return processed;
-	}
-
-	public void setProcessed(Boolean processed) {
-		this.processed = processed;
-	}
 
 }

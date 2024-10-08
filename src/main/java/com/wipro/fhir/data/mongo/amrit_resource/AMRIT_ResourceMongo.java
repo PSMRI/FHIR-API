@@ -21,6 +21,7 @@
 */
 package com.wipro.fhir.data.mongo.amrit_resource;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 
 import org.springframework.data.annotation.Id;
@@ -29,7 +30,10 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.google.gson.annotations.Expose;
 
+import lombok.Data;
+
 @Document(collection = "AMRIT_Resource")
+@Data
 public class AMRIT_ResourceMongo {
 
 	@Id
@@ -39,11 +43,11 @@ public class AMRIT_ResourceMongo {
 
 	@Expose
 	@Field(value = "BeneficiaryRegID")
-	private Long beneficiaryRegID;
+	private BigInteger beneficiaryRegID;
 
 	@Expose
 	@Field(value = "BeneficiaryID")
-	private Long beneficiaryID;
+	private BigInteger beneficiaryID;
 
 	@Expose
 	@Field(value = "NationalHealthID")
@@ -51,7 +55,7 @@ public class AMRIT_ResourceMongo {
 
 	@Expose
 	@Field(value = "VisitCode")
-	private Long visitCode;
+	private BigInteger visitCode;
 
 	@Expose
 	@Field(value = "ResourceType")
@@ -64,69 +68,5 @@ public class AMRIT_ResourceMongo {
 	@Expose
 	@Field(value = "CreateDate")
 	private Timestamp createDate = new Timestamp(System.currentTimeMillis());
-
-	public Long getBeneficiaryRegID() {
-		return beneficiaryRegID;
-	}
-
-	public void setBeneficiaryRegID(Long beneficiaryRegID) {
-		this.beneficiaryRegID = beneficiaryRegID;
-	}
-
-	public String getNationalHealthID() {
-		return nationalHealthID;
-	}
-
-	public void setNationalHealthID(String nationalHealthID) {
-		this.nationalHealthID = nationalHealthID;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public Long getBeneficiaryID() {
-		return beneficiaryID;
-	}
-
-	public void setBeneficiaryID(Long beneficiaryID) {
-		this.beneficiaryID = beneficiaryID;
-	}
-
-	public Long getVisitCode() {
-		return visitCode;
-	}
-
-	public void setVisitCode(Long visitCode) {
-		this.visitCode = visitCode;
-	}
-
-	public String getResourceType() {
-		return resourceType;
-	}
-
-	public void setResourceType(String resourceType) {
-		this.resourceType = resourceType;
-	}
-
-	public String getResourceJson() {
-		return resourceJson;
-	}
-
-	public void setResourceJson(String resourceJson) {
-		this.resourceJson = resourceJson;
-	}
-
-	public Timestamp getCreateDate() {
-		return createDate;
-	}
-
-	public void setCreateDate(Timestamp createDate) {
-		this.createDate = createDate;
-	}
 
 }

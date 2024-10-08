@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wipro.fhir.data.request_handler.ResourceRequestHandler;
@@ -33,7 +34,7 @@ public class FacilityController {
 	@CrossOrigin
 	@Operation(summary = "Get ABDM Registered Facilities")
 	@GetMapping(value = { "/getAbdmRegisteredFacilities" })
-	public String getStoreStockDetails(@RequestHeader(value = "Authorization") String Authorization) {
+	public String getAbdmRegisteredFacilities(@RequestHeader(value = "Authorization") String Authorization) {
 
 		OutputResponse response = new OutputResponse();
 
@@ -51,6 +52,27 @@ public class FacilityController {
 		logger.info("Get ABDM Registered facilities API response" + response.toString());
 		return response.toString();
 	}
+	
+	
+	@CrossOrigin
+	@Operation(summary = "Get ABDM Registered Facilities")
+	@PostMapping(value = { "/saveAbdmFacilityId" })
+	public String saveAbdmFacilityForVisit(@RequestHeader(value = "Authorization") String Authorization,  @RequestBody() String reqObj) {
 
+		OutputResponse response = new OutputResponse();
+
+		try {
+
+			String resp = facilityService.saveAbdmFacilityId(reqObj);
+
+				response.setResponse(resp);
+		} catch (FHIRException e) {
+
+			response.setError(5000, e.getMessage());
+			logger.error(e.getMessage());
+		}
+		logger.info("ABDM save Facility ID response" + response.toString());
+		return response.toString();
+	}
 
 }

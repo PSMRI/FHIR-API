@@ -6,4 +6,6 @@ public interface FacilityService {
 
 	String fetchRegisteredFacilities() throws FHIRException;
 
+	String saveAbdmFacilityId(String reqObj) throws FHIRException;
+
 }
