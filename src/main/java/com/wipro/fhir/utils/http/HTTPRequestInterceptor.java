@@ -82,12 +82,12 @@ public class HTTPRequestInterceptor implements HandlerInterceptor {
 					break;
 				default:
 					logger.debug("RequestURI::" + request.getRequestURI() + " || Authorization ::" + authorization);
-//					if (authorization == null)
-//						throw new Exception(
-//								"Authorization key is NULL, please pass valid session key to proceed further. ");
-//					String userRespFromRedis = sessionObject.getSessionObject(authorization);
-//					if (userRespFromRedis == null)
-//						throw new Exception("invalid Authorization key, please pass a valid key to proceed further. ");
+					if (authorization == null)
+						throw new Exception(
+								"Authorization key is NULL, please pass valid session key to proceed further. ");
+					String userRespFromRedis = sessionObject.getSessionObject(authorization);
+					if (userRespFromRedis == null)
+						throw new Exception("invalid Authorization key, please pass a valid key to proceed further. ");
 					break;
 				}
 			} catch (Exception e) {
