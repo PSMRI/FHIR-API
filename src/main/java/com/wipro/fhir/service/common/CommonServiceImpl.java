@@ -39,8 +39,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -148,9 +146,6 @@ public class CommonServiceImpl implements CommonService {
 
 	@Autowired
 	private PatientDataGatewayService patientDataGatewayService;
-	
-	@Autowired
-	private MongoTemplate mongoTemplate;
 
 	@Autowired
 	private GenerateSession_NDHMService generateSession_NDHM;
@@ -347,7 +342,7 @@ public class CommonServiceImpl implements CommonService {
 			
 			logger.info("********data to be saved in mongo :" ,  cc);
 			PatientCareContexts pcc;
-			PatientCareContexts resultSet;
+			PatientCareContexts resultSet = null;
 
 			if (pDemo.getBeneficiaryID() != null) {
 				pcc = patientCareContextsMongoRepo.findByIdentifier(pDemo.getBeneficiaryID().toString());
@@ -357,7 +352,6 @@ public class CommonServiceImpl implements CommonService {
 					ccList.add(cc);
 					pcc.setCareContextsList(ccList);
 					resultSet = patientCareContextsMongoRepo.save(pcc);
-					
 				} else {
 					pcc = new PatientCareContexts();
 					pcc.setCaseReferenceNumber(pDemo.getBeneficiaryID().toString());
@@ -396,7 +390,7 @@ public class CommonServiceImpl implements CommonService {
 
 				}
 
-				if (resultSet != null && resultSet.getId() != null)
+				if (resultSet != null && resultSet.get_id() != null)
 					response = 1;
 			}
 
