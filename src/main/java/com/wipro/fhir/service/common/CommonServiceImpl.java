@@ -335,7 +335,7 @@ public class CommonServiceImpl implements CommonService {
 
 			CareContexts cc = new CareContexts();
 			
-			logger.info("********t_benvisistData fetch response :" ,  res);
+			logger.info("********t_benvisistData fetch response : {}", res);
 			cc.setReferenceNumber(pVisit.getVisitCode() != null ? pVisit.getVisitCode().toString() : null);
 			cc.setDisplay(pVisit.getVisitCategory() != null ? pVisit.getVisitCategory().toString() : null);	
 			Object[] resData = null;
