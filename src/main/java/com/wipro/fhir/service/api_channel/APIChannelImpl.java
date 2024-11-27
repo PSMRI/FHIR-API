@@ -86,12 +86,13 @@ public class APIChannelImpl implements APIChannel {
 		String responseBody = null;
 		String authKey = null;
 
-		Map<String, String> userDetails = new HashMap<String, String>();
+		Map<String, Object> userDetails = new HashMap<String, Object>();
 		String decryptUserName = fhirUserName;
 		String decryptPassword = fhirPassword;
 
 		userDetails.put("userName", decryptUserName);
 		userDetails.put("password", decryptPassword);
+		userDetails.put("doLogout", true);
 
 		if (restTemplate == null)
 			restTemplate = new RestTemplate();

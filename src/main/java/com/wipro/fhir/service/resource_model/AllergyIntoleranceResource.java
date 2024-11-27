@@ -21,6 +21,7 @@
 */
 package com.wipro.fhir.service.resource_model;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,7 +66,7 @@ public class AllergyIntoleranceResource {
 			ResourceRequestHandler resourceRequestHandler, Practitioner practitioner) {
 
 		List<Object[]> rsObjList = patientEligibleForResourceCreationRepo
-				.callAllergySP(resourceRequestHandler.getBeneficiaryRegID(), resourceRequestHandler.getVisitCode());
+				.callAllergySP(resourceRequestHandler.getBeneficiaryRegID(),resourceRequestHandler.getVisitCode());
 
 		List<AllergyIntoleranceDataModel> allergyList = allergyIntoleranceDataModel.getAllergyList(rsObjList);
 

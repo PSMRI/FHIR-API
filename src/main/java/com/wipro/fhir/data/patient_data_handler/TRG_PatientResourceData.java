@@ -21,6 +21,7 @@
 */
 package com.wipro.fhir.data.patient_data_handler;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 
 import jakarta.persistence.Column;
@@ -29,12 +30,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.gson.annotations.Expose;
 
 @Entity
 @Table(name = "db_identity.trg_patientresourcedata")
+@Data
 public class TRG_PatientResourceData {
 
 	@Id
@@ -45,11 +48,11 @@ public class TRG_PatientResourceData {
 
 	@Expose
 	@Column(name = "BenRegId")
-	private Long benRegId;
+	private BigInteger benRegId;
 
 	@Expose
 	@Column(name = "BeneficiaryID")
-	private Long beneficiaryID;
+	private BigInteger beneficiaryID;
 
 	@Expose
 	@Column(name = "CreatedBy")
@@ -75,77 +78,5 @@ public class TRG_PatientResourceData {
 	@Expose
 	@Column(name = "Processed")
 	private Boolean processed;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public Long getBenRegId() {
-		return benRegId;
-	}
-
-	public void setBenRegId(Long benRegId) {
-		this.benRegId = benRegId;
-	}
-
-	public Long getBeneficiaryID() {
-		return beneficiaryID;
-	}
-
-	public void setBeneficiaryID(Long beneficiaryID) {
-		this.beneficiaryID = beneficiaryID;
-	}
-
-	public String getCreatedBy() {
-		return createdBy;
-	}
-
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
-
-	public Timestamp getCreatedDate() {
-		return createdDate;
-	}
-
-	public void setCreatedDate(Timestamp createdDate) {
-		this.createdDate = createdDate;
-	}
-
-	public String getModifiedBy() {
-		return modifiedBy;
-	}
-
-	public void setModifiedBy(String modifiedBy) {
-		this.modifiedBy = modifiedBy;
-	}
-
-	public Timestamp getLastModDate() {
-		return lastModDate;
-	}
-
-	public void setLastModDate(Timestamp lastModDate) {
-		this.lastModDate = lastModDate;
-	}
-
-	public String getTrgStatus() {
-		return trgStatus;
-	}
-
-	public void setTrgStatus(String trgStatus) {
-		this.trgStatus = trgStatus;
-	}
-
-	public Boolean getProcessed() {
-		return processed;
-	}
-
-	public void setProcessed(Boolean processed) {
-		this.processed = processed;
-	}
 
 }

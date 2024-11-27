@@ -41,9 +41,9 @@ public class MedicationRequestDataModel {
 
 	// @Id
 	// @GeneratedValue
-	private Long id;
-	private Long beneficiaryRegID;
-	private Long visitCode;
+	private BigInteger id;
+	private BigInteger beneficiaryRegID;
+	private BigInteger visitCode;
 	private Integer providerServiceMapID;
 	private Integer vanID;
 
@@ -79,9 +79,9 @@ public class MedicationRequestDataModel {
 	}
 
 	public MedicationRequestDataModel(Object[] objArr) {
-		this.id = ((BigInteger) objArr[0]).longValue();
-		this.beneficiaryRegID = ((BigInteger) objArr[1]).longValue();
-		this.visitCode = ((BigInteger) objArr[2]).longValue();
+		this.id = BigInteger.valueOf((long) objArr[0]);
+		this.beneficiaryRegID = BigInteger.valueOf((long) objArr[1]);
+		this.visitCode = BigInteger.valueOf((long) objArr[2]);
 		this.providerServiceMapID = (Integer) objArr[3];
 		this.vanID = (Integer) objArr[4];
 

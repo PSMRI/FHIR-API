@@ -21,6 +21,7 @@
 */
 package com.wipro.fhir.service.common;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -38,6 +39,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +66,7 @@ import com.wipro.fhir.data.patient_data_handler.PatientDemographicModel_NDHM_Pat
 import com.wipro.fhir.data.request_handler.PatientEligibleForResourceCreation;
 import com.wipro.fhir.data.request_handler.ResourceRequestHandler;
 import com.wipro.fhir.repo.common.PatientEligibleForResourceCreationRepo;
+import com.wipro.fhir.repo.healthID.BenHealthIDMappingRepo;
 import com.wipro.fhir.repo.mongo.amrit_resource.AMRIT_ResourceMongoRepo;
 import com.wipro.fhir.repo.mongo.amrit_resource.PatientCareContextsMongoRepo;
 import com.wipro.fhir.repo.mongo.amrit_resource.TempCollectionRepo;
@@ -144,6 +148,9 @@ public class CommonServiceImpl implements CommonService {
 
 	@Autowired
 	private PatientDataGatewayService patientDataGatewayService;
+	
+	@Autowired
+	private MongoTemplate mongoTemplate;
 
 	@Autowired
 	private GenerateSession_NDHMService generateSession_NDHM;
@@ -152,13 +159,16 @@ public class CommonServiceImpl implements CommonService {
 	private PatientDemographic patientDemographic;
 	@Autowired
 	private Common_NDHMService common_NDHMService;
+	
+	@Autowired
+	private BenHealthIDMappingRepo benHealthIDMappingRepo;
 
 	@Override
 	public String processResourceOperation() throws FHIRException {
 		String response = null;
 		// list of patient eligible for resource creation
 		List<PatientEligibleForResourceCreation> pList = getPatientListForResourceEligible();
-		logger.info("No of records available to create FHIR in last 2 days : " + pList.size());
+		logger.info("No of records available to create FHIR in last 2 dagetPatientListForResourceEligibleys : " + pList.size());
 		ResourceRequestHandler resourceRequestHandler;
 		for (PatientEligibleForResourceCreation p : pList) {
 
@@ -173,19 +183,23 @@ public class CommonServiceImpl implements CommonService {
 // ----------------------------------------------------------------------------------------------
 			try {
 
+				logger.info("*****Fetch beneficiary Id: " + resourceRequestHandler.getBeneficiaryRegID());
 				List<Object[]> rsObjList = patientEligibleForResourceCreationRepo
 						.callPatientDemographicSP(resourceRequestHandler.getBeneficiaryRegID());
+				logger.info("*****Fetch beneficiary Id response recevied :", rsObjList);
 
 				PatientDemographic patientDemographicOBJ = patientDemographic.getPatientDemographic(rsObjList);
+				logger.info("*****Fetch patient after fetching demographics");
 				if (patientDemographicOBJ != null) {
 					addCareContextToMongo(patientDemographicOBJ, p);
+					logger.info("*****Add to mongo success done");
 					if (patientDemographicOBJ.getPreferredPhoneNo() != null)
 						sendAbdmAdvSMS(patientDemographicOBJ.getPreferredPhoneNo());
 					else
 						throw new FHIRException("Advertisement sms could not be sent as beneficiary phone no not found");
 				}
 				else
-					throw new FHIRException("Beneficiary not found, benRegId = "+resourceRequestHandler.getBeneficiaryRegID());
+					throw new FHIRException("Beneficiary not found, benRegId = " +resourceRequestHandler.getBeneficiaryRegID());
 
 			} catch (Exception e) {
 				logger.error(e.getMessage());
@@ -204,7 +218,7 @@ public class CommonServiceImpl implements CommonService {
 				// update the processed flag in trigger table
 				p.setProcessed(true);
 				PatientEligibleForResourceCreation resultSet = patientEligibleForResourceCreationRepo.save(p);
-				if (resultSet != null && resultSet.getId() > 0)
+				if (resultSet != null && resultSet.getId().compareTo(BigInteger.ZERO) > 0)
 					logger.info("processed flag updated successfully after FHIR resource creation");
 
 				response = "Bundle creation is success for BenID : " + p.getBeneficiaryId() + " | BenRegID : "
@@ -310,63 +324,78 @@ public class CommonServiceImpl implements CommonService {
 			// get benid
 //			if (benRegID != null)
 //				benID = benHealthIDMappingRepo.getBenID(benRegID);
+			
+			// fetch abdm facility id  
+			logger.info("********t_benvisistData fetch request pvisit data :" ,  pVisit);
 
+			List<Object[]> res = benHealthIDMappingRepo.getAbdmFacilityAndlinkedDate(pVisit.getVisitCode());
+			
 			// check care context record in mongo against beneficiaryID
 			ArrayList<CareContexts> ccList = new ArrayList<>();
 
 			CareContexts cc = new CareContexts();
-
+			
+			logger.info("********t_benvisistData fetch response : {}", res);
 			cc.setReferenceNumber(pVisit.getVisitCode() != null ? pVisit.getVisitCode().toString() : null);
-			cc.setDisplay(pVisit.getVisitCategory() != null ? pVisit.getVisitCategory().toString() : null);
-
+			cc.setDisplay(pVisit.getVisitCategory() != null ? pVisit.getVisitCategory().toString() : null);	
+			Object[] resData = null;
+			if (res.get(0) != null) {
+				resData = res.get(0);
+			cc.setAbdmFacilityId(resData[0] != null ? resData[0].toString() : null );
+			cc.setCareContextLinkedDate(resData[1] != null ? resData[1].toString() : null);
+			}
+			
+			logger.info("********data to be saved in mongo :" ,  cc);
 			PatientCareContexts pcc;
+			PatientCareContexts resultSet;
 
 			if (pDemo.getBeneficiaryID() != null) {
 				pcc = patientCareContextsMongoRepo.findByIdentifier(pDemo.getBeneficiaryID().toString());
 
 				if (pcc != null && pcc.getIdentifier() != null) {
-					ccList = pcc.getCareContextsListTemp();
-
+					ccList = pcc.getCareContextsList();
+					ccList.add(cc);
+					pcc.setCareContextsList(ccList);
+					resultSet = patientCareContextsMongoRepo.save(pcc);
+					
 				} else {
 					pcc = new PatientCareContexts();
 					pcc.setCaseReferenceNumber(pDemo.getBeneficiaryID().toString());
 					pcc.setIdentifier(pDemo.getBeneficiaryID().toString());
+					if (pDemo.getGenderID() != null) {
+						switch (pDemo.getGenderID()) {
+						case 1:
+							pcc.setGender("M");
+							break;
+						case 2:
+							pcc.setGender("F");
+							break;
 
-				}
-				ccList.add(cc);
-				pcc.setCareContextsListTemp(ccList);
-				patientCareContextsStringOBJ.setCareContexts(ccList);
-				pcc.setCareContextsList(new Gson().toJson(patientCareContextsStringOBJ));
-				if (pDemo.getGenderID() != null) {
-					switch (pDemo.getGenderID()) {
-					case 1:
-						pcc.setGender("M");
-						break;
-					case 2:
-						pcc.setGender("F");
-						break;
+						case 3:
+							pcc.setGender("O");
+							break;
 
-					case 3:
-						pcc.setGender("O");
-						break;
-
-					default:
-						break;
+						default:
+							break;
+						}
 					}
-				}
-				if (pDemo.getName() != null)
-					pcc.setName(pDemo.getName());
-				if (pDemo.getDOB() != null)
-					pcc.setYearOfBirth(pDemo.getDOB().toString().split("-")[0]);
-				if (pDemo.getPreferredPhoneNo() != null)
-					pcc.setPhoneNumber(pDemo.getPreferredPhoneNo());
-				if (pDemo.getHealthID() != null)
-					pcc.setHealthId(pDemo.getHealthID());
-				if (pDemo.getHealthIdNo() != null)
-					pcc.setHealthNumber(pDemo.getHealthIdNo());
+					if (pDemo.getName() != null)
+						pcc.setName(pDemo.getName());
+					if (pDemo.getDOB() != null)
+						pcc.setYearOfBirth(pDemo.getDOB().toString().split("-")[0]);
+					if (pDemo.getPreferredPhoneNo() != null)
+						pcc.setPhoneNumber(pDemo.getPreferredPhoneNo());
+					if (pDemo.getHealthID() != null)
+						pcc.setHealthId(pDemo.getHealthID());
+					if (pDemo.getHealthIdNo() != null)
+						pcc.setHealthNumber(pDemo.getHealthIdNo());
+					ccList.add(cc);
+					pcc.setCareContextsList(ccList);
+					// save carecontext back to mongo
+					resultSet = patientCareContextsMongoRepo.save(pcc);
 
-				// save carecontext back to mongo
-				PatientCareContexts resultSet = patientCareContextsMongoRepo.save(pcc);
+				}
+
 				if (resultSet != null && resultSet.getId() != null)
 					response = 1;
 			}

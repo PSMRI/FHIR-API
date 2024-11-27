@@ -34,8 +34,8 @@ import lombok.Data;
 public class PatientDemographic {
 	private String healthID;
 	private String healthIdNo;
-	private Long beneficiaryRegID;
-	private Long beneficiaryID;
+	private BigInteger beneficiaryRegID;
+	private BigInteger beneficiaryID;
 
 	private String firstName;
 	private String middleName;
@@ -62,7 +62,7 @@ public class PatientDemographic {
 	private Integer actualAge;
 	private String ageUnits;
 
-	public PatientDemographic(String healthID, String healthIdNo, Long beneficiaryRegID, Long beneficiaryID,
+	public PatientDemographic(String healthID, String healthIdNo, BigInteger beneficiaryRegID, BigInteger beneficiaryID,
 			String name, Integer genderID, String gender, Integer maritalStatusID, String maritalStatus, Timestamp dOB,
 			String preferredPhoneNo, String country, String state, String district) {
 		super();
@@ -95,7 +95,7 @@ public class PatientDemographic {
 		if (objList != null && objList.size() > 0) {
 			Object[] objArr = objList.get(objList.size() - 1);
 			PatientDemographic obj = new PatientDemographic((String) objArr[0], (String) objArr[1],
-					((BigInteger) objArr[2]).longValue(), ((BigInteger) objArr[3]).longValue(), (String) objArr[4],
+					(BigInteger.valueOf((long) objArr[2])), BigInteger.valueOf((long) objArr[3]), (String) objArr[4],
 					(Integer) objArr[5], (String) objArr[6], (Integer) objArr[7], (String) objArr[8],
 					(Timestamp) objArr[9], (String) objArr[10], (String) objArr[11], (String) objArr[12],
 					(String) objArr[13]);

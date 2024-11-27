@@ -21,6 +21,7 @@
 */
 package com.wipro.fhir.repo.mongo.amrit_resource;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -32,5 +33,5 @@ import com.wipro.fhir.data.mongo.amrit_resource.TempCollection;
 @Repository
 @RestResource(exported = false)
 public interface TempCollectionRepo extends MongoRepository<TempCollection, String> {
-	List<TempCollection> findByBeneficiaryRegIDAndVisitCode(Long beneficiaryRegID, Long visitCode);
+	List<TempCollection> findByBeneficiaryRegIDAndVisitCode(BigInteger beneficiaryRegID, BigInteger visitCode);
 }

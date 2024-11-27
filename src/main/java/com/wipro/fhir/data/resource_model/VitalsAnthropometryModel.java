@@ -39,9 +39,9 @@ public class VitalsAnthropometryModel {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private Long beneficiaryRegID;
+	private BigInteger beneficiaryRegID;
 	private Integer providerServiceMapID;
-	private Long visitCode;
+	private BigInteger visitCode;
 	private BigDecimal Temperature;
 	private Short pulseRate;
 	private Short respiratoryRate;
@@ -61,9 +61,9 @@ public class VitalsAnthropometryModel {
 
 	public VitalsAnthropometryModel(Object[] objArr) {
 
-		this.beneficiaryRegID = ((BigInteger) objArr[0]).longValue();
+		this.beneficiaryRegID = BigInteger.valueOf((long) objArr[0]);
 		this.providerServiceMapID = (Integer) objArr[1];
-		this.visitCode = ((BigInteger) objArr[2]).longValue();
+		this.visitCode = BigInteger.valueOf((long) objArr[2]);
 		if (objArr[3] != null)
 			this.Temperature = (BigDecimal) objArr[3];
 		if (objArr[4] != null)

@@ -26,6 +26,8 @@ public class GenerateOTPForCareContextAndValidate {//give common name
 	String authenticationMode;
 	String healthID;
 	String healthIdNumber;
+	String abdmFacilityName;
+	String abdmFacilityId;
 	public String getAuthenticationMode() {
 		return authenticationMode;
 	}
@@ -44,5 +46,17 @@ public class GenerateOTPForCareContextAndValidate {//give common name
 	public void setHealthIdNumber(String healthIdNumber) {
 		this.healthIdNumber = healthIdNumber;
      }
+	public String getAbdmFacilityName() {
+		return abdmFacilityName;
+	}
+	public void setAbdmFacilityName(String abdmFacilityName) {
+		this.abdmFacilityName = abdmFacilityName;
+	}
+	public String getAbdmFacilityId() {
+		return abdmFacilityId;
+	}
+	public void setAbdmFacilityId(String abdmFacilityId) {
+		this.abdmFacilityId = abdmFacilityId;
+	}
 	
 }

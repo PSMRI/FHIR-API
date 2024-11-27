@@ -21,6 +21,7 @@
 */
 package com.wipro.fhir.repo.healthID;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,9 +62,18 @@ public interface BenHealthIDMappingRepo extends CrudRepository<BenHealthIDMappin
 	Integer updateHealthIDNumberForCareContext(@Param("healthIdNumber") String healthIdNumber, @Param("visitCode") String visitCode);
 
 	@Query(nativeQuery = true, value = " SELECT HealthID FROM t_benvisitdetail t WHERE t.VisitCode = :visitCode")
-	public List<String> getLinkedHealthIDForVisit(@Param("visitCode") Long visitCode);
+	public List<String> getLinkedHealthIDForVisit(@Param("visitCode") BigInteger visitCode);
 
 	@Query(value = "SELECT beneficiaryid FROM db_identity.m_beneficiaryregidmapping "
 			+ " WHERE BenRegId= :BenRegId ", nativeQuery = true)
 	Long getBenID(@Param("BenRegId") Long BenRegId);
+	
+	@Query(value = "SELECT AbdmFacilityID, CarecontextLinkDate FROM db_iemr.t_benvisitdetail WHERE VisitCode= :visitCode ", nativeQuery = true)
+	List<Object[]> getAbdmFacilityAndlinkedDate(@Param("visitCode") BigInteger visitCode);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE db_iemr.t_benvisitdetail SET AbdmFacilityID = :abdmFacilityId WHERE VisitCode= :visitCode", nativeQuery = true)
+	Integer updateFacilityIdForVisit(@Param("visitCode") BigInteger visitCode, @Param("abdmFacilityId") String abdmFacilityId);
+
 }
