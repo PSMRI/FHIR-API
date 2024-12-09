@@ -13,7 +13,7 @@
 	<artifactId>FHIR_API</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>FHIR_API</name>
+	<name>FHIR-API</name>
 	<description>FHIR_NDHM standard integration in AMRIT</description>
 
 	<properties>
@@ -57,12 +57,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-logging</artifactId>
-				</exclusion>
-			</exclusions>
+		</dependency>
+		<dependency> 
+			<groupId>co.elastic.logging</groupId> 
+			<artifactId>logback-ecs-encoder</artifactId> 
+			<version>1.3.2</version> 
 		</dependency>
 
 		<dependency>
