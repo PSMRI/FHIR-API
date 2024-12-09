@@ -26,9 +26,6 @@ public class CreateAbhaV3Controller {
 	@Autowired
 	private CreateAbhaV3Service createAbhaV3Service;
 	
-	@Autowired 
-	private GenerateHealthID_CardServiceImpl generateHealthID_CardServiceImpl;
-	
 	@CrossOrigin
 	@Operation(summary = "Generate OTP for ABHA enrollment")
 	@PostMapping(value = { "/requestOtpForAbhaEnrollment" })
