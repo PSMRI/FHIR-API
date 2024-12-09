@@ -1,6 +1,4 @@
-package com.wipro.fhir.controller.v3.abha.creation;
-
-import java.util.HashMap;
+package com.wipro.fhir.controller.v3.abha;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,9 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.Gson;
 import com.wipro.fhir.service.ndhm.GenerateHealthID_CardServiceImpl;
-import com.wipro.fhir.service.v3.abha.creation.CreateAbhaV3Service;
+import com.wipro.fhir.service.v3.abha.CreateAbhaV3Service;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.response.OutputResponse;
 
@@ -62,18 +59,6 @@ public class CreateAbhaV3Controller {
 		try {
 			if (request != null) {
 				 res = createAbhaV3Service.enrollmentByAadhaar(request);
-//				if(abdmToken != null) {
-//					HashMap<String, String> map = new HashMap<String, String>();
-//						String card = generateHealthID_CardServiceImpl.generateCard(request, abdmToken);
-//						if (card != null) {
-//							map.put("data", card);
-//							res = new Gson().toJson(map);
-//						} else
-//							throw new FHIRException("NDHM_FHIR Error while generating ABHA card");
-//
-//					} else {
-//						throw new FHIRException("NDHM_FHIR Error while validating OTP");
-//					}
 				response.setResponse(res);
 			} else
 				throw new FHIRException("NDHM_FHIR Empty request object");
@@ -89,7 +74,7 @@ public class CreateAbhaV3Controller {
 	@Operation(summary = "Verify Mobile OTP for ABHA enrollment")
 	@PostMapping(value = { "/verifyAuthByMobile" })
 	public String verifyMobileForAuth(@RequestBody String request) {
-		logger.info("Generate OTP for ABHA enrollment API request " + request);
+		logger.info("Verify Mobile OTP for ABHA enrollment " + request);
 		OutputResponse response = new OutputResponse();
 		try {
 			if (request != null) {
@@ -104,4 +89,25 @@ public class CreateAbhaV3Controller {
 		logger.info("NDHM_FHIR generate OTP for ABHA card API response " + response.toString());
 		return response.toString();
 	}
+	
+	@CrossOrigin
+	@Operation(summary = "Print Abha card")
+	@PostMapping(value = { "/printAbhaCard" })
+	public String printAbhaCard(@RequestBody String request) {
+		OutputResponse response = new OutputResponse();
+		try {
+			if (request != null) {
+				String s = createAbhaV3Service.getAbhaCardPrinted(request);
+				response.setResponse(s);
+			} else
+				throw new FHIRException("NDHM_FHIR Empty request object");
+		} catch (FHIRException e) {
+			response.setError(5000, e.getMessage());
+			logger.error(e.toString());
+		}
+		logger.info("NDHM_FHIR generate OTP for ABHA card API respponse " + response.toString());
+		return response.toString();
+	}
+	
+	
 }

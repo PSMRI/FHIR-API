@@ -5,9 +5,12 @@ import lombok.Data;
 @Data
 public class LoginMethod {
 	
-	String loginId;
-	String loginMethod;
-	String tnxId;
-	String mobileNumber;
+	private String loginId;
+	private String loginMethod;
+	private String pId;
+	private String tnxId;
+	private String mobileNumber;
+	private String createdBy;
+	private int providerServiceMapId;
 
 }
