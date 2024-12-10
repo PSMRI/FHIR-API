@@ -65,6 +65,7 @@ import com.wipro.fhir.data.patient.PatientDemographic;
 import com.wipro.fhir.data.patient_data_handler.PatientDemographicModel_NDHM_Patient_Profile;
 import com.wipro.fhir.data.request_handler.PatientEligibleForResourceCreation;
 import com.wipro.fhir.data.request_handler.ResourceRequestHandler;
+import com.wipro.fhir.data.users.User;
 import com.wipro.fhir.repo.common.PatientEligibleForResourceCreationRepo;
 import com.wipro.fhir.repo.healthID.BenHealthIDMappingRepo;
 import com.wipro.fhir.repo.mongo.amrit_resource.AMRIT_ResourceMongoRepo;
@@ -72,6 +73,7 @@ import com.wipro.fhir.repo.mongo.amrit_resource.PatientCareContextsMongoRepo;
 import com.wipro.fhir.repo.mongo.amrit_resource.TempCollectionRepo;
 import com.wipro.fhir.repo.mongo.ndhm_response.NDHMResponseRepo;
 import com.wipro.fhir.repo.patient_data_handler.PatientDemographicModel_NDHM_Patient_Profile_Repo;
+import com.wipro.fhir.repo.user.UserRepository;
 import com.wipro.fhir.service.api_channel.APIChannel;
 import com.wipro.fhir.service.ndhm.Common_NDHMService;
 import com.wipro.fhir.service.ndhm.GenerateSession_NDHMService;
@@ -96,16 +98,16 @@ public class CommonServiceImpl implements CommonService {
 
 	@Value("${patient-search-page-size}")
 	private String patient_search_page_size;
-	
+
 	@Value("${abhaMode}")
 	private String abhaMode;
 
 	private static String authKey;
 	private UUID uuid;
 
-	//public static String NDHM_AUTH_TOKEN;
-	//public static Long NDHM_TOKEN_EXP;
-	//public static String NDHM_OTP_TOKEN;
+	// public static String NDHM_AUTH_TOKEN;
+	// public static Long NDHM_TOKEN_EXP;
+	// public static String NDHM_OTP_TOKEN;
 
 	@Value("${clientID}")
 	private String clientID;
@@ -127,7 +129,6 @@ public class CommonServiceImpl implements CommonService {
 	private APIChannel aPIChannel;
 	@Autowired
 	private AMRIT_ResourceMongoRepo aMRIT_ResourceMongoRepo;
-	
 
 	@Autowired
 	private PatientCareContextsMongoRepo patientCareContextsMongoRepo;
@@ -148,7 +149,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Autowired
 	private PatientDataGatewayService patientDataGatewayService;
-	
+
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
@@ -159,16 +160,19 @@ public class CommonServiceImpl implements CommonService {
 	private PatientDemographic patientDemographic;
 	@Autowired
 	private Common_NDHMService common_NDHMService;
-	
+
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
+	@Autowired
+	private UserRepository userRepository;
 
 	@Override
 	public String processResourceOperation() throws FHIRException {
 		String response = null;
 		// list of patient eligible for resource creation
 		List<PatientEligibleForResourceCreation> pList = getPatientListForResourceEligible();
-		logger.info("No of records available to create FHIR in last 2 dagetPatientListForResourceEligibleys : " + pList.size());
+		logger.info("No of records available to create FHIR in last 2 dagetPatientListForResourceEligibleys : "
+				+ pList.size());
 		ResourceRequestHandler resourceRequestHandler;
 		for (PatientEligibleForResourceCreation p : pList) {
 
@@ -196,10 +200,11 @@ public class CommonServiceImpl implements CommonService {
 					if (patientDemographicOBJ.getPreferredPhoneNo() != null)
 						sendAbdmAdvSMS(patientDemographicOBJ.getPreferredPhoneNo());
 					else
-						throw new FHIRException("Advertisement sms could not be sent as beneficiary phone no not found");
-				}
-				else
-					throw new FHIRException("Beneficiary not found, benRegId = " +resourceRequestHandler.getBeneficiaryRegID());
+						throw new FHIRException(
+								"Advertisement sms could not be sent as beneficiary phone no not found");
+				} else
+					throw new FHIRException(
+							"Beneficiary not found, benRegId = " + resourceRequestHandler.getBeneficiaryRegID());
 
 			} catch (Exception e) {
 				logger.error(e.getMessage());
@@ -324,28 +329,28 @@ public class CommonServiceImpl implements CommonService {
 			// get benid
 //			if (benRegID != null)
 //				benID = benHealthIDMappingRepo.getBenID(benRegID);
-			
-			// fetch abdm facility id  
-			logger.info("********t_benvisistData fetch request pvisit data :" ,  pVisit);
+
+			// fetch abdm facility id
+			logger.info("********t_benvisistData fetch request pvisit data :", pVisit);
 
 			List<Object[]> res = benHealthIDMappingRepo.getAbdmFacilityAndlinkedDate(pVisit.getVisitCode());
-			
+
 			// check care context record in mongo against beneficiaryID
 			ArrayList<CareContexts> ccList = new ArrayList<>();
 
 			CareContexts cc = new CareContexts();
-			
+
 			logger.info("********t_benvisistData fetch response : {}", res);
 			cc.setReferenceNumber(pVisit.getVisitCode() != null ? pVisit.getVisitCode().toString() : null);
-			cc.setDisplay(pVisit.getVisitCategory() != null ? pVisit.getVisitCategory().toString() : null);	
+			cc.setDisplay(pVisit.getVisitCategory() != null ? pVisit.getVisitCategory().toString() : null);
 			Object[] resData = null;
 			if (res.get(0) != null) {
 				resData = res.get(0);
-			cc.setAbdmFacilityId(resData[0] != null ? resData[0].toString() : null );
-			cc.setCareContextLinkedDate(resData[1] != null ? resData[1].toString() : null);
+				cc.setAbdmFacilityId(resData[0] != null ? resData[0].toString() : null);
+				cc.setCareContextLinkedDate(resData[1] != null ? resData[1].toString() : null);
 			}
-			
-			logger.info("********data to be saved in mongo :" ,  cc);
+
+			logger.info("********data to be saved in mongo :", cc);
 			PatientCareContexts pcc;
 			PatientCareContexts resultSet;
 
@@ -357,7 +362,7 @@ public class CommonServiceImpl implements CommonService {
 					ccList.add(cc);
 					pcc.setCareContextsList(ccList);
 					resultSet = patientCareContextsMongoRepo.save(pcc);
-					
+
 				} else {
 					pcc = new PatientCareContexts();
 					pcc.setCaseReferenceNumber(pDemo.getBeneficiaryID().toString());
@@ -423,7 +428,7 @@ public class CommonServiceImpl implements CommonService {
 				JsonParser jsnParser = new JsonParser();
 				JsonElement jsnElmnt = jsnParser.parse(responseStrLogin);
 				jsnOBJ = jsnElmnt.getAsJsonObject();
-				//NDHM_AUTH_TOKEN = "Bearer" + " " + jsnOBJ.get("accessToken").getAsString();
+				// NDHM_AUTH_TOKEN = "Bearer" + " " + jsnOBJ.get("accessToken").getAsString();
 				Integer expiry = jsnOBJ.get("expiresIn").getAsInt();
 				double time = expiry / 60;
 				Date date = new Date();
@@ -431,7 +436,7 @@ public class CommonServiceImpl implements CommonService {
 				Calendar ndhmCalendar = Calendar.getInstance();
 				ndhmCalendar.setTime(sqlDate);
 				ndhmCalendar.add(Calendar.MINUTE, (int) time);
-			
+
 				res = "success";
 			} else
 				res = "Error while accessing authenticate API";
@@ -477,7 +482,7 @@ public class CommonServiceImpl implements CommonService {
 	 * @author SH20094090
 	 * @return
 	 * 
-	 * 		get the UUID and isoTimestamp for NDMH API's
+	 *         get the UUID and isoTimestamp for NDMH API's
 	 */
 	@Deprecated
 	@Override
@@ -541,7 +546,7 @@ public class CommonServiceImpl implements CommonService {
 	 * @param reqID
 	 * @return
 	 * 
-	 * 		hitting MongoDB
+	 *         hitting MongoDB
 	 */
 	@Deprecated
 	NDHMResponse getResponseMongo(String reqID) {
@@ -628,8 +633,8 @@ public class CommonServiceImpl implements CommonService {
 			SMSNotify smsNotify = new SMSNotify(obj.getRequestId(), obj.getTimestamp(), notification);
 			String requestOBJ = new Gson().toJson(smsNotify);
 			logger.info("NDHM_FHIR Generate Notify SMS request Obj: " + requestOBJ);
-			if(abhaMode !=null && !(abhaMode.equalsIgnoreCase("abdm") || abhaMode.equalsIgnoreCase("sbx")))
-				abhaMode="sbx";
+			if (abhaMode != null && !(abhaMode.equalsIgnoreCase("abdm") || abhaMode.equalsIgnoreCase("sbx")))
+				abhaMode = "sbx";
 			HttpHeaders headers = common_NDHMService.getHeaders(ndhmAuthToken, abhaMode);
 			ResponseEntity<String> responseEntity = httpUtils.postWithResponseEntity(generateABDM_NotifySMS, requestOBJ,
 					headers);
@@ -644,6 +649,24 @@ public class CommonServiceImpl implements CommonService {
 					+ e.getMessage());
 		}
 
+	}
+
+	public User getUserById(Long userId) throws Exception {
+		try {
+			// Fetch user from custom repository by userId
+			User user = userRepository.findByUserID(userId);
+
+			// Check if user is found
+			if (user == null) {
+				throw new Exception("User not found with ID: " + userId);
+			}
+
+			return user;
+		} catch (Exception e) {
+			// Log and throw custom exception in case of errors
+			logger.error("Error fetching user with ID: " + userId, e);
+			throw new Exception("Error fetching user with ID: " + userId, e);
+		}
 	}
 
 }
