@@ -23,4 +23,8 @@ public interface HealthIDRepo extends CrudRepository<HealthIDResponse, Long> {
 
 	@Query(" SELECT HIDR from HealthIDResponse HIDR WHERE HIDR.mobile = :mobile")
 	public ArrayList<HealthIDResponse> getHealthIDDetailsUsingMobileNumber(@Param("mobile") String mobile);
+	
+	@Query("SELECT COUNT(*) FROM HealthIDResponse HIDR WHERE HIDR.healthIdNumber = :healthId")
+	public Integer getCountOfHealthIdNumber(@Param("healthId") String healthId);
+
 }

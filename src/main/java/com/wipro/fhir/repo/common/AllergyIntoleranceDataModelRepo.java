@@ -21,6 +21,8 @@
 */
 package com.wipro.fhir.repo.common;
 
+import java.math.BigInteger;
+
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.stereotype.Repository;
@@ -29,7 +31,7 @@ import com.wipro.fhir.data.resource_model.AllergyIntoleranceDataModel;
 
 @Repository
 @RestResource(exported = false)
-public interface AllergyIntoleranceDataModelRepo extends CrudRepository<AllergyIntoleranceDataModel, Long> {
+public interface AllergyIntoleranceDataModelRepo extends CrudRepository<AllergyIntoleranceDataModel, BigInteger> {
 
 
 }
