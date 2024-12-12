@@ -31,6 +31,7 @@ import com.google.gson.JsonParser;
 import com.wipro.fhir.data.healthID.HealthIDResponse;
 import com.wipro.fhir.data.v3.abhaCard.BioRequest;
 import com.wipro.fhir.data.v3.abhaCard.ConsentRequest;
+import com.wipro.fhir.data.v3.abhaCard.EnrollAuthByABDM;
 import com.wipro.fhir.data.v3.abhaCard.EnrollByAadhaar;
 import com.wipro.fhir.data.v3.abhaCard.LoginMethod;
 import com.wipro.fhir.data.v3.abhaCard.OtpRequest;
@@ -61,6 +62,9 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 
 	@Value("${requestOtpForEnrollment}")
 	String requestOtpForEnrollment;
+	
+	@Value("${requestAuthByAbdm}")
+	String requestAuthByAbdm;
 
 	@Value("${abhaEnrollByAadhaar}")
 	String abhaEnrollByAadhaar;
@@ -108,6 +112,12 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 				reqOtpEnrollment.setOtpSystem("aadhaar");
 				reqOtpEnrollment.setLoginHint("aadhaar");
 				reqOtpEnrollment.setScope(new String[] { "abha-enrol" });
+			} else if ("MOBILE".equalsIgnoreCase(loginMethod.getLoginMethod())) {
+				reqOtpEnrollment.setLoginId(encryptedLoginId);
+				reqOtpEnrollment.setTnxId(loginMethod.getTnxId());
+				reqOtpEnrollment.setOtpSystem("abdm");
+				reqOtpEnrollment.setLoginHint("mobile");
+				reqOtpEnrollment.setScope(new String[] { "abha-enrol", "mobile-verify" });
 			}
 
 			String requestOBJ = new Gson().toJson(reqOtpEnrollment);
@@ -229,7 +239,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 	}
 
 	@Override
-	public String verifyAuthByMobile(String request) throws FHIRException {
+	public String verifyAuthByAbdm(String request) throws FHIRException {
 		String res = null;
 		Map<String, String> responseMap = new HashMap<>();
 		RestTemplate restTemplate = new RestTemplate();
@@ -250,7 +260,6 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 			headers.add("TIMESTAMP", nowAsISO);
 			headers.add("Authorization", ndhmAuthToken);
 
-			RequestOTPEnrollment reqOtpEnrollment = new RequestOTPEnrollment();
 			LoginMethod loginMethod = InputMapper.gson().fromJson(request, LoginMethod.class);
 
 			publicKeyString = certificateKeyService.getCertPublicKey();
@@ -258,20 +267,34 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 				encryptedLoginId = encryption.encrypt(loginMethod.getLoginId(), publicKeyString);
 			}
 
-			if ("AADHAAR".equalsIgnoreCase(loginMethod.getLoginMethod())) {
-				reqOtpEnrollment.setLoginId(encryptedLoginId);
-				reqOtpEnrollment.setTnxId(loginMethod.getTnxId());
-				reqOtpEnrollment.setOtpSystem("abdm");
-				reqOtpEnrollment.setLoginHint("mobile");
-				reqOtpEnrollment.setScope(new String[] { "abha-enrol", "mobile-verify" });
+			EnrollAuthByABDM enrollAuthByabdm = new EnrollAuthByABDM();
+			OtpRequest otp = new OtpRequest();
 
-			}
+			// Get current timestamp
+			OffsetDateTime now = OffsetDateTime.now(java.time.ZoneOffset.UTC);
+			DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+			String formattedTimestamp = now.format(formatter);
+			otp.setTimestamp(formattedTimestamp);
 
-			String requestOBJ = new Gson().toJson(reqOtpEnrollment);
-			logger.info("ABDM reqobj for verify mobile number for abha enrollment: " + requestOBJ);
+			otp.setTxnId(loginMethod.getTnxId());
+			otp.setOtpValue(encryptedLoginId);
+			
+			String[] scope;
+			scope = new String[] {"abha-enrol", "mobile-verify"};
 
-			HttpEntity<String> httpEntity = new HttpEntity<>(requestOBJ, headers);
-			ResponseEntity<String> responseEntity = restTemplate.exchange(requestOtpForEnrollment, HttpMethod.POST,
+			Map<String, Object> authDataMap = new HashMap<>();
+			authDataMap.put("otp", otp);
+			authDataMap.put("authMethods", new String[] { "otp" });
+
+			enrollAuthByabdm.setAuthData(authDataMap);
+			enrollAuthByabdm.setScope(scope);
+			
+
+			logger.info("ABDM request for enroll by ABDM: " + enrollAuthByabdm);
+
+			String requestObj = new Gson().toJson(enrollAuthByabdm);
+			HttpEntity<String> httpEntity = new HttpEntity<>(requestObj, headers);
+			ResponseEntity<String> responseEntity = restTemplate.exchange(requestAuthByAbdm, HttpMethod.POST,
 					httpEntity, String.class);
 
 			logger.info("ABDM response for verify mobile number for abha enrollment: " + responseEntity);

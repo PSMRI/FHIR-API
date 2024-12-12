@@ -8,7 +8,7 @@ public interface CreateAbhaV3Service {
 
 	public String enrollmentByAadhaar(String request) throws FHIRException;
 
-	public String verifyAuthByMobile(String request) throws FHIRException;
+	public String verifyAuthByAbdm(String request) throws FHIRException;
 
 	public String getAbhaCardPrinted(String reqObj) throws FHIRException;
 

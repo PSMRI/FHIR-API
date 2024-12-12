@@ -89,21 +89,26 @@ public class LoginAbhaV3ServiceImpl implements LoginAbhaV3Service {
 				reqOtpEnrollment.setLoginId(encryptedLoginId);
 			}
 
-			if ("AADHAAR".equalsIgnoreCase(loginAbhaRequest.getLoginMethod())) {
-				reqOtpEnrollment.setOtpSystem("aadhaar");
+			if ("AADHAAR".equalsIgnoreCase(loginAbhaRequest.getLoginMethod()) && 
+					("abha-number".equalsIgnoreCase(loginAbhaRequest.getLoginHint()) || "abha-address".equalsIgnoreCase(loginAbhaRequest.getLoginHint()) )) {
 				reqOtpEnrollment.setScope(new String[] { "abha-login", "aadhaar-verify" });
-			} else if ("mobile".equalsIgnoreCase(loginAbhaRequest.getLoginMethod())) {
-				reqOtpEnrollment.setOtpSystem("abdm");
+				reqOtpEnrollment.setLoginHint(loginAbhaRequest.getLoginHint());
+				reqOtpEnrollment.setOtpSystem("aadhaar");
+			} else if ("mobile".equalsIgnoreCase(loginAbhaRequest.getLoginMethod()) 
+					&& ("abha-number".equalsIgnoreCase(loginAbhaRequest.getLoginHint()) || "abha-address".equalsIgnoreCase(loginAbhaRequest.getLoginHint()) )) {
 				reqOtpEnrollment.setScope(new String[] { "abha-login", "mobile-verify" });
-			}
-			
-			if ("ABHA".equalsIgnoreCase(loginAbhaRequest.getLoginHint())) {
+				reqOtpEnrollment.setLoginHint(loginAbhaRequest.getLoginHint());
 				reqOtpEnrollment.setOtpSystem("abdm");
-				reqOtpEnrollment.setLoginHint("abha");
-			} else if ("AADHAAR".equalsIgnoreCase(loginAbhaRequest.getLoginHint())) {
-				reqOtpEnrollment.setLoginHint("aadhaar");
-			} else if ("MOBILE".equalsIgnoreCase(loginAbhaRequest.getLoginHint())) {
+			} else if ("mobile".equalsIgnoreCase(loginAbhaRequest.getLoginMethod()) && "mobile".equalsIgnoreCase(loginAbhaRequest.getLoginMethod()) ) {
+				reqOtpEnrollment.setScope(new String[] { "abha-login", "mobile-verify" });
 				reqOtpEnrollment.setLoginHint("mobile");
+				reqOtpEnrollment.setOtpSystem("abdm");
+			} else if ("aadhaar".equalsIgnoreCase(loginAbhaRequest.getLoginMethod()) && "aadhaar".equalsIgnoreCase(loginAbhaRequest.getLoginMethod()) ) {
+				reqOtpEnrollment.setScope(new String[] { "abha-login", "aadhaar-verify" });
+				reqOtpEnrollment.setLoginHint("aadhaar");
+				reqOtpEnrollment.setOtpSystem("aadhaar");
+			} else {
+				throw new FHIRException("Invalid Login ID and Login Hint, Please Pass Valid ID");
 			}
 
 			String requestOBJ = new Gson().toJson(reqOtpEnrollment);
@@ -113,7 +118,7 @@ public class LoginAbhaV3ServiceImpl implements LoginAbhaV3Service {
 			ResponseEntity<String> responseEntity = restTemplate.exchange(abhaLoginRequestOtp, HttpMethod.POST,
 					httpEntity, String.class);
 
-			logger.info("ABDM response for request otp for Abha login: " + responseEntity);
+			logger.info("ABDM response for response otp for Abha login: " + responseEntity);
 			String responseStrLogin = common_NDHMService.getBody(responseEntity);
 			if (responseEntity.getStatusCode() == HttpStatusCode.valueOf(200) && responseEntity.hasBody()) {
 				JsonObject jsnOBJ = JsonParser.parseString(responseStrLogin).getAsJsonObject();

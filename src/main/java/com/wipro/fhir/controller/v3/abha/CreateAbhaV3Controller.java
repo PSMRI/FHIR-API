@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.wipro.fhir.service.ndhm.GenerateHealthID_CardServiceImpl;
 import com.wipro.fhir.service.v3.abha.CreateAbhaV3Service;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.response.OutputResponse;
@@ -68,14 +67,14 @@ public class CreateAbhaV3Controller {
 	}
 	
 	@CrossOrigin
-	@Operation(summary = "Verify Mobile OTP for ABHA enrollment")
-	@PostMapping(value = { "/verifyAuthByMobile" })
+	@Operation(summary = "Verify Auth By ABDM for ABHA enrollment")
+	@PostMapping(value = { "/verifyAuthByAbdm" })
 	public String verifyMobileForAuth(@RequestBody String request) {
-		logger.info("Verify Mobile OTP for ABHA enrollment " + request);
+		logger.info("Verify Auth OTP for ABHA enrollment " + request);
 		OutputResponse response = new OutputResponse();
 		try {
 			if (request != null) {
-				String s = createAbhaV3Service.verifyAuthByMobile(request);
+				String s = createAbhaV3Service.verifyAuthByAbdm(request);
 				response.setResponse(s);
 			} else
 				throw new FHIRException("NDHM_FHIR Empty request object");
@@ -83,7 +82,7 @@ public class CreateAbhaV3Controller {
 			response.setError(5000, e.getMessage());
 			logger.error(e.toString());
 		}
-		logger.info("NDHM_FHIR generate OTP for ABHA card API response " + response.toString());
+		logger.info("NDHM_FHIR Verify Auth OTP for ABHA enrollment API response " + response.toString());
 		return response.toString();
 	}
 	
