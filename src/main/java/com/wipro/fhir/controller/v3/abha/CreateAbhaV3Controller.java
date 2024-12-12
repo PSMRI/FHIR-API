@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.wipro.fhir.service.ndhm.GenerateHealthID_CardServiceImpl;
 import com.wipro.fhir.service.v3.abha.CreateAbhaV3Service;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.response.OutputResponse;
@@ -25,7 +24,6 @@ public class CreateAbhaV3Controller {
 	
 	@Autowired
 	private CreateAbhaV3Service createAbhaV3Service;
-	
 	
 	@CrossOrigin
 	@Operation(summary = "Generate OTP for ABHA enrollment")
