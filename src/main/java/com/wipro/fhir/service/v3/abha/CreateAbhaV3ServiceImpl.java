@@ -114,7 +114,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 				reqOtpEnrollment.setScope(new String[] { "abha-enrol" });
 			} else if ("MOBILE".equalsIgnoreCase(loginMethod.getLoginMethod())) {
 				reqOtpEnrollment.setLoginId(encryptedLoginId);
-				reqOtpEnrollment.setTnxId(loginMethod.getTnxId());
+				reqOtpEnrollment.setTxnId(loginMethod.getTxnId());
 				reqOtpEnrollment.setOtpSystem("abdm");
 				reqOtpEnrollment.setLoginHint("mobile");
 				reqOtpEnrollment.setScope(new String[] { "abha-enrol", "mobile-verify" });
@@ -276,7 +276,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 			String formattedTimestamp = now.format(formatter);
 			otp.setTimestamp(formattedTimestamp);
 
-			otp.setTxnId(loginMethod.getTnxId());
+			otp.setTxnId(loginMethod.getTxnId());
 			otp.setOtpValue(encryptedLoginId);
 			
 			String[] scope;
@@ -327,7 +327,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 		String formattedTimestamp = now.format(formatter);
 		otp.setTimestamp(formattedTimestamp);
 
-		otp.setTxnId(loginData.getTnxId());
+		otp.setTxnId(loginData.getTxnId());
 		otp.setOtpValue(encryptedLoginId);
 		otp.setMobile(loginData.getMobileNumber());
 
@@ -359,7 +359,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 		String formattedTimestamp = now.format(formatter);
 		bio.setTimestamp(formattedTimestamp);
 
-		bio.setTxnId(loginData.getTnxId());
+		bio.setTxnId(loginData.getTxnId());
 		
 		bio.setAadhaar(encryptedLoginId);
 		bio.setFingerPrintAuthPid(loginData.getPId());
