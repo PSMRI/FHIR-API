@@ -170,7 +170,7 @@ public class LoginAbhaV3ServiceImpl implements LoginAbhaV3Service {
 			
 			OtpRequest otp = new OtpRequest();
 
-			otp.setTxnId(loginData.getTnxId());
+			otp.setTxnId(loginData.getTxnId());
 			otp.setOtpValue(encryptedLoginId);
 
 			Map<String, Object> authDataMap = new HashMap<>();
