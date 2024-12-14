@@ -103,6 +103,8 @@ public class JwtUserIdValidationFilter implements Filter {
 	private void clearUserIdCookie(HttpServletResponse response) {
 		Cookie cookie = new Cookie("userId", null);
 		cookie.setPath("/");
+		cookie.setHttpOnly(true);
+		cookie.setSecure(true);
 		cookie.setMaxAge(0); // Invalidate the cookie
 		response.addCookie(cookie);
 	}
