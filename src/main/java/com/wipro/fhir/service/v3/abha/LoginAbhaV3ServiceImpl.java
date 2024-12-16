@@ -53,6 +53,12 @@ public class LoginAbhaV3ServiceImpl implements LoginAbhaV3Service {
 	@Value("${abhaLoginRequestOtp}")
 	String abhaLoginRequestOtp;
 	
+	@Value("${webLoginAbhaRequestOtp}")
+	String webLoginAbhaRequestOtp;
+	
+	@Value("${webLoginAbhaVerify}")
+	String webLoginAbhaVerify;
+	
 	@Value("${verifyAbhaLogin}")
 	String verifyAbhaLoginUrl;
 	
@@ -65,6 +71,7 @@ public class LoginAbhaV3ServiceImpl implements LoginAbhaV3Service {
 		RestTemplate restTemplate = new RestTemplate();
 		String encryptedLoginId = null;
 		String publicKeyString = null;
+		ResponseEntity<String> responseEntity;
 
 		try {
 			String ndhmAuthToken = generateSession_NDHM.getNDHMAuthToken();
@@ -89,14 +96,20 @@ public class LoginAbhaV3ServiceImpl implements LoginAbhaV3Service {
 				reqOtpEnrollment.setLoginId(encryptedLoginId);
 			}
 
-			if ("AADHAAR".equalsIgnoreCase(loginAbhaRequest.getLoginMethod()) && 
-					("abha-number".equalsIgnoreCase(loginAbhaRequest.getLoginHint()) || "abha-address".equalsIgnoreCase(loginAbhaRequest.getLoginHint()) )) {
+			if ("AADHAAR".equalsIgnoreCase(loginAbhaRequest.getLoginMethod()) && "abha-number".equalsIgnoreCase(loginAbhaRequest.getLoginHint() )) {
 				reqOtpEnrollment.setScope(new String[] { "abha-login", "aadhaar-verify" });
 				reqOtpEnrollment.setLoginHint(loginAbhaRequest.getLoginHint());
 				reqOtpEnrollment.setOtpSystem("aadhaar");
-			} else if ("mobile".equalsIgnoreCase(loginAbhaRequest.getLoginMethod()) 
-					&& ("abha-number".equalsIgnoreCase(loginAbhaRequest.getLoginHint()) || "abha-address".equalsIgnoreCase(loginAbhaRequest.getLoginHint()) )) {
+			} else if ("mobile".equalsIgnoreCase(loginAbhaRequest.getLoginMethod()) && "abha-number".equalsIgnoreCase(loginAbhaRequest.getLoginHint() )) {
 				reqOtpEnrollment.setScope(new String[] { "abha-login", "mobile-verify" });
+				reqOtpEnrollment.setLoginHint(loginAbhaRequest.getLoginHint());
+				reqOtpEnrollment.setOtpSystem("abdm");
+			} else if ("aadhaar".equalsIgnoreCase(loginAbhaRequest.getLoginMethod()) && "abha-address".equalsIgnoreCase(loginAbhaRequest.getLoginHint() )) {
+				reqOtpEnrollment.setScope(new String[] { "abha-address-login", "aadhaar-verify" });
+				reqOtpEnrollment.setLoginHint(loginAbhaRequest.getLoginHint());
+				reqOtpEnrollment.setOtpSystem("aadhaar");
+			} else if ("mobile".equalsIgnoreCase(loginAbhaRequest.getLoginMethod()) && "abha-address".equalsIgnoreCase(loginAbhaRequest.getLoginHint() )) {
+				reqOtpEnrollment.setScope(new String[] { "abha-address-login", "mobile-verify" });
 				reqOtpEnrollment.setLoginHint(loginAbhaRequest.getLoginHint());
 				reqOtpEnrollment.setOtpSystem("abdm");
 			} else if ("mobile".equalsIgnoreCase(loginAbhaRequest.getLoginMethod()) && "mobile".equalsIgnoreCase(loginAbhaRequest.getLoginMethod()) ) {
@@ -115,8 +128,13 @@ public class LoginAbhaV3ServiceImpl implements LoginAbhaV3Service {
 			logger.info("ABDM reqobj for request otp for Abha login: " + requestOBJ);
 
 			HttpEntity<String> httpEntity = new HttpEntity<>(requestOBJ, headers);
-			ResponseEntity<String> responseEntity = restTemplate.exchange(abhaLoginRequestOtp, HttpMethod.POST,
+			if("abha-address".equalsIgnoreCase(loginAbhaRequest.getLoginHint())) {
+			responseEntity = restTemplate.exchange(webLoginAbhaRequestOtp, HttpMethod.POST,
+						httpEntity, String.class);	
+			} else {
+			responseEntity = restTemplate.exchange(abhaLoginRequestOtp, HttpMethod.POST,
 					httpEntity, String.class);
+			}
 
 			logger.info("ABDM response for response otp for Abha login: " + responseEntity);
 			String responseStrLogin = common_NDHMService.getBody(responseEntity);
@@ -145,6 +163,7 @@ public class LoginAbhaV3ServiceImpl implements LoginAbhaV3Service {
 		String encryptedLoginId = null;
 		String publicKeyString = null;
 		HealthIDResponse health = new HealthIDResponse();
+		ResponseEntity<String> responseEntity;
 
 		try {
 			String ndhmAuthToken = generateSession_NDHM.getNDHMAuthToken();
@@ -185,14 +204,25 @@ public class LoginAbhaV3ServiceImpl implements LoginAbhaV3Service {
 			} else if ("MOBILE".equalsIgnoreCase(loginData.getLoginMethod())) {
 				verifyAbhaLogin.setScope(new String[] {"abha-login", "mobile-verify" } );
 
+			} else if ("abha-mobile".equalsIgnoreCase(loginData.getLoginMethod())) {
+				verifyAbhaLogin.setScope(new String[] {"abha-address-login", "mobile-verify" } );
+			
+			} else if ("abha-aadhaar".equalsIgnoreCase(loginData.getLoginMethod())) {
+				verifyAbhaLogin.setScope(new String[] {"abha-address-login", "aadhaar-verify" } );
 			}
 			
 			String requestObj = new Gson().toJson(verifyAbhaLogin);
 			logger.info("ABDM request for verify abha login: " + requestObj);
 
 			HttpEntity<String> httpEntity = new HttpEntity<>(requestObj, headers);
-			ResponseEntity<String> responseEntity = restTemplate.exchange(verifyAbhaLoginUrl, HttpMethod.POST,
+			
+			if("abha-aadhaar".equalsIgnoreCase(loginData.getLoginMethod()) || "abha-mobile".equalsIgnoreCase(loginData.getLoginMethod())) {
+			responseEntity = restTemplate.exchange(webLoginAbhaVerify, HttpMethod.POST,
+						httpEntity, String.class);	
+			} else {
+			responseEntity = restTemplate.exchange(verifyAbhaLoginUrl, HttpMethod.POST,
 					httpEntity, String.class);
+			}
 
 			logger.info("ABDM response for verify abha login: " + httpEntity);
 			String responseStrLogin = common_NDHMService.getBody(responseEntity);
