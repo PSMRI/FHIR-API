@@ -224,8 +224,8 @@ public class LoginAbhaV3ServiceImpl implements LoginAbhaV3Service {
 					httpEntity, String.class);
 			}
 
-			logger.info("ABDM response for verify abha login: " + httpEntity);
 			String responseStrLogin = common_NDHMService.getBody(responseEntity);
+			logger.info("ABDM response for verify abha login: " + responseEntity);
 			if (responseEntity.getStatusCode() == HttpStatusCode.valueOf(200) && responseEntity.hasBody()) {
 				JsonObject jsonResponse = JsonParser.parseString(responseStrLogin).getAsJsonObject();
 
@@ -238,6 +238,16 @@ public class LoginAbhaV3ServiceImpl implements LoginAbhaV3Service {
 						responseMap.put("txnId", jsonResponse.get("txnId").getAsString());
 						if (jsonResponse.has("token")) {
 							responseMap.put("xToken", jsonResponse.get("token").getAsString());
+						}
+					} else if(jsonResponse.has("users")) {
+						responseMap.put("abhaDetails", jsonResponse.get("users").getAsJsonArray().get(0).getAsJsonObject().toString());
+						responseMap.put("txnId", jsonResponse.get("txnId").getAsString());
+						if (jsonResponse.has("tokens") && jsonResponse.get("tokens").isJsonObject()) {
+							JsonObject tokensObject = jsonResponse.get("tokens").getAsJsonObject();
+							if (tokensObject.has("token") && !tokensObject.get("token").isJsonNull()) {
+								String token = tokensObject.get("token").getAsString();
+								responseMap.put("xToken", token);
+							}
 						}
 					}
 				} else {
