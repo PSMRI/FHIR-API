@@ -73,7 +73,6 @@ import com.wipro.fhir.repo.mongo.amrit_resource.PatientCareContextsMongoRepo;
 import com.wipro.fhir.repo.mongo.amrit_resource.TempCollectionRepo;
 import com.wipro.fhir.repo.mongo.ndhm_response.NDHMResponseRepo;
 import com.wipro.fhir.repo.patient_data_handler.PatientDemographicModel_NDHM_Patient_Profile_Repo;
-import com.wipro.fhir.repo.user.UserRepository;
 import com.wipro.fhir.service.api_channel.APIChannel;
 import com.wipro.fhir.service.ndhm.Common_NDHMService;
 import com.wipro.fhir.service.ndhm.GenerateSession_NDHMService;
@@ -163,8 +162,6 @@ public class CommonServiceImpl implements CommonService {
 
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
-	@Autowired
-	private UserRepository userRepository;
 
 	@Override
 	public String processResourceOperation() throws FHIRException {
@@ -649,24 +646,6 @@ public class CommonServiceImpl implements CommonService {
 					+ e.getMessage());
 		}
 
-	}
-
-	public User getUserById(Long userId) throws Exception {
-		try {
-			// Fetch user from custom repository by userId
-			User user = userRepository.findByUserID(userId);
-
-			// Check if user is found
-			if (user == null) {
-				throw new Exception("User not found with ID: " + userId);
-			}
-
-			return user;
-		} catch (Exception e) {
-			// Log and throw custom exception in case of errors
-			logger.error("Error fetching user with ID: " + userId, e);
-			throw new Exception("Error fetching user with ID: " + userId, e);
-		}
 	}
 
 }
