@@ -338,6 +338,7 @@ public class CommonServiceImpl implements CommonService {
 			CareContexts cc = new CareContexts();
 
 			logger.info("********t_benvisistData fetch response : {}", res);
+
 			cc.setReferenceNumber(pVisit.getVisitCode() != null ? pVisit.getVisitCode().toString() : null);
 			cc.setDisplay(pVisit.getVisitCategory() != null ? pVisit.getVisitCategory().toString() : null);
 			Object[] resData = null;
@@ -349,7 +350,8 @@ public class CommonServiceImpl implements CommonService {
 
 			logger.info("********data to be saved in mongo :", cc);
 			PatientCareContexts pcc;
-			PatientCareContexts resultSet;
+			PatientCareContexts resultSet = null;
+
 
 			if (pDemo.getBeneficiaryID() != null) {
 				pcc = patientCareContextsMongoRepo.findByIdentifier(pDemo.getBeneficiaryID().toString());
@@ -395,10 +397,9 @@ public class CommonServiceImpl implements CommonService {
 					pcc.setCareContextsList(ccList);
 					// save carecontext back to mongo
 					resultSet = patientCareContextsMongoRepo.save(pcc);
-
 				}
 
-				if (resultSet != null && resultSet.getId() != null)
+				if (resultSet != null && resultSet.get_id() != null)
 					response = 1;
 			}
 

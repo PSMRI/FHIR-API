@@ -23,6 +23,7 @@ package com.wipro.fhir.data.mongo.care_context;
 
 import java.util.ArrayList;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -37,8 +38,8 @@ public class PatientCareContexts {
 
 	@Id
 	@Expose
-	@Field(value = "id")
-	private String id;
+	@Field(value = "_id")
+	private ObjectId _id;
 
 	@Expose
 	@Field(value = "phoneNumber")
