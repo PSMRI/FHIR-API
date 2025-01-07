@@ -26,6 +26,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.wipro.fhir.data.healthID.HealthIDResponse;
@@ -431,8 +432,16 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 
 	private void constructHealthIdResponse(HealthIDResponse healthIDResp, JsonObject profile) throws ParseException {
 		healthIDResp.setHealthIdNumber(profile.get("ABHANumber").getAsString());
-		String abhaAddress = profile.get("phrAddress").getAsString().replace("[", "").replace("]", "");
-		healthIDResp.setHealthId(abhaAddress);
+		JsonArray phrAddressArray = profile.getAsJsonArray("phrAddress");
+		StringBuilder abhaAddressBuilder = new StringBuilder();
+
+		for (int i = 0; i < phrAddressArray.size(); i++) {
+		    abhaAddressBuilder.append(phrAddressArray.get(i).getAsString());
+		    if (i < phrAddressArray.size() - 1) {
+		        abhaAddressBuilder.append(", ");
+		    }
+		}
+		healthIDResp.setHealthId(abhaAddressBuilder.toString());
 		healthIDResp.setName(
 				healthIDResp.getFirstName() + " " + healthIDResp.getMiddleName() + " " + healthIDResp.getLastName());
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
@@ -444,5 +453,5 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 		healthIDResp.setMonthOfBirth(month.format(date));
 		healthIDResp.setDayOfBirth(day.format(date));
 	}
-
+	
 }
