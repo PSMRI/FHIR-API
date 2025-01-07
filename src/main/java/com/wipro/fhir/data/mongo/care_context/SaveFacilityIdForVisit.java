@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class SaveFacilityIdForVisit {
 	
-	String facilityId;
+	String abdmFacilityId;
 	BigInteger visitCode;
 
 }

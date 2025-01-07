@@ -3,7 +3,6 @@ package com.wipro.fhir.service.facility;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +15,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.wipro.fhir.data.mongo.care_context.AddCareContextRequest;
 import com.wipro.fhir.data.mongo.care_context.SaveFacilityIdForVisit;
 import com.wipro.fhir.repo.healthID.BenHealthIDMappingRepo;
 import com.wipro.fhir.service.ndhm.Common_NDHMService;
@@ -88,10 +86,10 @@ public class FacilityServiceImpl implements FacilityService{
 		String res = null;
 		try {
 			SaveFacilityIdForVisit requestObj = InputMapper.gson().fromJson(reqObj, SaveFacilityIdForVisit.class);
-			if(requestObj.getFacilityId() == null || requestObj.getFacilityId() == "") {
-				requestObj.setFacilityId(abdmFacilityId);
+			if(requestObj.getAbdmFacilityId() == null || requestObj.getAbdmFacilityId() == "") {
+				requestObj.setAbdmFacilityId(abdmFacilityId);
 			}
-			Integer response = benHealthIDMappingRepo.updateFacilityIdForVisit(requestObj.getVisitCode(), requestObj.getFacilityId());
+			Integer response = benHealthIDMappingRepo.updateFacilityIdForVisit(requestObj.getVisitCode(), requestObj.getAbdmFacilityId());
 			if(response > 0 ) {
 				res = "ABDM Facility ID updated successfully";
 			} else
