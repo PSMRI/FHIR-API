@@ -161,8 +161,7 @@ public class CommonServiceImpl implements CommonService {
 		String response = null;
 		// list of patient eligible for resource creation
 		List<PatientEligibleForResourceCreation> pList = getPatientListForResourceEligible();
-		logger.info("No of records available to create FHIR in last 2 dagetPatientListForResourceEligibleys : "
-				+ pList.size());
+		logger.info("No of records available to create FHIR in last 2 dagetPatientListForResourceEligibleys : " + pList.size());
 		ResourceRequestHandler resourceRequestHandler;
 		for (PatientEligibleForResourceCreation p : pList) {
 
@@ -312,7 +311,6 @@ public class CommonServiceImpl implements CommonService {
 
 			logger.info("********data to be saved in mongo :", cc);
 			PatientCareContexts pcc;
-			PatientCareContexts resultSet = null;
 
 			if (pDemo.getBeneficiaryID() != null) {
 				pcc = patientCareContextsMongoRepo.findByIdentifier(pDemo.getBeneficiaryID().toString());
@@ -323,17 +321,16 @@ public class CommonServiceImpl implements CommonService {
 						ccList = pcc.getCareContextsList();
 
 						// Check if the visitCode is already in the careContextsList
-						boolean visitCodeExists = false;
 						for (CareContexts existingContext : ccList) {
 							if (existingContext.getReferenceNumber() != null
 									&& existingContext.getReferenceNumber().equals(pVisit.getVisitCode().toString())) {
-								visitCodeExists = true;
+								logger.info("Visit code already Exisit in Mongo for benId:" + pDemo.getBeneficiaryID().toString() + "and visit code : " + pVisit.getVisitCode() );
 								return;
 							}
 						}
 						ccList.add(cc);
 						pcc.setCareContextsList(ccList);
-						resultSet = patientCareContextsMongoRepo.save(pcc);
+						patientCareContextsMongoRepo.save(pcc);
 					}
 //				}
 //					if (pcc != null && pcc.getIdentifier() != null) {
@@ -376,7 +373,7 @@ public class CommonServiceImpl implements CommonService {
 					ccList.add(cc);
 					pcc.setCareContextsList(ccList);
 					// save carecontext back to mongo
-					resultSet = patientCareContextsMongoRepo.save(pcc);
+					patientCareContextsMongoRepo.save(pcc);
 				}
 			}
 
