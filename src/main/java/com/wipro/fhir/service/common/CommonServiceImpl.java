@@ -206,6 +206,7 @@ public class CommonServiceImpl implements CommonService {
 			int j = diagnosticReportRecordBundle.processDiagnosticReportRecordBundle(resourceRequestHandler, p);
 			// 3. prescription Bundle
 			int k = prescriptionBundle.processPrescriptionRecordBundle(resourceRequestHandler, p);
+
 			logger.info("The value of i: " + i + " The value of j: " + j + " The value of k: " + k);
 
 			if (i > 0 && j > 0 && k > 0) {
