@@ -1,0 +1,13 @@
+name: Call Checkstyle
+
+on:
+  pull_request:
+    branches: ["master", "develop"]
+    paths:
+      - '**/*.java'
+
+jobs:
+  style-check:
+    uses: PSMRI/.github/.github/workflows/checkstyle.yml@main
+    with:
+      java-version: '17'
