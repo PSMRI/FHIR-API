@@ -4,6 +4,6 @@ import com.wipro.fhir.utils.exception.FHIRException;
 
 public interface CertificateKeyService {
 
-	public String getCertPublicKey() throws FHIRException;
+	public String getCertPublicKey(String ndhmAuthToken) throws FHIRException;
 
 }

@@ -103,7 +103,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 			RequestOTPEnrollment reqOtpEnrollment = new RequestOTPEnrollment();
 			LoginMethod loginMethod = InputMapper.gson().fromJson(request, LoginMethod.class);
 
-			publicKeyString = certificateKeyService.getCertPublicKey();
+			publicKeyString = certificateKeyService.getCertPublicKey(ndhmAuthToken);
 			if (loginMethod.getLoginId() != null) {
 				encryptedLoginId = encryption.encrypt(loginMethod.getLoginId(), publicKeyString);
 			}
@@ -169,10 +169,9 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 			headers.add("Authorization", ndhmAuthToken);
 
 			// Create the enrollByAadhar object
-			EnrollByAadhaar enrollByAadhar = new EnrollByAadhaar();
 			LoginMethod loginData = InputMapper.gson().fromJson(request, LoginMethod.class);
 
-			publicKeyString = certificateKeyService.getCertPublicKey();
+			publicKeyString = certificateKeyService.getCertPublicKey(ndhmAuthToken);
 			if (loginData.getLoginId() != null) {
 				encryptedLoginId = encryption.encrypt(loginData.getLoginId(), publicKeyString);
 			}
@@ -263,7 +262,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 
 			LoginMethod loginMethod = InputMapper.gson().fromJson(request, LoginMethod.class);
 
-			publicKeyString = certificateKeyService.getCertPublicKey();
+			publicKeyString = certificateKeyService.getCertPublicKey(ndhmAuthToken);
 			if (loginMethod.getLoginId() != null) {
 				encryptedLoginId = encryption.encrypt(loginMethod.getLoginId(), publicKeyString);
 			}
