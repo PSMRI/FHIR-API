@@ -40,7 +40,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -59,7 +58,6 @@ import com.wipro.fhir.data.mongo.care_context.NDHMRequest;
 import com.wipro.fhir.data.mongo.care_context.NDHMResponse;
 import com.wipro.fhir.data.mongo.care_context.Notification;
 import com.wipro.fhir.data.mongo.care_context.PatientCareContexts;
-import com.wipro.fhir.data.mongo.care_context.PatientCareContextsStringOBJ;
 import com.wipro.fhir.data.mongo.care_context.SMSNotify;
 import com.wipro.fhir.data.patient.PatientDemographic;
 import com.wipro.fhir.data.patient_data_handler.PatientDemographicModel_NDHM_Patient_Profile;
@@ -104,9 +102,11 @@ public class CommonServiceImpl implements CommonService {
 	private static String authKey;
 	private UUID uuid;
 
+
 	// public static String NDHM_AUTH_TOKEN;
 	// public static Long NDHM_TOKEN_EXP;
 	// public static String NDHM_OTP_TOKEN;
+
 
 	@Value("${clientID}")
 	private String clientID;
@@ -215,6 +215,8 @@ public class CommonServiceImpl implements CommonService {
 			// 3. prescription Bundle
 			int k = prescriptionBundle.processPrescriptionRecordBundle(resourceRequestHandler, p);
 
+			logger.info("The value of i: " + i + " The value of j: " + j + " The value of k: " + k);
+
 			if (i > 0 && j > 0 && k > 0) {
 
 				// update the processed flag in trigger table
@@ -291,11 +293,11 @@ public class CommonServiceImpl implements CommonService {
 
 	// 31-03-2021
 	// @Override
-	public int addCareContextToMongo(PatientDemographic pDemo, PatientEligibleForResourceCreation pVisit)
+	public void addCareContextToMongo(PatientDemographic pDemo, PatientEligibleForResourceCreation pVisit)
 			throws FHIRException {
-		int response = 0;
 
 		if (pDemo != null && pVisit != null) {
+
 
 //			JsonObject jsnOBJ = new JsonObject();
 //			JsonParser jsnParser = new JsonParser();
@@ -327,6 +329,7 @@ public class CommonServiceImpl implements CommonService {
 //			if (benRegID != null)
 //				benID = benHealthIDMappingRepo.getBenID(benRegID);
 
+
 			// fetch abdm facility id
 			logger.info("********t_benvisistData fetch request pvisit data :", pVisit);
 
@@ -348,20 +351,42 @@ public class CommonServiceImpl implements CommonService {
 				cc.setCareContextLinkedDate(resData[1] != null ? resData[1].toString() : null);
 			}
 
+
 			logger.info("********data to be saved in mongo :", cc);
 			PatientCareContexts pcc;
 			PatientCareContexts resultSet = null;
 
 
+			logger.info("********data to be saved in mongo :", cc);
+			PatientCareContexts pcc;
+
 			if (pDemo.getBeneficiaryID() != null) {
 				pcc = patientCareContextsMongoRepo.findByIdentifier(pDemo.getBeneficiaryID().toString());
 
 				if (pcc != null && pcc.getIdentifier() != null) {
-					ccList = pcc.getCareContextsList();
-					ccList.add(cc);
-					pcc.setCareContextsList(ccList);
-					resultSet = patientCareContextsMongoRepo.save(pcc);
+					// Get the existing careContextsList
+					if (pcc.getCareContextsList() != null && pcc.getCareContextsList().size() > 0) {
+						ccList = pcc.getCareContextsList();
 
+						// Check if the visitCode is already in the careContextsList
+						for (CareContexts existingContext : ccList) {
+							if (existingContext.getReferenceNumber() != null
+									&& existingContext.getReferenceNumber().equals(pVisit.getVisitCode().toString())) {
+								logger.info("Visit code already Exisit in Mongo for benId:" + pDemo.getBeneficiaryID().toString() + "and visit code : " + pVisit.getVisitCode() );
+								return;
+							}
+						}
+						ccList.add(cc);
+						pcc.setCareContextsList(ccList);
+						patientCareContextsMongoRepo.save(pcc);
+					}
+//				}
+//					if (pcc != null && pcc.getIdentifier() != null) {
+//						ccList = pcc.getCareContextsList();
+//						ccList.add(cc);
+//						pcc.setCareContextsList(ccList);
+//						resultSet = patientCareContextsMongoRepo.save(pcc);
+//
 				} else {
 					pcc = new PatientCareContexts();
 					pcc.setCaseReferenceNumber(pDemo.getBeneficiaryID().toString());
@@ -396,15 +421,11 @@ public class CommonServiceImpl implements CommonService {
 					ccList.add(cc);
 					pcc.setCareContextsList(ccList);
 					// save carecontext back to mongo
-					resultSet = patientCareContextsMongoRepo.save(pcc);
+					patientCareContextsMongoRepo.save(pcc);
 				}
-
-				if (resultSet != null && resultSet.get_id() != null)
-					response = 1;
 			}
 
 		}
-		return response;
 	}
 
 	@Deprecated
