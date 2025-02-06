@@ -26,7 +26,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: 17
-        distribution: 'adopt'
+        distribution: 'zulu'
         
     - name: Build with Maven
       run: mvn clean install -DENV_VAR=${{ env.ENV_VAR }}
