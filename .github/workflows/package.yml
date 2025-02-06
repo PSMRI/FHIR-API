@@ -35,7 +35,7 @@ jobs:
       run: mvn -B package --file pom.xml
       
     - name: Upload WAR file as artifact
-      uses: actions/upload-artifact@v3 
+      uses: actions/upload-artifact@v4
       with:
         name: FHIR-API
         path: target/fhirapi-v1.0.war
