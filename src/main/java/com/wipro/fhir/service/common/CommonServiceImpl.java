@@ -359,7 +359,7 @@ public class CommonServiceImpl implements CommonService {
 
 
 			logger.info("********data to be saved in mongo :", cc);
-			PatientCareContexts pcc1;
+			PatientCareContexts pcc1; 
 
 			if (pDemo.getBeneficiaryID() != null) {
 				pcc1 = patientCareContextsMongoRepo.findByIdentifier(pDemo.getBeneficiaryID().toString());
