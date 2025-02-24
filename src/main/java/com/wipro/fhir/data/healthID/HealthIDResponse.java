@@ -31,10 +31,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import lombok.Data;
 
 import com.google.gson.annotations.Expose;
 
 
+@Data
 @Entity
 @Table(name = "t_healthid")
 public class HealthIDResponse {
@@ -125,194 +127,10 @@ public class HealthIDResponse {
 	private String modifiedBy;
 	@Column(name = "LastModDate", insertable = false, updatable = false)
 	private Timestamp lastModDate;
-    
+	@Column(name = "isNewAbha")
+	private Boolean isNewAbha;
 	
 	@Expose
 	@Column(name = "TxnID")
-	String txnId;
-	
-    public String getHealthId() {
-		return healthId;
-	}
-	public void setHealthId(String healthId) {
-		this.healthId = healthId;
-	}
-	public String getHealthIdNumber() {
-		return healthIdNumber;
-	}
-	public void setHealthIdNumber(String healthIdNumber) {
-		this.healthIdNumber = healthIdNumber;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getGender() {
-		return gender;
-	}
-	public void setGender(String gender) {
-		this.gender = gender;
-	}
-	public String getYearOfBirth() {
-		return yearOfBirth;
-	}
-	public void setYearOfBirth(String yearOfBirth) {
-		this.yearOfBirth = yearOfBirth;
-	}
-	public String getMonthOfBirth() {
-		return monthOfBirth;
-	}
-	public void setMonthOfBirth(String monthOfBirth) {
-		this.monthOfBirth = monthOfBirth;
-	}
-	public String getDayOfBirth() {
-		return dayOfBirth;
-	}
-	public void setDayOfBirth(String dayOfBirth) {
-		this.dayOfBirth = dayOfBirth;
-	}
-	public String getFirstName() {
-		return firstName;
-	}
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-	public String getLastName() {
-		return lastName;
-	}
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-	public String getMiddleName() {
-		return middleName;
-	}
-	public void setMiddleName(String middleName) {
-		this.middleName = middleName;
-	}
-	public String getStateCode() {
-		return stateCode;
-	}
-	public void setStateCode(String stateCode) {
-		this.stateCode = stateCode;
-	}
-	public String getDistrictCode() {
-		return districtCode;
-	}
-	public void setDistrictCode(String districtCode) {
-		this.districtCode = districtCode;
-	}
-	public String getStateName() {
-		return stateName;
-	}
-	public void setStateName(String stateName) {
-		this.stateName = stateName;
-	}
-	public String getDistrictName() {
-		return districtName;
-	}
-	public void setDistrictName(String districtName) {
-		this.districtName = districtName;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	public String getKycPhoto() {
-		return kycPhoto;
-	}
-	public void setKycPhoto(String kycPhoto) {
-		this.kycPhoto = kycPhoto;
-	}
-	public String getMobile() {
-		return mobile;
-	}
-	public void setMobile(String mobile) {
-		this.mobile = mobile;
-	}
-	
-	public Integer getProviderServiceMapID() {
-		return providerServiceMapID;
-	}
-	public void setProviderServiceMapID(Integer providerServiceMapID) {
-		this.providerServiceMapID = providerServiceMapID;
-	}
-	
-	public List<String> getAuthMethods() {
-		return authMethods;
-	}
-	public void setAuthMethods(List<String> authMethods) {
-		this.authMethods = authMethods;
-	}
-	public Integer gethID() {
-		return hID;
-	}
-	public void sethID(Integer hID) {
-		this.hID = hID;
-	}
-	public Long getBeneficiaryRegId() {
-		return beneficiaryRegId;
-	}
-	public void setBeneficiaryRegId(Long beneficiaryRegId) {
-		this.beneficiaryRegId = beneficiaryRegId;
-	}
-	public String getAuthMethod() {
-		return authMethod;
-	}
-	public void setAuthMethod(String authMethod) {
-		this.authMethod = authMethod;
-	}
-	public Boolean getDeleted() {
-		return deleted;
-	}
-	public void setDeleted(Boolean deleted) {
-		this.deleted = deleted;
-	}
-	public String getProcessed() {
-		return processed;
-	}
-	public void setProcessed(String processed) {
-		this.processed = processed;
-	}
-	public String getCreatedBy() {
-		return createdBy;
-	}
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
-	public Timestamp getCreatedDate() {
-		return createdDate;
-	}
-	public void setCreatedDate(Timestamp createdDate) {
-		this.createdDate = createdDate;
-	}
-	public String getModifiedBy() {
-		return modifiedBy;
-	}
-	public void setModifiedBy(String modifiedBy) {
-		this.modifiedBy = modifiedBy;
-	}
-	public Timestamp getLastModDate() {
-		return lastModDate;
-	}
-	public void setLastModDate(Timestamp lastModDate) {
-		this.lastModDate = lastModDate;
-	}
-	public String getTxnId() {
-		return txnId;
-	}
-	public void setTxnId(String txnId) {
-		this.txnId = txnId;
-	}
-	public String getAuthenticationMode() {
-		return authenticationMode;
-	}
-	public void setAuthenticationMode(String authenticationMode) {
-		this.authenticationMode = authenticationMode;
-	}
-	
-	
+	String txnId;	
 }
