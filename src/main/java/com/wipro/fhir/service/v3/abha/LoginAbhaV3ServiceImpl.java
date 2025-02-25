@@ -123,12 +123,12 @@ public class LoginAbhaV3ServiceImpl implements LoginAbhaV3Service {
 				reqOtpEnrollment.setLoginHint(loginAbhaRequest.getLoginHint());
 				reqOtpEnrollment.setOtpSystem("abdm");
 			} else if ("mobile".equalsIgnoreCase(loginAbhaRequest.getLoginMethod())
-					&& "mobile".equalsIgnoreCase(loginAbhaRequest.getLoginMethod())) {
+					&& "mobile".equalsIgnoreCase(loginAbhaRequest.getLoginHint())) {
 				reqOtpEnrollment.setScope(new String[] { "abha-login", "mobile-verify" });
 				reqOtpEnrollment.setLoginHint("mobile");
 				reqOtpEnrollment.setOtpSystem("abdm");
 			} else if ("aadhaar".equalsIgnoreCase(loginAbhaRequest.getLoginMethod())
-					&& "aadhaar".equalsIgnoreCase(loginAbhaRequest.getLoginMethod())) {
+					&& "aadhaar".equalsIgnoreCase(loginAbhaRequest.getLoginHint())) {
 				reqOtpEnrollment.setScope(new String[] { "abha-login", "aadhaar-verify" });
 				reqOtpEnrollment.setLoginHint("aadhaar");
 				reqOtpEnrollment.setOtpSystem("aadhaar");
