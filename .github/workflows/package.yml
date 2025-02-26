@@ -26,7 +26,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: 17
-        distribution: 'zulu'
+        distribution: 'adopt'
         
     - name: Build with Maven
       run: mvn clean install -DENV_VAR=${{ env.ENV_VAR }}
@@ -35,7 +35,7 @@ jobs:
       run: mvn -B package --file pom.xml
       
     - name: Upload WAR file as artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3 
       with:
         name: FHIR-API
         path: target/fhirapi-v1.0.war
