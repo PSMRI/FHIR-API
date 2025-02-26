@@ -58,11 +58,13 @@ import com.wipro.fhir.data.mongo.care_context.NDHMRequest;
 import com.wipro.fhir.data.mongo.care_context.NDHMResponse;
 import com.wipro.fhir.data.mongo.care_context.Notification;
 import com.wipro.fhir.data.mongo.care_context.PatientCareContexts;
+import com.wipro.fhir.data.mongo.care_context.PatientCareContextsStringOBJ;
 import com.wipro.fhir.data.mongo.care_context.SMSNotify;
 import com.wipro.fhir.data.patient.PatientDemographic;
 import com.wipro.fhir.data.patient_data_handler.PatientDemographicModel_NDHM_Patient_Profile;
 import com.wipro.fhir.data.request_handler.PatientEligibleForResourceCreation;
 import com.wipro.fhir.data.request_handler.ResourceRequestHandler;
+import com.wipro.fhir.data.users.User;
 import com.wipro.fhir.repo.common.PatientEligibleForResourceCreationRepo;
 import com.wipro.fhir.repo.healthID.BenHealthIDMappingRepo;
 import com.wipro.fhir.repo.mongo.amrit_resource.AMRIT_ResourceMongoRepo;
@@ -100,6 +102,12 @@ public class CommonServiceImpl implements CommonService {
 
 	private static String authKey;
 	private UUID uuid;
+
+
+	// public static String NDHM_AUTH_TOKEN;
+	// public static Long NDHM_TOKEN_EXP;
+	// public static String NDHM_OTP_TOKEN;
+
 
 	@Value("${clientID}")
 	private String clientID;
@@ -161,7 +169,8 @@ public class CommonServiceImpl implements CommonService {
 		String response = null;
 		// list of patient eligible for resource creation
 		List<PatientEligibleForResourceCreation> pList = getPatientListForResourceEligible();
-		logger.info("No of records available to create FHIR in last 2 dagetPatientListForResourceEligibleys : " + pList.size());
+		logger.info("No of records available to create FHIR in last 2 dagetPatientListForResourceEligibleys : "
+				+ pList.size());
 		ResourceRequestHandler resourceRequestHandler;
 		for (PatientEligibleForResourceCreation p : pList) {
 
@@ -290,6 +299,38 @@ public class CommonServiceImpl implements CommonService {
 
 		if (pDemo != null && pVisit != null) {
 
+
+//			JsonObject jsnOBJ = new JsonObject();
+//			JsonParser jsnParser = new JsonParser();
+//			JsonElement jsnElmnt = jsnParser.parse(requestObj);
+//			jsnOBJ = jsnElmnt.getAsJsonObject();
+
+			PatientCareContextsStringOBJ patientCareContextsStringOBJ = new PatientCareContextsStringOBJ();
+
+			// wrong variable name in request obj for benregid, need to correct in main
+			// request obj first
+//			Long benID = null;
+//			Long benRegID = null;
+//			Long visitCode = null;
+//
+//			if (jsnOBJ.has("beneficiaryID") && jsnOBJ.get("beneficiaryID") != null)
+//				benRegID = jsnOBJ.get("beneficiaryID").getAsLong();
+//			if (jsnOBJ.has("visitCode") && jsnOBJ.get("visitCode") != null)
+//				visitCode = jsnOBJ.get("visitCode").getAsLong();
+//			String healthID = jsnOBJ.get("healthID").getAsString();
+//			String healthIDNumber = jsnOBJ.get("healthIdNumber").getAsString();
+//			String visitCategory = jsnOBJ.get("visitCategory").getAsString();
+//			String phoneNo;
+//			String gender;
+//			String yearOfBirth;
+//			String name;
+//			String email;
+
+			// get benid
+//			if (benRegID != null)
+//				benID = benHealthIDMappingRepo.getBenID(benRegID);
+
+
 			// fetch abdm facility id
 			logger.info("********t_benvisistData fetch request pvisit data :", pVisit);
 
@@ -299,6 +340,7 @@ public class CommonServiceImpl implements CommonService {
 			ArrayList<CareContexts> ccList = new ArrayList<>();
 
 			CareContexts cc = new CareContexts();
+
 			logger.info("********t_benvisistData fetch response : {}", res);
 
 			cc.setReferenceNumber(pVisit.getVisitCode() != null ? pVisit.getVisitCode().toString() : null);
@@ -310,16 +352,22 @@ public class CommonServiceImpl implements CommonService {
 				cc.setCareContextLinkedDate(resData[1] != null ? resData[1].toString() : null);
 			}
 
+
 			logger.info("********data to be saved in mongo :", cc);
 			PatientCareContexts pcc;
+			PatientCareContexts resultSet = null;
+
+
+			logger.info("********data to be saved in mongo :", cc);
+			PatientCareContexts pcc1; 
 
 			if (pDemo.getBeneficiaryID() != null) {
-				pcc = patientCareContextsMongoRepo.findByIdentifier(pDemo.getBeneficiaryID().toString());
+				pcc1 = patientCareContextsMongoRepo.findByIdentifier(pDemo.getBeneficiaryID().toString());
 
-				if (pcc != null && pcc.getIdentifier() != null) {
+				if (pcc1 != null && pcc1.getIdentifier() != null) {
 					// Get the existing careContextsList
-					if (pcc.getCareContextsList() != null && pcc.getCareContextsList().size() > 0) {
-						ccList = pcc.getCareContextsList();
+					if (pcc1.getCareContextsList() != null && pcc1.getCareContextsList().size() > 0) {
+						ccList = pcc1.getCareContextsList();
 
 						// Check if the visitCode is already in the careContextsList
 						for (CareContexts existingContext : ccList) {
@@ -330,8 +378,8 @@ public class CommonServiceImpl implements CommonService {
 							}
 						}
 						ccList.add(cc);
-						pcc.setCareContextsList(ccList);
-						patientCareContextsMongoRepo.save(pcc);
+						pcc1.setCareContextsList(ccList);
+						patientCareContextsMongoRepo.save(pcc1);
 					}
 //				}
 //					if (pcc != null && pcc.getIdentifier() != null) {
@@ -341,20 +389,20 @@ public class CommonServiceImpl implements CommonService {
 //						resultSet = patientCareContextsMongoRepo.save(pcc);
 //
 				} else {
-					pcc = new PatientCareContexts();
-					pcc.setCaseReferenceNumber(pDemo.getBeneficiaryID().toString());
-					pcc.setIdentifier(pDemo.getBeneficiaryID().toString());
+					pcc1 = new PatientCareContexts();
+					pcc1.setCaseReferenceNumber(pDemo.getBeneficiaryID().toString());
+					pcc1.setIdentifier(pDemo.getBeneficiaryID().toString());
 					if (pDemo.getGenderID() != null) {
 						switch (pDemo.getGenderID()) {
 						case 1:
-							pcc.setGender("M");
+							pcc1.setGender("M");
 							break;
 						case 2:
-							pcc.setGender("F");
+							pcc1.setGender("F");
 							break;
 
 						case 3:
-							pcc.setGender("O");
+							pcc1.setGender("O");
 							break;
 
 						default:
@@ -362,19 +410,19 @@ public class CommonServiceImpl implements CommonService {
 						}
 					}
 					if (pDemo.getName() != null)
-						pcc.setName(pDemo.getName());
+						pcc1.setName(pDemo.getName());
 					if (pDemo.getDOB() != null)
-						pcc.setYearOfBirth(pDemo.getDOB().toString().split("-")[0]);
+						pcc1.setYearOfBirth(pDemo.getDOB().toString().split("-")[0]);
 					if (pDemo.getPreferredPhoneNo() != null)
-						pcc.setPhoneNumber(pDemo.getPreferredPhoneNo());
+						pcc1.setPhoneNumber(pDemo.getPreferredPhoneNo());
 					if (pDemo.getHealthID() != null)
-						pcc.setHealthId(pDemo.getHealthID());
+						pcc1.setHealthId(pDemo.getHealthID());
 					if (pDemo.getHealthIdNo() != null)
-						pcc.setHealthNumber(pDemo.getHealthIdNo());
+						pcc1.setHealthNumber(pDemo.getHealthIdNo());
 					ccList.add(cc);
-					pcc.setCareContextsList(ccList);
+					pcc1.setCareContextsList(ccList);
 					// save carecontext back to mongo
-					patientCareContextsMongoRepo.save(pcc);
+					patientCareContextsMongoRepo.save(pcc1);
 				}
 			}
 
