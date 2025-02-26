@@ -64,5 +64,24 @@ public class LoginAbhaV3Controller {
 		logger.info("NDHM_FHIR Verify abha login API response " + response.toString());
 		return response.toString();
 	}
+	
+	@CrossOrigin
+	@Operation(summary = "Print PHR card - abha address web login")
+	@PostMapping(value = { "/printWebLoginPhrCard" })
+	public String printWebLoginPhrCard(@RequestBody String request) {
+		OutputResponse response = new OutputResponse();
+		try {
+			if (request != null) {
+				String s = loginAbhaV3Service.getWebLoginPhrCard(request);
+				response.setResponse(s);
+			} else
+				throw new FHIRException("NDHM_FHIR Empty request object");
+		} catch (FHIRException e) {
+			response.setError(5000, e.getMessage());
+			logger.error(e.toString());
+		}
+		logger.info("NDHM_FHIR generate OTP for ABHA card API respponse " + response.toString());
+		return response.toString();
+	}
 
 }

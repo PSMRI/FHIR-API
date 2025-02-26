@@ -49,7 +49,7 @@ import com.wipro.fhir.utils.mapper.InputMapper;
 public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 
 	@Autowired
-	private GenerateSession_NDHMService generateSession_NDHM;
+	private GenerateAuthSessionService generateAuthSessionService;
 	@Autowired
 	private Common_NDHMService common_NDHMService;
 	@Autowired
@@ -87,7 +87,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 		String publicKeyString = null;
 
 		try {
-			String ndhmAuthToken = generateSession_NDHM.getNDHMAuthToken();
+			String abhaAuthToken = generateAuthSessionService.getAbhaAuthToken();
 
 			MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
 			headers.add("Content-Type", MediaType.APPLICATION_JSON + ";charset=utf-8");
@@ -98,12 +98,12 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 			df.setTimeZone(tz);
 			String nowAsISO = df.format(new Date());
 			headers.add("TIMESTAMP", nowAsISO);
-			headers.add("Authorization", ndhmAuthToken);
+			headers.add("Authorization", abhaAuthToken);
 
 			RequestOTPEnrollment reqOtpEnrollment = new RequestOTPEnrollment();
 			LoginMethod loginMethod = InputMapper.gson().fromJson(request, LoginMethod.class);
 
-			publicKeyString = certificateKeyService.getCertPublicKey();
+			publicKeyString = certificateKeyService.getCertPublicKey(abhaAuthToken);
 			if (loginMethod.getLoginId() != null) {
 				encryptedLoginId = encryption.encrypt(loginMethod.getLoginId(), publicKeyString);
 			}
@@ -156,7 +156,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 		String requestObj = null;
 
 		try {
-			String ndhmAuthToken = generateSession_NDHM.getNDHMAuthToken();
+			String abhaAuthToken = generateAuthSessionService.getAbhaAuthToken();
 			MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
 			headers.add("Content-Type", MediaType.APPLICATION_JSON.toString());
 			headers.add("REQUEST-ID", UUID.randomUUID().toString());
@@ -166,13 +166,12 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 			df.setTimeZone(tz);
 			String nowAsISO = df.format(new Date());
 			headers.add("TIMESTAMP", nowAsISO);
-			headers.add("Authorization", ndhmAuthToken);
+			headers.add("Authorization", abhaAuthToken);
 
 			// Create the enrollByAadhar object
-			EnrollByAadhaar enrollByAadhar = new EnrollByAadhaar();
 			LoginMethod loginData = InputMapper.gson().fromJson(request, LoginMethod.class);
 
-			publicKeyString = certificateKeyService.getCertPublicKey();
+			publicKeyString = certificateKeyService.getCertPublicKey(abhaAuthToken);
 			if (loginData.getLoginId() != null) {
 				encryptedLoginId = encryption.encrypt(loginData.getLoginId(), publicKeyString);
 			}
@@ -212,6 +211,9 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 						constructHealthIdResponse(healthIDResp, abhaProfileAsJsonObj);
 						healthIDResp.setProviderServiceMapID(loginData.getProviderServiceMapId());
 						healthIDResp.setCreatedBy(loginData.getCreatedBy());
+						if(jsonResponse.get("isNew") != null && jsonResponse.get("isNew").getAsString() == "true") {
+							healthIDResp.setIsNewAbha(true);
+						}
 						Integer healthIdCount = healthIDRepo.getCountOfHealthIdNumber(healthIDResp.getHealthIdNumber());
 						HealthIDResponse save = healthIDResp;
 						if (healthIdCount < 1) {
@@ -248,7 +250,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 		String publicKeyString = null;
 
 		try {
-			String ndhmAuthToken = generateSession_NDHM.getNDHMAuthToken();
+			String abhaAuthToken = generateAuthSessionService.getAbhaAuthToken();
 
 			MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
 			headers.add("Content-Type", MediaType.APPLICATION_JSON + ";charset=utf-8");
@@ -259,11 +261,11 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 			df.setTimeZone(tz);
 			String nowAsISO = df.format(new Date());
 			headers.add("TIMESTAMP", nowAsISO);
-			headers.add("Authorization", ndhmAuthToken);
+			headers.add("Authorization", abhaAuthToken);
 
 			LoginMethod loginMethod = InputMapper.gson().fromJson(request, LoginMethod.class);
 
-			publicKeyString = certificateKeyService.getCertPublicKey();
+			publicKeyString = certificateKeyService.getCertPublicKey(abhaAuthToken);
 			if (loginMethod.getLoginId() != null) {
 				encryptedLoginId = encryption.encrypt(loginMethod.getLoginId(), publicKeyString);
 			}
@@ -392,7 +394,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 
 
 		try {
-			String ndhmAuthToken = generateSession_NDHM.getNDHMAuthToken();
+			String abhaAuthToken = generateAuthSessionService.getAbhaAuthToken();
 
 			MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
 			headers.add("Content-Type", MediaType.APPLICATION_JSON + ";charset=utf-8");
@@ -403,7 +405,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 			df.setTimeZone(tz);
 			String nowAsISO = df.format(new Date());
 			headers.add("TIMESTAMP", nowAsISO);
-			headers.add("Authorization", ndhmAuthToken);
+			headers.add("Authorization", abhaAuthToken);
 
 			JsonObject stringReqObj = JsonParser.parseString(reqObj).getAsJsonObject();
 			if (stringReqObj.has("xToken") && stringReqObj.get("xToken") != null) {
