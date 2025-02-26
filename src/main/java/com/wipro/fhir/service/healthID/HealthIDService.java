@@ -26,4 +26,5 @@ import com.wipro.fhir.utils.exception.FHIRException;
 public interface HealthIDService {
  String mapHealthIDToBeneficiary(String request) throws FHIRException;
  public String getBenHealthID(Long benRegID);
+ public String addRecordToHealthIdTable(String request) throws FHIRException;
 }

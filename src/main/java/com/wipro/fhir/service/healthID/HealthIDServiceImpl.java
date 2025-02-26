@@ -21,7 +21,9 @@
 */
 package com.wipro.fhir.service.healthID;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,8 +34,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.wipro.fhir.data.healthID.BenHealthIDMapping;
+import com.wipro.fhir.data.healthID.HealthIDRequestAadhar;
+import com.wipro.fhir.data.healthID.HealthIDResponse;
 import com.wipro.fhir.repo.healthID.BenHealthIDMappingRepo;
+import com.wipro.fhir.repo.healthID.HealthIDRepo;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.http.HttpUtils;
 import com.wipro.fhir.utils.mapper.InputMapper;
@@ -46,9 +54,12 @@ public class HealthIDServiceImpl implements HealthIDService {
 
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
+	@Autowired
+	HealthIDRepo healthIDRepo;
 
 	public String mapHealthIDToBeneficiary(String request) throws FHIRException {
 		BenHealthIDMapping health = InputMapper.gson().fromJson(request, BenHealthIDMapping.class);
+		 health = InputMapper.gson().fromJson(request, BenHealthIDMapping.class);
 		try {
 			if (health.getBeneficiaryRegId() == null && health.getBeneficiaryID() == null)
 				throw new FHIRException("Error in mapping request");
@@ -61,6 +72,40 @@ public class HealthIDServiceImpl implements HealthIDService {
 					health = benHealthIDMappingRepo.save(health);
 				}
 			}
+			// Adding the code to check if the received healthId is present in t_healthId table and add if missing 
+			Integer healthIdCount = healthIDRepo.getCountOfHealthIdNumber(health.getHealthIdNumber());
+			if(healthIdCount < 1) {
+				JsonObject jsonRequest = JsonParser.parseString(request).getAsJsonObject();
+	            JsonObject abhaProfileJson = jsonRequest.getAsJsonObject("ABHAProfile");
+	            HealthIDResponse healthID = InputMapper.gson().fromJson(abhaProfileJson, HealthIDResponse.class);
+	            
+	    		healthID.setHealthIdNumber(abhaProfileJson.get("ABHANumber").getAsString());
+	    		JsonArray phrAddressArray = abhaProfileJson.getAsJsonArray("phrAddress");
+	    		StringBuilder abhaAddressBuilder = new StringBuilder();
+
+	    		for (int i = 0; i < phrAddressArray.size(); i++) {
+	    		    abhaAddressBuilder.append(phrAddressArray.get(i).getAsString());
+	    		    if (i < phrAddressArray.size() - 1) {
+	    		        abhaAddressBuilder.append(", ");
+	    		    }
+	    		}
+	    		healthID.setHealthId(abhaAddressBuilder.toString());
+				healthID.setName(
+						abhaProfileJson.get("firstName").getAsString() + " " + abhaProfileJson.get("middleName").getAsString() + " " + abhaProfileJson.get("lastName").getAsString());
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+				Date date = simpleDateFormat.parse(abhaProfileJson.get("dob").getAsString());
+				SimpleDateFormat year = new SimpleDateFormat("yyyy");
+				SimpleDateFormat month = new SimpleDateFormat("MM");
+				SimpleDateFormat day = new SimpleDateFormat("dd");
+				healthID.setYearOfBirth(year.format(date));
+				healthID.setMonthOfBirth(month.format(date));
+				healthID.setDayOfBirth(day.format(date));
+				healthID.setCreatedBy(jsonRequest.get("createdBy").getAsString());
+				healthID.setProviderServiceMapID(jsonRequest.get("providerServiceMapId").getAsInt());
+				healthID.setIsNewAbha(jsonRequest.get("isNew").getAsBoolean());
+				healthIDRepo.save(healthID);
+			}
+			
 		} catch (Exception e) {
 			throw new FHIRException("Error in saving data");
 		}
@@ -74,5 +119,49 @@ public class HealthIDServiceImpl implements HealthIDService {
 		resMap.put("BenHealthDetails", new Gson().toJson(healthDetailsList));
 
 		return resMap.toString();
+	}
+	
+	@Override
+	public String addRecordToHealthIdTable(String request) throws FHIRException {
+		JsonObject jsonRequest = JsonParser.parseString(request).getAsJsonObject();
+        JsonObject abhaProfileJson = jsonRequest.getAsJsonObject("ABHAProfile");
+        HealthIDResponse healthID = InputMapper.gson().fromJson(abhaProfileJson, HealthIDResponse.class);
+		String res = null;
+		try {
+			Integer healthIdCount = healthIDRepo.getCountOfHealthIdNumber(healthID.getHealthIdNumber());
+			if(healthIdCount < 1) {	            
+	    		healthID.setHealthIdNumber(abhaProfileJson.get("ABHANumber").getAsString());
+	    		JsonArray phrAddressArray = abhaProfileJson.getAsJsonArray("phrAddress");
+	    		StringBuilder abhaAddressBuilder = new StringBuilder();
+
+	    		for (int i = 0; i < phrAddressArray.size(); i++) {
+	    		    abhaAddressBuilder.append(phrAddressArray.get(i).getAsString());
+	    		    if (i < phrAddressArray.size() - 1) {
+	    		        abhaAddressBuilder.append(", ");
+	    		    }
+	    		}
+	    		healthID.setHealthId(abhaAddressBuilder.toString());
+				healthID.setName(
+						abhaProfileJson.get("firstName").getAsString() + " " + abhaProfileJson.get("middleName").getAsString() + " " + abhaProfileJson.get("lastName").getAsString());
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+				Date date = simpleDateFormat.parse(abhaProfileJson.get("dob").getAsString());
+				SimpleDateFormat year = new SimpleDateFormat("yyyy");
+				SimpleDateFormat month = new SimpleDateFormat("MM");
+				SimpleDateFormat day = new SimpleDateFormat("dd");
+				healthID.setYearOfBirth(year.format(date));
+				healthID.setMonthOfBirth(month.format(date));
+				healthID.setDayOfBirth(day.format(date));
+				healthID.setCreatedBy(jsonRequest.get("createdBy").getAsString());
+				healthID.setProviderServiceMapID(jsonRequest.get("providerServiceMapId").getAsInt());
+				healthID.setIsNewAbha(jsonRequest.get("isNew").getAsBoolean());
+				healthIDRepo.save(healthID);
+				res = "Data Saved Successfully";
+			} else {
+				res = "Data already exists";
+			}		
+		} catch (Exception e) {
+			throw new FHIRException("Error in saving data");
+		}
+		return res;
 	}
 }
