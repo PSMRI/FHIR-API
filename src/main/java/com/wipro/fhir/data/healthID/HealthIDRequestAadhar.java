@@ -38,6 +38,6 @@ public class HealthIDRequestAadhar {
 	String healthId;
 	String password;
 	String profilePhoto;
-	Boolean isNew;
+	boolean isNew;
 	String dob;
 }
