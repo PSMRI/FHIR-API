@@ -111,35 +111,6 @@ public class CreateHealthIDWithMobileOTP {
 
 	/***
 	 * 
-	 * @param request
-	 * @param Authorization
-	 * @return BenRegID of beneficiary after mapping
-	 */
-	@CrossOrigin
-	@Operation(summary = "Map ABHA to beneficiary")
-	@PostMapping(value = { "/mapHealthIDToBeneficiary" })
-	public String mapHealthIDToBeneficiary(
-			@Param(value = "{\"beneficiaryRegID\":\"Long\",\"beneficiaryID\":\"Long\",\"healthId\":\"String\",\"healthIdNumber\":\"String\""
-					+ "providerServiceMapId\":\"Integer\",\"createdBy\":\"String\"}") @RequestBody String request,
-			@RequestHeader(value = "Authorization") String Authorization) {
-		logger.info("NDHM_FHIR Map ABHA to beneficiary API request " + request);
-		OutputResponse response = new OutputResponse();
-		try {
-			if (request != null) {
-				String s = healthIDService.mapHealthIDToBeneficiary(request);
-				response.setResponse(s);
-			} else
-				throw new FHIRException("NDHM_FHIR Empty request object");
-		} catch (FHIRException e) {
-			response.setError(5000, e.getMessage());
-			logger.error(e.toString());
-		}
-		logger.info("NDHM_FHIR Map ABHA to beneficiary API response " + response.toString());
-		return response.toString();
-	}
-
-	/***
-	 * 
 	 * @param comingRequest
 	 * @return ABHA of Beneficiary
 	 */
