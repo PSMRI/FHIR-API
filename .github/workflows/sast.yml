@@ -41,10 +41,10 @@ jobs:
       uses: actions/setup-java@v2
       with:
           java-version: 17
-          distribution: 'zulu'
+          distribution: 'adopt'
        
     - name: Build with Maven
-      run: mvn clean install
+      run: mvn clean install -DENV_VAR=test
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
