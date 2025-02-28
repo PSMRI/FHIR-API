@@ -24,6 +24,7 @@ package com.wipro.fhir.service.api_channel;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -32,11 +33,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.wipro.fhir.data.request_handler.ResourceRequestHandler;
 import com.wipro.fhir.data.request_handler.UserAuthAPIResponse;
+import com.wipro.fhir.utils.CookieUtil;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.mapper.InputMapper;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class APIChannelImpl implements APIChannel {
@@ -54,6 +60,9 @@ public class APIChannelImpl implements APIChannel {
 	@Value("${fhirPassword}")
 	private String fhirPassword;
 
+	@Autowired
+	private CookieUtil cookieUtil;
+
 	/**
 	 * search patient by beneficiary ID
 	 */
@@ -63,9 +72,13 @@ public class APIChannelImpl implements APIChannel {
 		String responseBody = null;
 		if (restTemplate == null)
 			restTemplate = new RestTemplate();
+		HttpServletRequest requestHeader = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+				.getRequest();
+		String jwtTokenFromCookie = cookieUtil.getJwtTokenFromCookie(requestHeader);
 
 		MultiValueMap<String, String> header = getHttpHeader(Authorization, "application/json");
 		HttpEntity<Object> urlRequestOBJ = new HttpEntity<Object>(resourceRequestHandler, header);
+		header.add("Cookie", "Jwttoken=" + jwtTokenFromCookie);
 
 		ResponseEntity<String> response = restTemplate.exchange(benSearchByBenIDURL, HttpMethod.POST, urlRequestOBJ,
 				String.class);
@@ -96,9 +109,13 @@ public class APIChannelImpl implements APIChannel {
 
 		if (restTemplate == null)
 			restTemplate = new RestTemplate();
+		HttpServletRequest requestHeader = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+				.getRequest();
+		String jwtTokenFromCookie = cookieUtil.getJwtTokenFromCookie(requestHeader);
 
 		MultiValueMap<String, String> header = getHttpHeader(null, "application/json");
 		HttpEntity<Object> urlRequestOBJ = new HttpEntity<Object>(userDetails, header);
+		header.add("Cookie", "Jwttoken=" + jwtTokenFromCookie);
 
 		ResponseEntity<String> response = restTemplate.exchange(userAuthURL, HttpMethod.POST, urlRequestOBJ,
 				String.class);
