@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -61,14 +62,14 @@ public class HealthIDServiceImpl implements HealthIDService {
 		BenHealthIDMapping health = InputMapper.gson().fromJson(request, BenHealthIDMapping.class);
 		 health = InputMapper.gson().fromJson(request, BenHealthIDMapping.class);
 		try {
-			if (health.getBeneficiaryRegId() == null && health.getBeneficiaryID() == null)
+			if (health.getBeneficiaryRegID() == null && health.getBeneficiaryID() == null)
 				throw new FHIRException("Error in mapping request");
-			if (health.getBeneficiaryRegId() != null)
+			if (health.getBeneficiaryRegID() != null)
 				health = benHealthIDMappingRepo.save(health);
 			else {
 				if (health.getBeneficiaryID() != null) {
 					Long check1 = benHealthIDMappingRepo.getBenRegID(health.getBeneficiaryID());
-					health.setBeneficiaryRegId(check1);
+					health.setBeneficiaryRegID(check1);
 					health = benHealthIDMappingRepo.save(health);
 				}
 			}
@@ -116,7 +117,18 @@ public class HealthIDServiceImpl implements HealthIDService {
 		Map<String, Object> resMap = new HashMap<>();
 
 		ArrayList<BenHealthIDMapping> healthDetailsList = benHealthIDMappingRepo.getHealthDetails(benRegID);
-		resMap.put("BenHealthDetails", new Gson().toJson(healthDetailsList));
+		ArrayList<BenHealthIDMapping> healthDetailsWithAbhaList = new ArrayList<>();
+		
+		if(healthDetailsList.size() > 0) {
+			for(BenHealthIDMapping healthDetails: healthDetailsList) {
+				String healthIdNumber = healthDetails.getHealthIdNumber();
+				boolean isNewAbha = benHealthIDMappingRepo.getIsNewAbha(healthIdNumber);
+				healthDetails.setNewAbha(isNewAbha);
+					
+				healthDetailsWithAbhaList.add(healthDetails);
+			}
+		}
+		resMap.put("BenHealthDetails", new Gson().toJson(healthDetailsWithAbhaList));
 
 		return resMap.toString();
 	}

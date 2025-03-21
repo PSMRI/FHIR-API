@@ -75,5 +75,8 @@ public interface BenHealthIDMappingRepo extends CrudRepository<BenHealthIDMappin
 	@Modifying
 	@Query(value = "UPDATE db_iemr.t_benvisitdetail SET AbdmFacilityID = :abdmFacilityId WHERE VisitCode= :visitCode", nativeQuery = true)
 	Integer updateFacilityIdForVisit(@Param("visitCode") BigInteger visitCode, @Param("abdmFacilityId") String abdmFacilityId);
+	
+	@Query(value = "select isNewAbha from t_healthid where HealthIdNumber=:healthIdNumber order by 1 desc limit 1", nativeQuery = true)
+	boolean getIsNewAbha(@Param("healthIdNumber") String healthIdNumber);
 
 }

@@ -247,7 +247,8 @@ public class LoginAbhaV3ServiceImpl implements LoginAbhaV3Service {
 						responseMap.put("abhaDetails",
 								jsonResponse.get("accounts").getAsJsonArray().get(0).getAsJsonObject().toString());
 						responseMap.put("txnId", jsonResponse.get("txnId").getAsString());
-						if ("MOBILE".equalsIgnoreCase(loginData.getLoginMethod()) && jsonResponse.has("token")) {
+						if ("MOBILE".equalsIgnoreCase(loginData.getLoginMethod()) && "MOBILE".equalsIgnoreCase(loginData.getLoginHint()) 
+								&& jsonResponse.has("token")) {
 							String xtoken = verifyProfileLoginUser(jsonResponse.get("token").getAsString(),
 									jsonResponse.get("txnId").getAsString(), abhaNumber);
 							responseMap.put("xToken", xtoken);
