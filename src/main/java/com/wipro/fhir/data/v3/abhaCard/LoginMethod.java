@@ -7,6 +7,7 @@ public class LoginMethod {
 	
 	private String loginId;
 	private String loginMethod;
+	private String loginHint;
 	private String pId;
 	private String txnId;
 	private String mobileNumber;
