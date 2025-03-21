@@ -26,11 +26,32 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import com.wipro.fhir.data.users.User;
 
 @SpringBootApplication
 public class FhirApiApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(FhirApiApplication.class, args);
+	}
+
+	@Bean
+	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+		RedisTemplate<String, Object> template = new RedisTemplate<>();
+		template.setConnectionFactory(factory);
+
+		// Use StringRedisSerializer for keys (userId)
+		template.setKeySerializer(new StringRedisSerializer());
+
+		// Use Jackson2JsonRedisSerializer for values (Users objects)
+		Jackson2JsonRedisSerializer<User> serializer = new Jackson2JsonRedisSerializer<>(User.class);
+		template.setValueSerializer(serializer);
+
+		return template;
 	}
 }
