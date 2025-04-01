@@ -69,10 +69,19 @@ public class HTTPRequestInterceptor implements HandlerInterceptor {
 
 				// case "patient":
 				case "swagger-ui.html":
+				case "index.html":
+				case "index.css":
+				case "swagger-initializer.js":
+				case "swagger-config":
+				case "swagger-ui-bundle.js":
+				case "swagger-ui.css":
 				case "ui":
+				case "swagger-ui-standalone-preset.js":
+				case "favicon-32x32.png":
+				case "favicon-16x16.png":
 				case "swagger-resources":
-				case "version":
 				case "api-docs":
+				case "version":
 
 					break;
 				case "error":
