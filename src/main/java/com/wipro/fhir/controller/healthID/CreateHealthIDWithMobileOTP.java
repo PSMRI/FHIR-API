@@ -139,5 +139,31 @@ public class CreateHealthIDWithMobileOTP {
 		logger.info("NDHM_FHIR get beneficiary ABHA response:" + response.toString());
 		return response.toString();
 	}
+	
+	@CrossOrigin()
+	@Operation(summary = "Get Beneficiary Id for ABHA Id")
+	@PostMapping(value = { "/getBenIdForhealthID" })
+	public String getBenIdForhealthID(
+			@Param(value = "{\"healthIdNumber\":\"String\"}") @RequestBody String request) {
+		OutputResponse response = new OutputResponse();
+
+		logger.info("NDHM_FHIR Request obj to fetch beneficiary Ids for HealthID :" + request);
+		try {
+			JSONObject obj = new JSONObject(request);
+			if (request != null) {
+				String healthId = obj.getString("healthIdNumber");
+				String res = healthIDService.getMappedBenIdForHealthId(healthId);
+				response.setResponse(res);
+			} else {
+				logger.info("NDHM_FHIR Invalid Request Data.");
+				response.setError(5000, "NDHM_FHIR Invalid request");
+			}
+		} catch (Exception e) {
+			response.setError(5000, e.getMessage());
+			logger.error("NDHM_FHIR Error while getting beneficiary Ids for HealthID:" + e);
+		}
+		logger.info("NDHM_FHIR get beneficiary Ids for HealthID response:" + response.toString());
+		return response.toString();
+	}
 
 }

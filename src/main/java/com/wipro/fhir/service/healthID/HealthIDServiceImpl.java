@@ -176,4 +176,16 @@ public class HealthIDServiceImpl implements HealthIDService {
 		}
 		return res;
 	}
+	
+	@Override
+	public String getMappedBenIdForHealthId(String healthIdNumber) {
+		String[] beneficiaryIdsList = benHealthIDMappingRepo.getBenIdForHealthId(healthIdNumber);
+		
+		if(beneficiaryIdsList.length > 0) {
+			String[] benIds = benHealthIDMappingRepo.getBeneficiaryIds(beneficiaryIdsList);
+			return String.join(",", benIds);
+		} 
+		return "No Beneficiary Found";
+	}
+	
 }
