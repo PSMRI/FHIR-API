@@ -45,6 +45,12 @@ public interface BenHealthIDMappingRepo extends CrudRepository<BenHealthIDMappin
 	@Query(" SELECT bvd from BenHealthIDMapping bvd WHERE bvd.beneficiaryRegID = :benRegID")
 	public ArrayList<BenHealthIDMapping> getHealthDetails(@Param("benRegID") Long benRegID);
 	
+	@Query("SELECT bvd.beneficiaryRegID from BenHealthIDMapping bvd WHERE bvd.healthIdNumber = :healthIdNumber")
+	public String[] getBenIdForHealthId(@Param("healthIdNumber") String healthIdNumber);
+	
+	@Query(value = "SELECT BeneficiaryID FROM db_identity.m_beneficiaryregidmapping where BenRegId in (:benIds)", nativeQuery = true)
+	public String[] getBeneficiaryIds(@Param("benIds") String[] benIds);
+	
 	@Transactional
 	@Modifying
 	@Query(value = "UPDATE db_iemr.t_benvisitdetail SET HealthID= :healthID,HealthIdNumber= :healthIdNumber,CarecontextLinkDate=CURRENT_TIMESTAMP() WHERE VisitCode= :visitCode ", nativeQuery = true)
