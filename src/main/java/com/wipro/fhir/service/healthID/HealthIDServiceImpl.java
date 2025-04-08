@@ -23,6 +23,7 @@ package com.wipro.fhir.service.healthID;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -183,7 +184,7 @@ public class HealthIDServiceImpl implements HealthIDService {
 		
 		if(beneficiaryIdsList.length > 0) {
 			String[] benIds = benHealthIDMappingRepo.getBeneficiaryIds(beneficiaryIdsList);
-			return String.join(",", benIds);
+			return Arrays.toString(benIds);
 		} 
 		return "No Beneficiary Found";
 	}
