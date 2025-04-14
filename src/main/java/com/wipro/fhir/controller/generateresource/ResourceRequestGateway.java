@@ -49,7 +49,7 @@ import io.swagger.v3.oas.annotations.Operation;
  *
  */
 
-@CrossOrigin
+
 @RestController
 @RequestMapping(value = "/get/resource", headers = "Authorization", consumes = "application/json", produces = "application/json")
 public class ResourceRequestGateway {
@@ -73,7 +73,7 @@ public class ResourceRequestGateway {
 	 *         DocumentReference}
 	 * 
 	 */
-	@CrossOrigin
+	
 	@Operation(summary = "Get OP consult record bundle")
 	@PostMapping(value = { "/OPConsultRecord" })
 	public String getPatientResource(@RequestBody ResourceRequestHandler patientResourceRequest,
@@ -100,7 +100,7 @@ public class ResourceRequestGateway {
 	 *         DocumentReference}
 	 * 
 	 */
-	@CrossOrigin
+	
 	@Operation(summary = "Get diagnostic report record bundle")
 	@PostMapping(value = { "/DiagnosticReportRecord" })
 	public String getDiagnosticReportRecord(@RequestBody ResourceRequestHandler patientResourceRequest,
@@ -126,7 +126,7 @@ public class ResourceRequestGateway {
 	 *         || Organization || MedicationRequest || Binary}
 	 * 
 	 */
-	@CrossOrigin
+	
 	@Operation(summary = "Get prescription record")
 	@PostMapping(value = { "/PrescriptionRecord" })
 	public String getPrescriptionRecord(@RequestBody ResourceRequestHandler patientResourceRequest,
