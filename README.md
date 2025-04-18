@@ -68,6 +68,7 @@ Types include:
 - `test`: Adding or fixing tests
 - `build`: Changes to build process or tools
 - `ci`: Changes to CI configuration
+- `chore`: Other changes (e.g., maintenance tasks, dependencies)
 
 Your commit messages will be automatically validated when you commit, ensuring project consistency.
 
