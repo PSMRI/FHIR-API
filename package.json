@@ -18,7 +18,7 @@
     "**/*.java": [
     "java -jar checkstyle.jar -c checkstyle.xml "
   ],
-  "**/*.xml": [
+    "**/*.xml": [
     "xmllint --noout "
   ]
   },
