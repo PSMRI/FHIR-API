@@ -19,7 +19,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
-package com.wipro.fhir.controller.generateresource;
+   package com.wipro.fhir.controller.generateresource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
