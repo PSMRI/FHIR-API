@@ -15,10 +15,10 @@
     "src/**/*.{ts,js}": [
       "eslint --fix"
     ],
-    "*.java": [
-    "java -jar checkstyle.jar -c checkstyle.xml {{files}}"
+    "**/*.java": [
+    "java -jar checkstyle.jar -c checkstyle.xml"
   ],
-  "*.xml": [
+  "**/*.xml": [
     "xmllint --noout {{files}}"
   ]
   },
