@@ -34,13 +34,12 @@ public class JwtUserIdValidationFilter implements Filter {
 		String path = request.getRequestURI();
 		String contextPath = request.getContextPath();
 		logger.info("JwtUserIdValidationFilter invoked for path: " + path);
-		String requestSource = request.getHeader("User-Agent");
-	    if (null != requestSource && requestSource.contains("okhttp")) {
-	        logger.info("Skipping JWT validation for X-Request-Source: okhttp");
+		String userAgent = request.getHeader("User-Agent");
+	    if (isMobileClient(userAgent)) {
+	        logger.info("Skipping JWT validation for X-Request-Source : "+userAgent);
 	        filterChain.doFilter(servletRequest, servletResponse);
 	        return;
 	    }
-
 		// Log cookies for debugging
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
@@ -115,5 +114,15 @@ public class JwtUserIdValidationFilter implements Filter {
 		cookie.setSecure(true);
 		cookie.setMaxAge(0); // Invalidate the cookie
 		response.addCookie(cookie);
+	}
+	private boolean isMobileClient(String userAgent) {
+	    if (userAgent == null) return false;
+	    userAgent = userAgent.toLowerCase();
+	    // Common indicators for mobile apps
+	    return userAgent.contains("okhttp") ||         // Android OkHttp client
+	           userAgent.contains("android") ||        // Generic Android apps
+	           userAgent.contains("dalvik") ||         // Android runtime
+	           userAgent.contains("iphone") ||         // iOS device
+	           userAgent.contains("ios");              // Custom iOS client
 	}
 }
