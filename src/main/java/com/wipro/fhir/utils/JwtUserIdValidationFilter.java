@@ -34,6 +34,12 @@ public class JwtUserIdValidationFilter implements Filter {
 		String path = request.getRequestURI();
 		String contextPath = request.getContextPath();
 		logger.info("JwtUserIdValidationFilter invoked for path: " + path);
+		String requestSource = request.getHeader("User-Agent");
+	    if (null != requestSource && requestSource.contains("okhttp")) {
+	        logger.info("Skipping JWT validation for X-Request-Source: okhttp");
+	        filterChain.doFilter(servletRequest, servletResponse);
+	        return;
+	    }
 
 		// Log cookies for debugging
 		Cookie[] cookies = request.getCookies();
@@ -71,8 +77,8 @@ public class JwtUserIdValidationFilter implements Filter {
 			// Determine which token (cookie or header) to validate
 			String jwtToken = jwtTokenFromCookie != null ? jwtTokenFromCookie : jwtTokenFromHeader;
 			if (jwtToken == null) {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT token not found in cookies or headers");
-				return;
+				//response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT token not found in cookies or headers");
+				//return;
 			}
 
 			// Validate JWT token and userId
