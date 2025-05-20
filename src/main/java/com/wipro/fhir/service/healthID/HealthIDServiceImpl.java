@@ -123,8 +123,8 @@ public class HealthIDServiceImpl implements HealthIDService {
 		if(healthDetailsList.size() > 0) {
 			for(BenHealthIDMapping healthDetails: healthDetailsList) {
 				String healthIdNumber = healthDetails.getHealthIdNumber();
-				boolean isNewAbha = benHealthIDMappingRepo.getIsNewAbha(healthIdNumber);
-				healthDetails.setNewAbha(isNewAbha);
+				Boolean isNewAbha = benHealthIDMappingRepo.getIsNewAbha(healthIdNumber);
+				healthDetails.setIsNewAbha(isNewAbha);
 					
 				healthDetailsWithAbhaList.add(healthDetails);
 			}
