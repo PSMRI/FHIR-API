@@ -54,65 +54,64 @@ public class JwtUserIdValidationFilter implements Filter {
 
 		// Skip login and public endpoints
 		if (shouldSkipPath(path, contextPath)) {
-	        filterChain.doFilter(servletRequest, servletResponse);
-	        return;
-	    }
-		
+			filterChain.doFilter(servletRequest, servletResponse);
+			return;
+		}
 
 		try {
 			String jwtFromCookie = getJwtTokenFromCookies(request);
-		    String jwtFromHeader = request.getHeader("JwtToken");
-		    String authHeader = request.getHeader("Authorization");
+			String jwtFromHeader = request.getHeader("JwtToken");
+			String authHeader = request.getHeader("Authorization");
 
-	        if (jwtFromCookie != null) {
-	            logger.info("Validating JWT token from cookie");
-	            if (jwtAuthenticationUtil.validateUserIdAndJwtToken(jwtFromCookie)) {
-	                filterChain.doFilter(servletRequest, servletResponse);
-	                return;
-	            }
-	        }
+			if (jwtFromCookie != null) {
+				logger.info("Validating JWT token from cookie");
+				if (jwtAuthenticationUtil.validateUserIdAndJwtToken(jwtFromCookie)) {
+					filterChain.doFilter(servletRequest, servletResponse);
+					return;
+				}
+			}
 
-	        if (jwtFromHeader != null) {
-	            logger.info("Validating JWT token from header");
-	            if (jwtAuthenticationUtil.validateUserIdAndJwtToken(jwtFromHeader)) {
-	                filterChain.doFilter(servletRequest, servletResponse);
-	                return;
-	            }
-	        }
-	        String userAgent = request.getHeader("User-Agent");
-	        logger.info("User-Agent: " + userAgent);
+			if (jwtFromHeader != null) {
+				logger.info("Validating JWT token from header");
+				if (jwtAuthenticationUtil.validateUserIdAndJwtToken(jwtFromHeader)) {
+					filterChain.doFilter(servletRequest, servletResponse);
+					return;
+				}
+			}
+			String userAgent = request.getHeader("User-Agent");
+			logger.info("User-Agent: " + userAgent);
 
 			if (userAgent != null && isMobileClient(userAgent) && authHeader != null) {
 				filterChain.doFilter(servletRequest, servletResponse);
 				return;
 			}
 
-	        logger.warn("No valid authentication token found");
-	        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Invalid or missing token");
+			logger.warn("No valid authentication token found");
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Invalid or missing token");
 
 		} catch (Exception e) {
 			logger.error("Authorization error: ", e);
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization error: " + e.getMessage());
 		}
 	}
+
 	private boolean isMobileClient(String userAgent) {
-	    if (userAgent == null) return false;
+		if (userAgent == null)
+			return false;
 
-	    userAgent = userAgent.toLowerCase();
+		userAgent = userAgent.toLowerCase();
 
-	    return userAgent.contains("okhttp") ||       // Android (OkHttp)
-	           userAgent.contains("dalvik") ||       // Android runtime
-	           userAgent.contains("android") ||      // Generic Android
-	           userAgent.contains("iphone") ||       // iOS
-	           userAgent.contains("ios");            // iOS (custom clients)
+		return userAgent.contains("okhttp"); // iOS (custom clients)
 	}
+
 	private boolean shouldSkipPath(String path, String contextPath) {
-	    return path.equals(contextPath + "/user/userAuthenticate") ||
-	           path.equalsIgnoreCase(contextPath + "/user/logOutUserFromConcurrentSession") ||
-	           path.startsWith(contextPath + "/swagger-ui") ||
-	           path.startsWith(contextPath + "/v3/api-docs") ||
-	           path.startsWith(contextPath + "/public");
+		return path.equals(contextPath + "/user/userAuthenticate")
+				|| path.equalsIgnoreCase(contextPath + "/user/logOutUserFromConcurrentSession")
+				|| path.startsWith(contextPath + "/swagger-ui")
+				|| path.startsWith(contextPath + "/v3/api-docs")
+				|| path.startsWith(contextPath + "/public");
 	}
+
 	private String getJwtTokenFromCookies(HttpServletRequest request) {
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
