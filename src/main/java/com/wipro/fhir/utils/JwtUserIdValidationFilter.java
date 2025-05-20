@@ -53,41 +53,63 @@ public class JwtUserIdValidationFilter implements Filter {
 		logger.info("JWT token from header: ");
 
 		// Skip login and public endpoints
-		if (path.equals(contextPath + "/user/userAuthenticate")
-				|| path.equalsIgnoreCase(contextPath + "/user/logOutUserFromConcurrentSession")
-				|| path.startsWith(contextPath + "/swagger-ui")
-				|| path.startsWith(contextPath + "/v3/api-docs")
-				|| path.startsWith(contextPath + "/public")) {
-			logger.info("Skipping filter for path: " + path);
+		if (shouldSkipPath(path, contextPath)) {
 			filterChain.doFilter(servletRequest, servletResponse);
 			return;
 		}
 
 		try {
-			// Retrieve JWT token from cookies
-			String jwtTokenFromCookie = getJwtTokenFromCookies(request);
-			logger.info("JWT token from cookie: ");
+			String jwtFromCookie = getJwtTokenFromCookies(request);
+			String jwtFromHeader = request.getHeader("JwtToken");
+			String authHeader = request.getHeader("Authorization");
 
-			// Determine which token (cookie or header) to validate
-			String jwtToken = jwtTokenFromCookie != null ? jwtTokenFromCookie : jwtTokenFromHeader;
-			if (jwtToken == null) {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT token not found in cookies or headers");
+			if (jwtFromCookie != null) {
+				logger.info("Validating JWT token from cookie");
+				if (jwtAuthenticationUtil.validateUserIdAndJwtToken(jwtFromCookie)) {
+					filterChain.doFilter(servletRequest, servletResponse);
+					return;
+				}
+			}
+
+			if (jwtFromHeader != null) {
+				logger.info("Validating JWT token from header");
+				if (jwtAuthenticationUtil.validateUserIdAndJwtToken(jwtFromHeader)) {
+					filterChain.doFilter(servletRequest, servletResponse);
+					return;
+				}
+			}
+			String userAgent = request.getHeader("User-Agent");
+			logger.info("User-Agent: " + userAgent);
+
+			if (userAgent != null && isMobileClient(userAgent) && authHeader != null) {
+				filterChain.doFilter(servletRequest, servletResponse);
 				return;
 			}
 
-			// Validate JWT token and userId
-			boolean isValid = jwtAuthenticationUtil.validateUserIdAndJwtToken(jwtToken);
+			logger.warn("No valid authentication token found");
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Invalid or missing token");
 
-			if (isValid) {
-				// If token is valid, allow the request to proceed
-				filterChain.doFilter(servletRequest, servletResponse);
-			} else {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
-			}
 		} catch (Exception e) {
 			logger.error("Authorization error: ", e);
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization error: " + e.getMessage());
 		}
+	}
+
+	private boolean isMobileClient(String userAgent) {
+		if (userAgent == null)
+			return false;
+
+		userAgent = userAgent.toLowerCase();
+
+		return userAgent.contains("okhttp"); // iOS (custom clients)
+	}
+
+	private boolean shouldSkipPath(String path, String contextPath) {
+		return path.equals(contextPath + "/user/userAuthenticate")
+				|| path.equalsIgnoreCase(contextPath + "/user/logOutUserFromConcurrentSession")
+				|| path.startsWith(contextPath + "/swagger-ui")
+				|| path.startsWith(contextPath + "/v3/api-docs")
+				|| path.startsWith(contextPath + "/public");
 	}
 
 	private String getJwtTokenFromCookies(HttpServletRequest request) {
