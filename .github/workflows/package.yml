@@ -5,12 +5,12 @@ on:
     branches: [ "develop"]
     paths-ignore:
      - target/**
-     
+
   pull_request:
      branches: [ "develop" ]
      paths-ignore:
      - target/**
-     
+
 env:
   ENV_VAR: test
 
@@ -18,22 +18,22 @@ jobs:
   Package-test:
     runs-on: ubuntu-latest
     steps:
-    
-    - name: Checkout code 
-      uses: actions/checkout@v2
-      
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
     - name: Setup JDK 17
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v4
       with:
         java-version: 17
-        distribution: 'zulu'
-        
+        distribution: 'temurin'
+
     - name: Build with Maven
       run: mvn clean install -DENV_VAR=${{ env.ENV_VAR }}
-      
+
     - name: Build WAR file
       run: mvn -B package --file pom.xml
-      
+
     - name: Upload WAR file as artifact
       uses: actions/upload-artifact@v4
       with:
