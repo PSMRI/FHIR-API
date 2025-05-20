@@ -211,7 +211,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 						constructHealthIdResponse(healthIDResp, abhaProfileAsJsonObj);
 						healthIDResp.setProviderServiceMapID(loginData.getProviderServiceMapId());
 						healthIDResp.setCreatedBy(loginData.getCreatedBy());
-						if(jsonResponse.get("isNew") != null && (jsonResponse.get("isNew").getAsString() == "true")) {
+						if(jsonResponse.get("isNew") != null && "true".equals(jsonResponse.get("isNew").getAsString())) {
 							healthIDResp.setIsNewAbha(true);
 						} else {
 							healthIDResp.setIsNewAbha(false);
