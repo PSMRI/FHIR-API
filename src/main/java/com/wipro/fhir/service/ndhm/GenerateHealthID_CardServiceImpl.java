@@ -34,7 +34,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -79,8 +78,7 @@ public class GenerateHealthID_CardServiceImpl implements GenerateHealthID_CardSe
 
 			String ndhmAuthToken = generateSession_NDHM.getNDHMAuthToken();
 			Map<String, String> responseMap = new HashMap<String, String>();
-			ObjectMapper objectMapper = new ObjectMapper();
-			SendOTPForCard obj = objectMapper.convertValue(request, SendOTPForCard.class);
+			SendOTPForCard obj = InputMapper.gson().fromJson(request, SendOTPForCard.class);
 
 			Map<String, Object> requestMap = null;
 			requestMap = new HashMap<String, Object>();
