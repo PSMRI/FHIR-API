@@ -65,26 +65,32 @@ public class JwtUserIdValidationFilter implements Filter {
 			if (jwtFromCookie != null) {
 				logger.info("Validating JWT token from cookie");
 				if (jwtAuthenticationUtil.validateUserIdAndJwtToken(jwtFromCookie)) {
-					AuthorizationHeaderRequestWrapper authorizationHeaderRequestWrapper = new AuthorizationHeaderRequestWrapper(request, "");
+					AuthorizationHeaderRequestWrapper authorizationHeaderRequestWrapper = new AuthorizationHeaderRequestWrapper(
+							request, "");
 					filterChain.doFilter(authorizationHeaderRequestWrapper, servletResponse);
 					return;
 				}
-			}
-
-			if (jwtFromHeader != null) {
+			} else if (jwtFromHeader != null) {
 				logger.info("Validating JWT token from header");
 				if (jwtAuthenticationUtil.validateUserIdAndJwtToken(jwtFromHeader)) {
-					AuthorizationHeaderRequestWrapper authorizationHeaderRequestWrapper = new AuthorizationHeaderRequestWrapper(request, "");
+					AuthorizationHeaderRequestWrapper authorizationHeaderRequestWrapper = new AuthorizationHeaderRequestWrapper(
+							request, "");
 					filterChain.doFilter(authorizationHeaderRequestWrapper, servletResponse);
 					return;
 				}
-			}
-			String userAgent = request.getHeader("User-Agent");
-			logger.info("User-Agent: " + userAgent);
+			} else {
+				String userAgent = request.getHeader("User-Agent");
+				logger.info("User-Agent: " + userAgent);
 
-			if (userAgent != null && isMobileClient(userAgent) && authHeader != null) {
-				filterChain.doFilter(servletRequest, servletResponse);
-				return;
+				if (userAgent != null && isMobileClient(userAgent) && authHeader != null) {
+					try {
+						UserAgentContext.setUserAgent(userAgent);
+						filterChain.doFilter(servletRequest, servletResponse);
+					} finally {
+						UserAgentContext.clear();
+					}
+					return;
+				}
 			}
 
 			logger.warn("No valid authentication token found");

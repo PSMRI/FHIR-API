@@ -59,7 +59,7 @@ public class HTTPRequestInterceptor implements HandlerInterceptor {
 		boolean status = true;
 		logger.debug("In preHandle we are Intercepting the Request");
 		String authorization = request.getHeader("Authorization");
-		if (authorization.equals("")) {
+		if (authorization == null || authorization.isEmpty()) {
 	        logger.info("Authorization header is null or empty. Skipping HTTPRequestInterceptor.");
 	        return true; // Allow the request to proceed without validation
 	    }

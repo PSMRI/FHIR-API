@@ -39,6 +39,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.wipro.fhir.data.request_handler.ResourceRequestHandler;
 import com.wipro.fhir.data.request_handler.UserAuthAPIResponse;
 import com.wipro.fhir.utils.CookieUtil;
+import com.wipro.fhir.utils.RestTemplateUtil;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.mapper.InputMapper;
 
@@ -72,15 +73,9 @@ public class APIChannelImpl implements APIChannel {
 		String responseBody = null;
 		if (restTemplate == null)
 			restTemplate = new RestTemplate();
-		HttpServletRequest requestHeader = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-				.getRequest();
-		String jwtTokenFromCookie = cookieUtil.getJwtTokenFromCookie(requestHeader);
-
-		MultiValueMap<String, String> header = getHttpHeader(Authorization, "application/json");
-		HttpEntity<Object> urlRequestOBJ = new HttpEntity<Object>(resourceRequestHandler, header);
-		header.add("Cookie", "Jwttoken=" + jwtTokenFromCookie);
-
-		ResponseEntity<String> response = restTemplate.exchange(benSearchByBenIDURL, HttpMethod.POST, urlRequestOBJ,
+		
+		HttpEntity<Object> request = RestTemplateUtil.createRequestEntity(resourceRequestHandler, Authorization);
+		ResponseEntity<String> response = restTemplate.exchange(benSearchByBenIDURL, HttpMethod.POST, request,
 				String.class);
 
 		if (response.getStatusCodeValue() == 200 && response.hasBody()) {
@@ -111,12 +106,8 @@ public class APIChannelImpl implements APIChannel {
 			restTemplate = new RestTemplate();
 		HttpServletRequest requestHeader = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
 				.getRequest();
-		String jwtTokenFromCookie = cookieUtil.getJwtTokenFromCookie(requestHeader);
-
-		MultiValueMap<String, String> header = getHttpHeader(null, "application/json");
-		HttpEntity<Object> urlRequestOBJ = new HttpEntity<Object>(userDetails, header);
-		header.add("Cookie", "Jwttoken=" + jwtTokenFromCookie);
-
+		
+		HttpEntity<Object> urlRequestOBJ = RestTemplateUtil.createRequestEntity(userDetails, requestHeader.getHeader("Authorization"));
 		ResponseEntity<String> response = restTemplate.exchange(userAuthURL, HttpMethod.POST, urlRequestOBJ,
 				String.class);
 
