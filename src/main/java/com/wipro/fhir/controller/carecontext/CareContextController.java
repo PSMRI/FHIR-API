@@ -38,7 +38,7 @@ import com.wipro.fhir.utils.response.OutputResponse;
 import io.lettuce.core.dynamic.annotation.Param;
 import io.swagger.v3.oas.annotations.Operation;
 
-@CrossOrigin
+
 @RestController
 @RequestMapping(value = "/careContext", headers = "Authorization", consumes = "application/json", produces = "application/json")
 public class CareContextController {
@@ -46,7 +46,7 @@ public class CareContextController {
 	@Autowired
 	private CareContextService careContextService;
 
-	@CrossOrigin
+	
 	@Operation(summary = "Generate OTP for care context linking")
 	@PostMapping(value = { "/generateOTPForCareContext" })
 	public String generateOTP(
@@ -69,7 +69,7 @@ public class CareContextController {
 		return response.toString();
 	}
 
-	@CrossOrigin
+	
 	@Operation(summary = "Validate OTP and create care context")
 	@PostMapping(value = { "/validateOTPAndCreateCareContext" })
 	public String validateOTPAndCreateCareContext(
@@ -94,7 +94,7 @@ public class CareContextController {
 		return response.toString();
 	}
 
-	@CrossOrigin
+	
 	@Operation(summary = "Add care context to Mongo")
 	@PostMapping(value = { "/addCarecontextToMongo" })
 	public String saveCareContextToMongo(@Param(value = "{}") @RequestBody String request,

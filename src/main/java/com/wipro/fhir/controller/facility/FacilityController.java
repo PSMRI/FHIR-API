@@ -20,7 +20,7 @@ import com.wipro.fhir.utils.response.OutputResponse;
 import io.swagger.v3.oas.annotations.Operation;
 
 
-@CrossOrigin
+
 @RestController
 @RequestMapping(value = "/facility", headers = "Authorization")
 public class FacilityController {
@@ -31,7 +31,7 @@ public class FacilityController {
 	
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-	@CrossOrigin
+	
 	@Operation(summary = "Get ABDM Registered Facilities")
 	@GetMapping(value = { "/getAbdmRegisteredFacilities" })
 	public String getAbdmRegisteredFacilities(@RequestHeader(value = "Authorization") String Authorization) {
@@ -54,7 +54,7 @@ public class FacilityController {
 	}
 	
 	
-	@CrossOrigin
+	
 	@Operation(summary = "Get ABDM Registered Facilities")
 	@PostMapping(value = { "/saveAbdmFacilityId" })
 	public String saveAbdmFacilityForVisit(@RequestHeader(value = "Authorization") String Authorization,  @RequestBody() String reqObj) {

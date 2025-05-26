@@ -34,7 +34,7 @@ import com.wipro.fhir.utils.response.OutputResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 
-@CrossOrigin
+
 @RestController
 @RequestMapping(value = "/higher/health/facility", headers = "Authorization", consumes = "application/json", produces = "application/json")
 public class HigherHealthFacilityController {
@@ -42,7 +42,7 @@ public class HigherHealthFacilityController {
 	@Autowired
 	private HigherHealthFacilityServiceImpl higherHealthFacilityServiceImpl;
 
-	@CrossOrigin
+	
 	@Operation(summary = "Update beneficiary id for higher health facility")
 	@PostMapping(value = { "/update/bengenid" })
 	public String feedPatientDemographicData(@RequestBody ResourceRequestHandler resourceRequestHandler) {
@@ -64,7 +64,7 @@ public class HigherHealthFacilityController {
 
 	}
 
-	@CrossOrigin
+	
 	@Operation(summary = "Get clinical data from higher health facility")
 	@PostMapping(value = { "/get/clinical/data" })
 	public String getCLinicalDataHigherhealthFacility(@RequestBody ResourceRequestHandler resourceRequestHandler) {

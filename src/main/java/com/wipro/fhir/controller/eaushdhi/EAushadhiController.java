@@ -47,7 +47,7 @@ import io.swagger.v3.oas.annotations.Operation;
  * @author DE40034072 Date 01-12-2021
  */
 
-@CrossOrigin
+
 @RestController
 @RequestMapping(value = "/eAushadhi", headers = "Authorization", consumes = "application/json", produces = "application/json")
 public class EAushadhiController {
@@ -56,7 +56,7 @@ public class EAushadhiController {
 	private EAushadhiService eAushadhiService;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-	@CrossOrigin
+	
 	@Operation(summary = "Getting store stock details from e-aushadhi")
 	@PostMapping(value = { "/getStoreStockDetails" })
 	public String getStoreStockDetails(@Param(value = "{\"facilityID\":\"Integer\"}") @RequestBody String request,
@@ -90,7 +90,7 @@ public class EAushadhiController {
 	 * @param Authorization
 	 * @return sync dispense data and patient information to E-Aushadhi.
 	 */
-	@CrossOrigin
+	
 	@Operation(summary = "Sync drug dispense data and patient details with e-aushadhi")
 	@PostMapping(value = { "/syncDrugDispenseDetails" })
 	public String syncDrugDispenseAndPatientDetails(
@@ -113,7 +113,7 @@ public class EAushadhiController {
 		return response.toString();
 	}
 
-	@CrossOrigin
+	
 	@Operation(summary = "Get log for stock processing")
 	@PostMapping(value = { "/getFacilityStockProcessLog" })
 	public String getFacilityStockProcessLog(@RequestBody String request) {
@@ -134,7 +134,7 @@ public class EAushadhiController {
 		return response.toString();
 	}
 
-	@CrossOrigin
+	
 	@Operation(summary = "Sync e-aushadhi for patient issue details")
 	@PostMapping(value = { "/updatePatientIssueSyncStatus" })
 	public String addFacility(@RequestBody String request) {

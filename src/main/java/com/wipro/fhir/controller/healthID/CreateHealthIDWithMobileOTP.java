@@ -40,7 +40,7 @@ import com.wipro.fhir.utils.response.OutputResponse;
 import io.lettuce.core.dynamic.annotation.Param;
 import io.swagger.v3.oas.annotations.Operation;
 
-@CrossOrigin
+
 @RestController
 @RequestMapping(value = "/healthID", headers = "Authorization", consumes = "application/json", produces = "application/json")
 public class CreateHealthIDWithMobileOTP {
@@ -56,7 +56,7 @@ public class CreateHealthIDWithMobileOTP {
 	 * @param Authorization
 	 * @return NDHM transactionID
 	 */
-	@CrossOrigin
+	
 	@Operation(summary = "generate OTP")
 	@PostMapping(value = { "/generateOTP" })
 	public String generateOTP(@Param(value = "{\"mobile\":\"String\"}") @RequestBody String request,
@@ -84,7 +84,7 @@ public class CreateHealthIDWithMobileOTP {
 	 * @param Authorization
 	 * @return Generated ABHA for Beneficiary
 	 */
-	@CrossOrigin
+	
 	@Operation(summary = "verify OTP and generate ABHA")
 	@PostMapping(value = { "/verifyOTPAndGenerateHealthID" })
 	public String verifyOTPAndGenerateHealthID(
@@ -114,7 +114,7 @@ public class CreateHealthIDWithMobileOTP {
 	 * @param comingRequest
 	 * @return ABHA of Beneficiary
 	 */
-	@CrossOrigin()
+
 	@Operation(summary = "Get Beneficiary ABHA details")
 	@PostMapping(value = { "/getBenhealthID" })
 	public String getBenhealthID(
@@ -140,7 +140,7 @@ public class CreateHealthIDWithMobileOTP {
 		return response.toString();
 	}
 	
-	@CrossOrigin()
+
 	@Operation(summary = "Get Beneficiary Id for ABHA Id")
 	@PostMapping(value = { "/getBenIdForhealthID" })
 	public String getBenIdForhealthID(

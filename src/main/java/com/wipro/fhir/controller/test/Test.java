@@ -42,7 +42,7 @@ import com.wipro.fhir.utils.response.OutputResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 
-@CrossOrigin
+
 @RestController
 @RequestMapping(value = "/feeds", headers = "Authorization")
 public class Test {
@@ -53,7 +53,7 @@ public class Test {
 	@Autowired
 	private OPConsultRecordBundleImpl oPConsultRecordBundleImpl;
 
-	@CrossOrigin
+	
 	@Operation(summary = "Test parse ATOM Feeds")
 	@PostMapping(value = { "/parse/feed/ATOM" })
 	public String parseFeeds(@RequestBody ResourceRequestHandler resourceRequestHandler,

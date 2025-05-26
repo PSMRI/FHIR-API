@@ -38,7 +38,7 @@ import com.wipro.fhir.utils.response.OutputResponse;
 import io.lettuce.core.dynamic.annotation.Param;
 import io.swagger.v3.oas.annotations.Operation;
 
-@CrossOrigin
+
 @RestController
 @RequestMapping(value = "/validate", headers = "Authorization")
 public class HealthIDValidateController {
@@ -47,7 +47,7 @@ public class HealthIDValidateController {
 	private HealthIDValidationService healthIDValidationService;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-	@CrossOrigin
+	
 	@Operation(summary = "Generate OTP for ABHA validation")
 	@PostMapping(value = { "/generateOTPForHealthIDValidation" })
 	public String generateOTPForHealthIDValidation(
@@ -70,7 +70,7 @@ public class HealthIDValidateController {
 		return response.toString();
 	}
 
-	@CrossOrigin
+	
 	@Operation(summary = "Verify OTP for ABHA validation")
 	@PostMapping(value = { "/verifyOTPForHealthIDValidation" })
 	public String verifyOTPForHealthIDValidation(

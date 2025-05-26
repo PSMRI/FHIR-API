@@ -15,7 +15,7 @@ import com.wipro.fhir.utils.response.OutputResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 
-@CrossOrigin
+
 @RestController
 @RequestMapping(value = "/abhaLogin", headers = "Authorization")
 public class LoginAbhaV3Controller {
@@ -25,7 +25,7 @@ public class LoginAbhaV3Controller {
 	@Autowired
 	private LoginAbhaV3Service loginAbhaV3Service;
 
-	@CrossOrigin
+	
 	@Operation(summary = "Request OTP for Abha LOgin")
 	@PostMapping(value = { "/abhaLoginRequestOtp" })
 	public String requestOtpForAbhaLogin(@RequestBody String request) {
@@ -45,7 +45,7 @@ public class LoginAbhaV3Controller {
 		return response.toString();
 	}
 	
-	@CrossOrigin
+	
 	@Operation(summary = "verify OTP for Abha LOgin")
 	@PostMapping(value = { "/verifyAbhaLogin" })
 	public String verifyAbhaLogin(@RequestBody String request) {
@@ -65,7 +65,7 @@ public class LoginAbhaV3Controller {
 		return response.toString();
 	}
 	
-	@CrossOrigin
+	
 	@Operation(summary = "Print PHR card - abha address web login")
 	@PostMapping(value = { "/printWebLoginPhrCard" })
 	public String printWebLoginPhrCard(@RequestBody String request) {
