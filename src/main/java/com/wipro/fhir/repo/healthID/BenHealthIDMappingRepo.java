@@ -83,6 +83,6 @@ public interface BenHealthIDMappingRepo extends CrudRepository<BenHealthIDMappin
 	Integer updateFacilityIdForVisit(@Param("visitCode") BigInteger visitCode, @Param("abdmFacilityId") String abdmFacilityId);
 	
 	@Query(value = "select isNewAbha from t_healthid where HealthIdNumber=:healthIdNumber order by 1 desc limit 1", nativeQuery = true)
-	boolean getIsNewAbha(@Param("healthIdNumber") String healthIdNumber);
+	Boolean getIsNewAbha(@Param("healthIdNumber") String healthIdNumber);
 
 }

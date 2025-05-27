@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.wipro.fhir.utils.http.AuthorizationHeaderRequestWrapper;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,6 +31,7 @@ public class JwtUserIdValidationFilter implements Filter {
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
 			throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) servletRequest;
+		
 		HttpServletResponse response = (HttpServletResponse) servletResponse;
 
 		String path = request.getRequestURI();
@@ -47,47 +50,74 @@ public class JwtUserIdValidationFilter implements Filter {
 		} else {
 			logger.info("No cookies found in the request");
 		}
-
-		// Log headers for debugging
-		String jwtTokenFromHeader = request.getHeader("Jwttoken");
-		logger.info("JWT token from header: ");
-
+		
 		// Skip login and public endpoints
-		if (path.equals(contextPath + "/user/userAuthenticate")
-				|| path.equalsIgnoreCase(contextPath + "/user/logOutUserFromConcurrentSession")
-				|| path.startsWith(contextPath + "/swagger-ui")
-				|| path.startsWith(contextPath + "/v3/api-docs")
-				|| path.startsWith(contextPath + "/public")) {
-			logger.info("Skipping filter for path: " + path);
+		if (shouldSkipPath(path, contextPath)) {
 			filterChain.doFilter(servletRequest, servletResponse);
 			return;
 		}
 
 		try {
-			// Retrieve JWT token from cookies
-			String jwtTokenFromCookie = getJwtTokenFromCookies(request);
-			logger.info("JWT token from cookie: ");
+			String jwtFromCookie = getJwtTokenFromCookies(request);
+			String jwtFromHeader = request.getHeader("JwtToken");
+			String authHeader = request.getHeader("Authorization");
 
-			// Determine which token (cookie or header) to validate
-			String jwtToken = jwtTokenFromCookie != null ? jwtTokenFromCookie : jwtTokenFromHeader;
-			if (jwtToken == null) {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT token not found in cookies or headers");
-				return;
-			}
+			if (jwtFromCookie != null) {
+				logger.info("Validating JWT token from cookie");
+				if (jwtAuthenticationUtil.validateUserIdAndJwtToken(jwtFromCookie)) {
 
-			// Validate JWT token and userId
-			boolean isValid = jwtAuthenticationUtil.validateUserIdAndJwtToken(jwtToken);
-
-			if (isValid) {
-				// If token is valid, allow the request to proceed
-				filterChain.doFilter(servletRequest, servletResponse);
+					AuthorizationHeaderRequestWrapper authorizationHeaderRequestWrapper = new AuthorizationHeaderRequestWrapper(
+							request, "");
+					filterChain.doFilter(authorizationHeaderRequestWrapper, servletResponse);
+					return;
+				}
+			} else if (jwtFromHeader != null) {
+				logger.info("Validating JWT token from header");
+				if (jwtAuthenticationUtil.validateUserIdAndJwtToken(jwtFromHeader)) {
+					AuthorizationHeaderRequestWrapper authorizationHeaderRequestWrapper = new AuthorizationHeaderRequestWrapper(
+							request, "");
+					filterChain.doFilter(authorizationHeaderRequestWrapper, servletResponse);
+					return;
+				}
 			} else {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
+				String userAgent = request.getHeader("User-Agent");
+				logger.info("User-Agent: " + userAgent);
+
+				if (userAgent != null && isMobileClient(userAgent) && authHeader != null) {
+					try {
+						UserAgentContext.setUserAgent(userAgent);
+						filterChain.doFilter(servletRequest, servletResponse);
+					} finally {
+						UserAgentContext.clear();
+					}
+					return;
+				}
 			}
+
+			logger.warn("No valid authentication token found");
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Invalid or missing token");
+
 		} catch (Exception e) {
 			logger.error("Authorization error: ", e);
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization error: " + e.getMessage());
 		}
+	}
+
+	private boolean isMobileClient(String userAgent) {
+		if (userAgent == null)
+			return false;
+
+		userAgent = userAgent.toLowerCase();
+
+		return userAgent.contains("okhttp"); // iOS (custom clients)
+	}
+
+	private boolean shouldSkipPath(String path, String contextPath) {
+		return path.equals(contextPath + "/user/userAuthenticate")
+				|| path.equalsIgnoreCase(contextPath + "/user/logOutUserFromConcurrentSession")
+				|| path.startsWith(contextPath + "/swagger-ui")
+				|| path.startsWith(contextPath + "/v3/api-docs")
+				|| path.startsWith(contextPath + "/public");
 	}
 
 	private String getJwtTokenFromCookies(HttpServletRequest request) {

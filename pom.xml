@@ -10,8 +10,8 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.wipro.fhir.r4</groupId>
-	<artifactId>FHIR_API</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>fhir-api</artifactId>
+	<version>3.1.0</version>
 	<packaging>war</packaging>
 	<name>FHIR-API</name>
 	<description>FHIR_NDHM standard integration in AMRIT</description>
@@ -258,7 +258,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>fhirapi-v3.0.0</finalName>
+		<finalName>${artifactId}-${version}</finalName>
 
 		<plugins>
 			<plugin>

@@ -76,6 +76,6 @@ public class BenHealthIDMapping {
 	private Timestamp lastModDate;
 	
 	@Transient
-	private boolean isNewAbha;
+	private Boolean isNewAbha;
 
 }
