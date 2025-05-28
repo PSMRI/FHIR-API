@@ -198,7 +198,7 @@ public class CommonServiceImpl implements CommonService {
 						if (patientDemographicOBJ.getPreferredPhoneNo() != null)
 							sendAbdmAdvSMS(patientDemographicOBJ.getPreferredPhoneNo());
 						else
-							throw new FHIRException(
+							logger.error(
 									"Advertisement sms could not be sent as beneficiary phone no not found");
 					} else
 						throw new FHIRException(
