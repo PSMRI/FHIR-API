@@ -173,68 +173,70 @@ public class CommonServiceImpl implements CommonService {
 				+ pList.size());
 		ResourceRequestHandler resourceRequestHandler;
 		for (PatientEligibleForResourceCreation p : pList) {
-
-			logger.info("Bundle creation is started for BenID : " + p.getBeneficiaryId() + " | BenRegID : "
-					+ p.getBeneficiaryRegID() + " | VisitCode : " + p.getVisitCode());
-
-			resourceRequestHandler = new ResourceRequestHandler();
-			resourceRequestHandler.setBeneficiaryID(p.getBeneficiaryId());
-			resourceRequestHandler.setVisitCode(p.getVisitCode());
-			resourceRequestHandler.setBeneficiaryRegID(p.getBeneficiaryRegID());
-
-// ----------------------------------------------------------------------------------------------
 			try {
+				logger.info("Bundle creation is started for BenID : " + p.getBeneficiaryId() + " | BenRegID : "
+						+ p.getBeneficiaryRegID() + " | VisitCode : " + p.getVisitCode());
 
-				logger.info("*****Fetch beneficiary Id: " + resourceRequestHandler.getBeneficiaryRegID());
-				List<Object[]> rsObjList = patientEligibleForResourceCreationRepo
-						.callPatientDemographicSP(resourceRequestHandler.getBeneficiaryRegID());
-				logger.info("*****Fetch beneficiary Id response recevied :", rsObjList);
+				resourceRequestHandler = new ResourceRequestHandler();
+				resourceRequestHandler.setBeneficiaryID(p.getBeneficiaryId());
+				resourceRequestHandler.setVisitCode(p.getVisitCode());
+				resourceRequestHandler.setBeneficiaryRegID(p.getBeneficiaryRegID());
 
-				PatientDemographic patientDemographicOBJ = patientDemographic.getPatientDemographic(rsObjList);
-				logger.info("*****Fetch patient after fetching demographics");
-				if (patientDemographicOBJ != null) {
-					addCareContextToMongo(patientDemographicOBJ, p);
-					logger.info("*****Add to mongo success done");
-					if (patientDemographicOBJ.getPreferredPhoneNo() != null)
-						sendAbdmAdvSMS(patientDemographicOBJ.getPreferredPhoneNo());
-					else
+// ----------------------------------------------------------------------------------------------
+				try {
+
+					logger.info("*****Fetch beneficiary Id: " + resourceRequestHandler.getBeneficiaryRegID());
+					List<Object[]> rsObjList = patientEligibleForResourceCreationRepo
+							.callPatientDemographicSP(resourceRequestHandler.getBeneficiaryRegID());
+					logger.info("*****Fetch beneficiary Id response recevied :", rsObjList);
+
+					PatientDemographic patientDemographicOBJ = patientDemographic.getPatientDemographic(rsObjList);
+					logger.info("*****Fetch patient after fetching demographics");
+					if (patientDemographicOBJ != null) {
+						addCareContextToMongo(patientDemographicOBJ, p);
+						logger.info("*****Add to mongo success done");
+						if (patientDemographicOBJ.getPreferredPhoneNo() != null)
+							sendAbdmAdvSMS(patientDemographicOBJ.getPreferredPhoneNo());
+						else
+							logger.error(
+									"Advertisement sms could not be sent as beneficiary phone no not found");
+					} else
 						throw new FHIRException(
-								"Advertisement sms could not be sent as beneficiary phone no not found");
-				} else
-					throw new FHIRException(
-							"Beneficiary not found, benRegId = " + resourceRequestHandler.getBeneficiaryRegID());
+								"Beneficiary not found, benRegId = " + resourceRequestHandler.getBeneficiaryRegID());
 
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-			}
+				} catch (Exception e) {
+					logger.error(e.getMessage());
+				}
 // ----------------------------------------------------------------------------------------------
 
-			// 1. OP consult resource bundle
-			int i = oPConsultRecordBundle.processOPConsultRecordBundle(resourceRequestHandler, p);
-			// 2. diagnostic report record budle
-			int j = diagnosticReportRecordBundle.processDiagnosticReportRecordBundle(resourceRequestHandler, p);
-			// 3. prescription Bundle
-			int k = prescriptionBundle.processPrescriptionRecordBundle(resourceRequestHandler, p);
+				// 1. OP consult resource bundle
+				int i = oPConsultRecordBundle.processOPConsultRecordBundle(resourceRequestHandler, p);
+				// 2. diagnostic report record budle
+				int j = diagnosticReportRecordBundle.processDiagnosticReportRecordBundle(resourceRequestHandler, p);
+				// 3. prescription Bundle
+				int k = prescriptionBundle.processPrescriptionRecordBundle(resourceRequestHandler, p);
 
-			logger.info("The value of i: " + i + " The value of j: " + j + " The value of k: " + k);
+				logger.info("The value of i: " + i + " The value of j: " + j + " The value of k: " + k);
 
-			if (i > 0 && j > 0 && k > 0) {
+				if (i > 0 && j > 0 && k > 0) {
 
-				// update the processed flag in trigger table
-				p.setProcessed(true);
-				PatientEligibleForResourceCreation resultSet = patientEligibleForResourceCreationRepo.save(p);
-				if (resultSet != null && resultSet.getId().compareTo(BigInteger.ZERO) > 0)
-					logger.info("processed flag updated successfully after FHIR resource creation");
+					// update the processed flag in trigger table
+					p.setProcessed(true);
+					PatientEligibleForResourceCreation resultSet = patientEligibleForResourceCreationRepo.save(p);
+					if (resultSet != null && resultSet.getId().compareTo(BigInteger.ZERO) > 0)
+						logger.info("processed flag updated successfully after FHIR resource creation");
 
-				response = "Bundle creation is success for BenID : " + p.getBeneficiaryId() + " | BenRegID : "
-						+ p.getBeneficiaryRegID() + " | VisitCode : " + p.getVisitCode();
+					response = "Bundle creation is success for BenID : " + p.getBeneficiaryId() + " | BenRegID : "
+							+ p.getBeneficiaryRegID() + " | VisitCode : " + p.getVisitCode();
 
-				logger.info("Bundle creation is success for BenID : " + p.getBeneficiaryId() + " | BenRegID : "
-						+ p.getBeneficiaryRegID() + " | VisitCode : " + p.getVisitCode());
+					logger.info("Bundle creation is success for BenID : " + p.getBeneficiaryId() + " | BenRegID : "
+							+ p.getBeneficiaryRegID() + " | VisitCode : " + p.getVisitCode());
+				}
+
+				// adv SMS - ABDM notify2 API
+			} catch (Exception e) {
+				logger.error("Fhir Schedule run failed " +e.getMessage());
 			}
-
-			// adv SMS - ABDM notify2 API
-
 		}
 		return response;
 	}
