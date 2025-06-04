@@ -187,15 +187,20 @@
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-r4</artifactId>
-			<version>7.0.2</version>
+			<version>6.10.0</version>
 		</dependency>
-
+		
+		<dependency>
+			<groupId>ca.uhn.hapi</groupId>
+			<artifactId>hapi-base</artifactId>
+			<version>2.6.0</version>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/org.hl7.fhir.utilities -->
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>org.hl7.fhir.utilities</artifactId>
-			<version>6.3.6</version>
+			<version>6.5.18</version>
 		</dependency>
 
 		<!-- lombok -->
