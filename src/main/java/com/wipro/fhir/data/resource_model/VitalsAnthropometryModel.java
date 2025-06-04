@@ -61,9 +61,12 @@ public class VitalsAnthropometryModel {
 
 	public VitalsAnthropometryModel(Object[] objArr) {
 
-		this.beneficiaryRegID = BigInteger.valueOf((long) objArr[0]);
-		this.providerServiceMapID = (Integer) objArr[1];
-		this.visitCode = BigInteger.valueOf((long) objArr[2]);
+		if (objArr[0] != null)
+			this.beneficiaryRegID = BigInteger.valueOf((long) objArr[0]);
+		if (objArr[1] != null)
+			this.providerServiceMapID = (Integer) objArr[1];
+		if (objArr[2] != null)
+			this.visitCode = BigInteger.valueOf((long) objArr[2]);
 		if (objArr[3] != null)
 			this.Temperature = (BigDecimal) objArr[3];
 		if (objArr[4] != null)

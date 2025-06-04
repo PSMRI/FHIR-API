@@ -57,17 +57,16 @@ public class FamilyMemberHistoryDataModel implements Serializable {
 	}
 
 	public FamilyMemberHistoryDataModel(Object[] objArr) {
-		this.id = BigInteger.valueOf((long) objArr[0]);
-		this.beneficiaryRegID = BigInteger.valueOf((long) objArr[1]);
-		this.visitCode = BigInteger.valueOf((long) objArr[2]);
-		this.providerServiceMapID = (Integer) objArr[3];
-		this.vanID = (Integer) objArr[4];
-		this.familyMembers = (String) objArr[5];
-		this.sctcode = (String) objArr[6];
-		this.sctTerm = (String) objArr[7];
-		this.createdDate = (Timestamp) objArr[8];
-		this.createdBy = (String) objArr[9];
-
+	    this.id = objArr[0] != null ? BigInteger.valueOf(((Number) objArr[0]).longValue()) : null;
+	    this.beneficiaryRegID = objArr[1] != null ? BigInteger.valueOf(((Number) objArr[1]).longValue()) : null;
+	    this.visitCode = objArr[2] != null ? BigInteger.valueOf(((Number) objArr[2]).longValue()) : null;
+	    this.providerServiceMapID = objArr[3] != null ? (Integer) objArr[3] : null;
+	    this.vanID = objArr[4] != null ? (Integer) objArr[4] : null;
+	    this.familyMembers = objArr[5] != null ? (String) objArr[5] : null;
+	    this.sctcode = objArr[6] != null ? (String) objArr[6] : null;
+	    this.sctTerm = objArr[7] != null ? (String) objArr[7] : null;
+	    this.createdDate = objArr[8] != null ? (Timestamp) objArr[8] : null;
+	    this.createdBy = objArr[9] != null ? (String) objArr[9] : null;
 	}
 
 	public List<FamilyMemberHistoryDataModel> getFamilyMemberHistoryList(List<Object[]> resultSetList) {
