@@ -79,29 +79,29 @@ public class MedicationRequestDataModel {
 	}
 
 	public MedicationRequestDataModel(Object[] objArr) {
-		this.id = BigInteger.valueOf((long) objArr[0]);
-		this.beneficiaryRegID = BigInteger.valueOf((long) objArr[1]);
-		this.visitCode = BigInteger.valueOf((long) objArr[2]);
-		this.providerServiceMapID = (Integer) objArr[3];
-		this.vanID = (Integer) objArr[4];
+	    this.id = objArr[0] != null ? BigInteger.valueOf(((Number) objArr[0]).longValue()) : null;
+	    this.beneficiaryRegID = objArr[1] != null ? BigInteger.valueOf(((Number) objArr[1]).longValue()) : null;
+	    this.visitCode = objArr[2] != null ? BigInteger.valueOf(((Number) objArr[2]).longValue()) : null;
+	    this.providerServiceMapID = objArr[3] != null ? (Integer) objArr[3] : null;
+	    this.vanID = objArr[4] != null ? (Integer) objArr[4] : null;
 
-		this.drugForm = (String) objArr[5];
-		this.genericDrugName = (String) objArr[6];
-		this.drugStrength = (String) objArr[7];
-		this.drugDose = (String) objArr[8];
-		this.drugRoute = (String) objArr[9];
-		this.drugFrequency = (String) objArr[10];
+	    this.drugForm = objArr[5] != null ? (String) objArr[5] : null;
+	    this.genericDrugName = objArr[6] != null ? (String) objArr[6] : null;
+	    this.drugStrength = objArr[7] != null ? (String) objArr[7] : null;
+	    this.drugDose = objArr[8] != null ? (String) objArr[8] : null;
+	    this.drugRoute = objArr[9] != null ? (String) objArr[9] : null;
+	    this.drugFrequency = objArr[10] != null ? (String) objArr[10] : null;
 
-		this.duration = (String) objArr[11];
-		this.durationUnit = (String) objArr[12];
+	    this.duration = objArr[11] != null ? (String) objArr[11] : null;
+	    this.durationUnit = objArr[12] != null ? (String) objArr[12] : null;
 
-		this.instructions = (String) objArr[13];
-		this.qtyPrescribed = (Integer) objArr[14];
+	    this.instructions = objArr[13] != null ? (String) objArr[13] : null;
+	    this.qtyPrescribed = objArr[14] != null ? (Integer) objArr[14] : null;
 
-		this.snomedCTCodeDrug = (String) objArr[15];
-		this.snomedCTTermDrug = (String) objArr[16];
-		this.createdDate = (Timestamp) objArr[17];
-		this.createdBy = (String) objArr[18];
+	    this.snomedCTCodeDrug = objArr[15] != null ? (String) objArr[15] : null;
+	    this.snomedCTTermDrug = objArr[16] != null ? (String) objArr[16] : null;
+	    this.createdDate = objArr[17] != null ? (Timestamp) objArr[17] : null;
+	    this.createdBy = objArr[18] != null ? (String) objArr[18] : null;
 
 	}
 
