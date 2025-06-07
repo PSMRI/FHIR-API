@@ -111,15 +111,21 @@ public class JwtAuthenticationUtil {
 		User user = userLoginRepo.getUserByUserID(Long.parseLong(userId));
 
 		if (user != null) {
-			// Cache the user in Redis for future requests (cache for 30 minutes)
-			redisTemplate.opsForValue().set(redisKey, user, 30, TimeUnit.MINUTES);
+			User userHash = new User();
+			userHash.setUserID(user.getUserID());
+			userHash.setUserName(user.getUserName());
+
+			// Cache the minimal user in Redis for future requests (cache for 30 minutes)
+			redisTemplate.opsForValue().set(redisKey, userHash, 30, TimeUnit.MINUTES);
 
 			// Log that the user has been stored in Redis
 			logger.info("User stored in Redis with key: " + redisKey);
+
+			return user;
 		} else {
 			logger.warn("User not found for userId: " + userId);
 		}
 
-		return user;
+		return null;
 	}
 }
