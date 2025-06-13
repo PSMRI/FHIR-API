@@ -116,26 +116,6 @@ public class HealthIDServiceImpl implements HealthIDService {
 		return new Gson().toJson(health);
 	}
 
-	// public String getBenHealthID(Long benRegID) {
-	// 	Map<String, Object> resMap = new HashMap<>();
-
-	// 	ArrayList<BenHealthIDMapping> healthDetailsList = benHealthIDMappingRepo.getHealthDetails(benRegID);
-	// 	ArrayList<BenHealthIDMapping> healthDetailsWithAbhaList = new ArrayList<>();
-		
-	// 	if(healthDetailsList.size() > 0) {
-	// 		for(BenHealthIDMapping healthDetails: healthDetailsList) {
-	// 			String healthIdNumber = healthDetails.getHealthIdNumber();
-	// 			boolean isNewAbha = benHealthIDMappingRepo.getIsNewAbha(healthIdNumber);
-	// 			healthDetails.setNewAbha(isNewAbha);
-					
-	// 			healthDetailsWithAbhaList.add(healthDetails);
-	// 		}
-	// 	}
-	// 	resMap.put("BenHealthDetails", new Gson().toJson(healthDetailsWithAbhaList));
-
-	// 	return resMap.toString();
-	// }
-
 	public String getBenHealthID(Long benRegID) {
         List<BenHealthIDMapping> healthDetailsList = benHealthIDMappingRepo.getHealthDetails(benRegID);
 
