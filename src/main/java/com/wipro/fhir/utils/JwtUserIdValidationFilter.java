@@ -31,8 +31,13 @@ public class JwtUserIdValidationFilter implements Filter {
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
 			throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) servletRequest;
-		
+
 		HttpServletResponse response = (HttpServletResponse) servletResponse;
+
+		if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+			filterChain.doFilter(servletRequest, servletResponse); // allow it through
+			return;
+		}
 
 		String path = request.getRequestURI();
 		String contextPath = request.getContextPath();
@@ -50,7 +55,7 @@ public class JwtUserIdValidationFilter implements Filter {
 		} else {
 			logger.info("No cookies found in the request");
 		}
-		
+
 		// Skip login and public endpoints
 		if (shouldSkipPath(path, contextPath)) {
 			filterChain.doFilter(servletRequest, servletResponse);
