@@ -85,7 +85,7 @@ public interface BenHealthIDMappingRepo extends CrudRepository<BenHealthIDMappin
 	@Query(value = "select isNewAbha from t_healthid where HealthIdNumber=:healthIdNumber order by 1 desc limit 1", nativeQuery = true)
 	boolean getIsNewAbha(@Param("healthIdNumber") String healthIdNumber);
 
-	@Query(value = "SELECT HealthIdNumber, isNewAbha FROM t_healthid WHERE HealthIdNumber IN :healthIdNumbers ORDER BY 1 DESC", nativeQuery = true)
+	@Query(value = "SELECT HealthIdNumber, isNewAbha FROM t_healthid WHERE HealthIdNumber IN :healthIdNumbers ORDER BY HealthIdNumber, isNewAbha DESC", nativeQuery = true)
 	List<Object[]> getIsNewAbhaBatch(@Param("healthIdNumbers") List<String> healthIdNumbers);
 
 

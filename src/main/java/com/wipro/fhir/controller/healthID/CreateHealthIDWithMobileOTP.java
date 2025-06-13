@@ -147,8 +147,6 @@ public class CreateHealthIDWithMobileOTP {
         OutputResponse response = new OutputResponse();
 
         try {
-            logger.info("NDHM_FHIR Request to fetch ABHA details: {}", comingRequest);
-
             JSONObject obj = new JSONObject(comingRequest);
             if (obj.has("beneficiaryRegID")) {
                 Long benRegID = obj.getLong("beneficiaryRegID");
