@@ -116,29 +116,27 @@ public class CreateHealthIDWithMobileOTP {
 	 */
 	@CrossOrigin()
 	@Operation(summary = "Get Beneficiary ABHA details")
-	@PostMapping(value = { "/getBenhealthID" })
-	public String getBenhealthID(
-			@Param(value = "{\"beneficiaryRegID\":\"Long\"}") @RequestBody String comingRequest) {
-		OutputResponse response = new OutputResponse();
+    @PostMapping("/getBenhealthID")
+    public String getBenhealthID(@RequestBody String comingRequest) {
+        OutputResponse response = new OutputResponse();
 
-		logger.info("NDHM_FHIR Request obj to fetch beneficiary ABHA details :" + comingRequest);
-		try {
-			JSONObject obj = new JSONObject(comingRequest);
-			if (obj.length() > 0) {
-				Long benRegID = obj.getLong("beneficiaryRegID");
-				String res = healthIDService.getBenHealthID(benRegID);
-				response.setResponse(res);
-			} else {
-				logger.info("NDHM_FHIR Invalid Request Data.");
-				response.setError(5000, "NDHM_FHIR Invalid request");
-			}
-		} catch (Exception e) {
-			response.setError(5000, e.getMessage());
-			logger.error("NDHM_FHIR Error while getting beneficiary ABHA:" + e);
-		}
-		logger.info("NDHM_FHIR get beneficiary ABHA response:" + response.toString());
-		return response.toString();
-	}
+        try {
+            JSONObject obj = new JSONObject(comingRequest);
+            if (obj.has("beneficiaryRegID")) {
+                Long benRegID = obj.getLong("beneficiaryRegID");
+                String res = healthIDService.getBenHealthID(benRegID);
+                response.setResponse(res);
+            } else {
+                response.setError(4001, "Missing 'beneficiaryRegID' in request");
+            }
+        } catch (Exception e) {
+            logger.error("NDHM_FHIR Error while getting beneficiary ABHA: ", e);
+            response.setError(5000, "Error: " + e.getMessage());
+        }
+
+        logger.info("NDHM_FHIR Response:", response);
+        return response.toString();
+    }
 	
 	@CrossOrigin()
 	@Operation(summary = "Get Beneficiary Id for ABHA Id")
