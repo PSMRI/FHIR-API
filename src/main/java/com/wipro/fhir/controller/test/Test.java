@@ -24,7 +24,7 @@ package com.wipro.fhir.controller.test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -42,7 +42,6 @@ import com.wipro.fhir.utils.response.OutputResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/feeds", headers = "Authorization")
 public class Test {
@@ -53,7 +52,6 @@ public class Test {
 	@Autowired
 	private OPConsultRecordBundleImpl oPConsultRecordBundleImpl;
 
-	@CrossOrigin
 	@Operation(summary = "Test parse ATOM Feeds")
 	@PostMapping(value = { "/parse/feed/ATOM" })
 	public String parseFeeds(@RequestBody ResourceRequestHandler resourceRequestHandler,
