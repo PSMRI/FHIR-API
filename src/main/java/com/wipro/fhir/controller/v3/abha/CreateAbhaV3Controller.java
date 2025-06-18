@@ -3,7 +3,7 @@ package com.wipro.fhir.controller.v3.abha;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +15,6 @@ import com.wipro.fhir.utils.response.OutputResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/abhaCreation", headers = "Authorization")
 public class CreateAbhaV3Controller {
@@ -24,8 +23,6 @@ public class CreateAbhaV3Controller {
 	
 	@Autowired
 	private CreateAbhaV3Service createAbhaV3Service;
-	
-	@CrossOrigin
 	@Operation(summary = "Generate OTP for ABHA enrollment")
 	@PostMapping(value = { "/requestOtpForAbhaEnrollment" })
 	public String requestOtpForEnrollment(@RequestBody String request) {
@@ -44,8 +41,6 @@ public class CreateAbhaV3Controller {
 		logger.info("NDHM_FHIR generate OTP for ABHA card API response " + response.toString());
 		return response.toString();
 	}
-	
-	@CrossOrigin
 	@Operation(summary = "ABHA enrollment by Aadhaar")
 	@PostMapping(value = { "/abhaEnrollmentByAadhaar" })
 	public String abhaEnrollmentByAadhaar(@RequestBody String request) {
@@ -65,8 +60,6 @@ public class CreateAbhaV3Controller {
 		logger.info("NDHM_FHIR generate OTP for ABHA card API response " + response.toString());
 		return response.toString();
 	}
-	
-	@CrossOrigin
 	@Operation(summary = "Verify Auth By ABDM for ABHA enrollment")
 	@PostMapping(value = { "/verifyAuthByAbdm" })
 	public String verifyMobileForAuth(@RequestBody String request) {
@@ -85,8 +78,6 @@ public class CreateAbhaV3Controller {
 		logger.info("NDHM_FHIR Verify Auth OTP for ABHA enrollment API response " + response.toString());
 		return response.toString();
 	}
-	
-	@CrossOrigin
 	@Operation(summary = "Print Abha card")
 	@PostMapping(value = { "/printAbhaCard" })
 	public String printAbhaCard(@RequestBody String request) {

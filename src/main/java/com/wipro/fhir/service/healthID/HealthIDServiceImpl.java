@@ -28,6 +28,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,24 +131,33 @@ public class HealthIDServiceImpl implements HealthIDService {
 	}
 
 	public String getBenHealthID(Long benRegID) {
-		Map<String, Object> resMap = new HashMap<>();
+        List<BenHealthIDMapping> healthDetailsList = benHealthIDMappingRepo.getHealthDetails(benRegID);
 
-		ArrayList<BenHealthIDMapping> healthDetailsList = benHealthIDMappingRepo.getHealthDetails(benRegID);
-		ArrayList<BenHealthIDMapping> healthDetailsWithAbhaList = new ArrayList<>();
-		
-		if(healthDetailsList.size() > 0) {
-			for(BenHealthIDMapping healthDetails: healthDetailsList) {
-				String healthIdNumber = healthDetails.getHealthIdNumber();
-				Boolean isNewAbha = benHealthIDMappingRepo.getIsNewAbha(healthIdNumber);
-				healthDetails.setIsNewAbha(isNewAbha);
-					
-				healthDetailsWithAbhaList.add(healthDetails);
-			}
+        List<String> healthIdNumbers = healthDetailsList.stream()
+            .map(BenHealthIDMapping::getHealthIdNumber)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        Map<String, Boolean> abhaMap = new HashMap<>();
+        if (!healthIdNumbers.isEmpty()) {
+            List<Object[]> abhaResults = benHealthIDMappingRepo.getIsNewAbhaBatch(healthIdNumbers);
+            for (Object[] row : abhaResults) {
+                String healthIdNumber = (String) row[0];
+                Boolean isNewAbha = (Boolean) row[1];
+                abhaMap.put(healthIdNumber, isNewAbha);
+            }
+        }
+
+        for (BenHealthIDMapping healthDetails : healthDetailsList) {
+    		Boolean isNew = abhaMap.get(healthDetails.getHealthIdNumber());
+    		healthDetails.setNewAbha(Boolean.TRUE.equals(isNew));
 		}
-		resMap.put("BenHealthDetails", new Gson().toJson(healthDetailsWithAbhaList));
 
-		return resMap.toString();
-	}
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("BenHealthDetails", healthDetailsList);
+
+        return new Gson().toJson(responseMap);
+    }
 	
 	@Override
 	public String addRecordToHealthIdTable(String request) throws FHIRException {
