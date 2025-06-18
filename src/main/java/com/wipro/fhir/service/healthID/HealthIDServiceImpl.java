@@ -64,7 +64,6 @@ public class HealthIDServiceImpl implements HealthIDService {
 	@Override
 	public String mapHealthIDToBeneficiary(String request) throws FHIRException {
 		BenHealthIDMapping health = InputMapper.gson().fromJson(request, BenHealthIDMapping.class);
-		health = InputMapper.gson().fromJson(request, BenHealthIDMapping.class);
 		String[] beneficiaryIdsList = null;
 		try {
 			if (health.getBeneficiaryRegID() == null && health.getBeneficiaryID() == null)
@@ -80,8 +79,8 @@ public class HealthIDServiceImpl implements HealthIDService {
 							health = benHealthIDMappingRepo.save(health);
 						else {
 							if (health.getBeneficiaryID() != null) {
-								Long check1 = benHealthIDMappingRepo.getBenRegID(health.getBeneficiaryID());
-								health.setBeneficiaryRegID(check1);
+								Long benRegId = benHealthIDMappingRepo.getBenRegID(health.getBeneficiaryID());
+								health.setBeneficiaryRegID(benRegId);
 								health = benHealthIDMappingRepo.save(health);
 							}
 						}
