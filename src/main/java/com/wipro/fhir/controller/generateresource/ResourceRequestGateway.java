@@ -24,7 +24,7 @@ package com.wipro.fhir.controller.generateresource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -48,8 +48,6 @@ import io.swagger.v3.oas.annotations.Operation;
  * fetch from Mongo instead creating again ***
  *
  */
-
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/get/resource", headers = "Authorization", consumes = "application/json", produces = "application/json")
 public class ResourceRequestGateway {
@@ -73,7 +71,6 @@ public class ResourceRequestGateway {
 	 *         DocumentReference}
 	 * 
 	 */
-	@CrossOrigin
 	@Operation(summary = "Get OP consult record bundle")
 	@PostMapping(value = { "/OPConsultRecord" })
 	public String getPatientResource(@RequestBody ResourceRequestHandler patientResourceRequest,
@@ -100,7 +97,6 @@ public class ResourceRequestGateway {
 	 *         DocumentReference}
 	 * 
 	 */
-	@CrossOrigin
 	@Operation(summary = "Get diagnostic report record bundle")
 	@PostMapping(value = { "/DiagnosticReportRecord" })
 	public String getDiagnosticReportRecord(@RequestBody ResourceRequestHandler patientResourceRequest,
@@ -126,7 +122,6 @@ public class ResourceRequestGateway {
 	 *         || Organization || MedicationRequest || Binary}
 	 * 
 	 */
-	@CrossOrigin
 	@Operation(summary = "Get prescription record")
 	@PostMapping(value = { "/PrescriptionRecord" })
 	public String getPrescriptionRecord(@RequestBody ResourceRequestHandler patientResourceRequest,

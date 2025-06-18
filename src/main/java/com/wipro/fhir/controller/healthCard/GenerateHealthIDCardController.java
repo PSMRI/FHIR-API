@@ -24,7 +24,7 @@ package com.wipro.fhir.controller.healthCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -38,7 +38,6 @@ import com.wipro.fhir.utils.response.OutputResponse;
 import io.lettuce.core.dynamic.annotation.Param;
 import io.swagger.v3.oas.annotations.Operation;
 
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/healthIDCard", headers = "Authorization")
 public class GenerateHealthIDCardController {
@@ -46,7 +45,6 @@ public class GenerateHealthIDCardController {
 	@Autowired
 	private HealthID_CardService healthID_CardService;
 
-	@CrossOrigin
 	@Operation(summary = "Generate OTP for ABHA card")
 	@PostMapping(value = { "/generateOTP" })
 	public String mapHealthIDToBeneficiary(
@@ -68,7 +66,6 @@ public class GenerateHealthIDCardController {
 		return response.toString();
 	}
 
-	@CrossOrigin
 	@Operation(summary = "Generate OTP for ABHA card")
 	@PostMapping(value = { "/verifyOTPAndGenerateHealthCard" })
 	public String verifyOTPAndGenerateHealthCard(

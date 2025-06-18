@@ -25,7 +25,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -40,7 +40,6 @@ import com.wipro.fhir.utils.response.OutputResponse;
 import io.lettuce.core.dynamic.annotation.Param;
 import io.swagger.v3.oas.annotations.Operation;
 
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/healthID", headers = "Authorization", consumes = "application/json", produces = "application/json")
 public class CreateHealthIDWithMobileOTP {
@@ -56,7 +55,6 @@ public class CreateHealthIDWithMobileOTP {
 	 * @param Authorization
 	 * @return NDHM transactionID
 	 */
-	@CrossOrigin
 	@Operation(summary = "generate OTP")
 	@PostMapping(value = { "/generateOTP" })
 	public String generateOTP(@Param(value = "{\"mobile\":\"String\"}") @RequestBody String request,
@@ -84,7 +82,6 @@ public class CreateHealthIDWithMobileOTP {
 	 * @param Authorization
 	 * @return Generated ABHA for Beneficiary
 	 */
-	@CrossOrigin
 	@Operation(summary = "verify OTP and generate ABHA")
 	@PostMapping(value = { "/verifyOTPAndGenerateHealthID" })
 	public String verifyOTPAndGenerateHealthID(
@@ -114,33 +111,29 @@ public class CreateHealthIDWithMobileOTP {
 	 * @param comingRequest
 	 * @return ABHA of Beneficiary
 	 */
-	@CrossOrigin()
 	@Operation(summary = "Get Beneficiary ABHA details")
-	@PostMapping(value = { "/getBenhealthID" })
-	public String getBenhealthID(
-			@Param(value = "{\"beneficiaryRegID\":\"Long\"}") @RequestBody String comingRequest) {
-		OutputResponse response = new OutputResponse();
+    @PostMapping("/getBenhealthID")
+    public String getBenhealthID(@RequestBody String comingRequest) {
+        OutputResponse response = new OutputResponse();
 
-		logger.info("NDHM_FHIR Request obj to fetch beneficiary ABHA details :" + comingRequest);
-		try {
-			JSONObject obj = new JSONObject(comingRequest);
-			if (obj.length() > 0) {
-				Long benRegID = obj.getLong("beneficiaryRegID");
-				String res = healthIDService.getBenHealthID(benRegID);
-				response.setResponse(res);
-			} else {
-				logger.info("NDHM_FHIR Invalid Request Data.");
-				response.setError(5000, "NDHM_FHIR Invalid request");
-			}
-		} catch (Exception e) {
-			response.setError(5000, e.getMessage());
-			logger.error("NDHM_FHIR Error while getting beneficiary ABHA:" + e);
-		}
-		logger.info("NDHM_FHIR get beneficiary ABHA response:" + response.toString());
-		return response.toString();
-	}
+        try {
+            JSONObject obj = new JSONObject(comingRequest);
+            if (obj.has("beneficiaryRegID")) {
+                Long benRegID = obj.getLong("beneficiaryRegID");
+                String res = healthIDService.getBenHealthID(benRegID);
+                response.setResponse(res);
+            } else {
+                response.setError(4001, "Missing 'beneficiaryRegID' in request");
+            }
+        } catch (Exception e) {
+            logger.error("NDHM_FHIR Error while getting beneficiary ABHA: ", e);
+            response.setError(5000, "Error: " + e.getMessage());
+        }
+
+        logger.info("NDHM_FHIR Response:", response);
+        return response.toString();
+    }
 	
-	@CrossOrigin()
 	@Operation(summary = "Get Beneficiary Id for ABHA Id")
 	@PostMapping(value = { "/getBenIdForhealthID" })
 	public String getBenIdForhealthID(

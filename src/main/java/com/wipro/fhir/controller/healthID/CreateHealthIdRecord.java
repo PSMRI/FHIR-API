@@ -3,7 +3,7 @@ package com.wipro.fhir.controller.healthID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -16,7 +16,6 @@ import com.wipro.fhir.utils.response.OutputResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/healthIDRecord", headers = "Authorization", consumes = "application/json", produces = "application/json")
 public class CreateHealthIdRecord {
@@ -32,7 +31,6 @@ public class CreateHealthIdRecord {
 	 * @param Authorization
 	 * @return BenRegID of beneficiary after mapping
 	 */
-	@CrossOrigin
 	@Operation(summary = "Map ABHA to beneficiary")
 	@PostMapping(value = { "/mapHealthIDToBeneficiary" })
 	public String mapHealthIDToBeneficiary(
@@ -52,9 +50,6 @@ public class CreateHealthIdRecord {
 		logger.info("NDHM_FHIR Map ABHA to beneficiary API response " + response.toString());
 		return response.toString();
 	}
-	
-	
-	@CrossOrigin
 	@Operation(summary = "Add New health ID record to healthId table")
 	@PostMapping(value = { "/addHealthIdRecord" })
 	public String addRecordToHealthIdTable(

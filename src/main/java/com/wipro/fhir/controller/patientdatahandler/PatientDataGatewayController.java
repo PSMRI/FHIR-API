@@ -26,7 +26,7 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,7 +41,6 @@ import com.wipro.fhir.utils.response.OutputResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/patient/data", headers = "Authorization", consumes = "application/json", produces = "application/json")
 public class PatientDataGatewayController {
@@ -51,7 +50,6 @@ public class PatientDataGatewayController {
 	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-	@CrossOrigin
 	@Operation(summary = "Patient profile search from Mongo, search parameter - healthId, healthIdNo, amritId, externalId, phoneNo, state, district, village")
 	@PostMapping(value = { "/profile/search/demographic" })
 	public String patientDataSearchFromMongo(@RequestBody ResourceRequestHandler resourceRequestHandler,
@@ -72,7 +70,6 @@ public class PatientDataGatewayController {
 
 	}
 
-	@CrossOrigin
 	@Operation(summary = "Patient profile search from Mongo, all data based on page no")
 	@GetMapping(value = { "/searchWithPagination/{pageNo}" }, produces = MediaType.APPLICATION_JSON)
 	public String patientDataSearchFromMongoPagination(@PathVariable("pageNo") Integer pageNo) {
