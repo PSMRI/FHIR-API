@@ -27,4 +27,6 @@ public interface HealthIDRepo extends CrudRepository<HealthIDResponse, Long> {
 	@Query("SELECT COUNT(*) FROM HealthIDResponse HIDR WHERE HIDR.healthIdNumber = :healthId")
 	public Integer getCountOfHealthIdNumber(@Param("healthId") String healthId);
 
+	boolean existsByHealthIdNumber(String healthIdNumber);
+
 }

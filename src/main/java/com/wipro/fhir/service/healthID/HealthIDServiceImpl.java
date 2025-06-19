@@ -49,6 +49,10 @@ import com.wipro.fhir.repo.healthID.HealthIDRepo;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.http.HttpUtils;
 import com.wipro.fhir.utils.mapper.InputMapper;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Service
 public class HealthIDServiceImpl implements HealthIDService {
@@ -61,73 +65,83 @@ public class HealthIDServiceImpl implements HealthIDService {
 	@Autowired
 	HealthIDRepo healthIDRepo;
 
+	
 	@Override
 	public String mapHealthIDToBeneficiary(String request) throws FHIRException {
-		BenHealthIDMapping health = InputMapper.gson().fromJson(request, BenHealthIDMapping.class);
-		String[] beneficiaryIdsList = null;
-		try {
-			if (health.getBeneficiaryRegID() == null && health.getBeneficiaryID() == null)
-				throw new FHIRException("Error in mapping request");
-			else {
-				if (health.getHealthIdNumber() != null) {
-					beneficiaryIdsList = benHealthIDMappingRepo.getBenIdForHealthId(health.getHealthIdNumber());
+    	BenHealthIDMapping health = null;
+    	try {
+        	JsonObject jsonRequest = JsonParser.parseString(request).getAsJsonObject();
+        	JsonObject abhaProfileJson = jsonRequest.getAsJsonObject("ABHAProfile");
 
-					if (beneficiaryIdsList != null && beneficiaryIdsList.length > 0) {
-						return "HealthId is already linked to other beneficiary ID";
-					} else {
-						if (health.getBeneficiaryRegID() != null)
-							health = benHealthIDMappingRepo.save(health);
-						else {
-							if (health.getBeneficiaryID() != null) {
-								Long benRegId = benHealthIDMappingRepo.getBenRegID(health.getBeneficiaryID());
-								health.setBeneficiaryRegID(benRegId);
-								health = benHealthIDMappingRepo.save(health);
-							}
-						}
-						// Adding the code to check if the received healthId is present in t_healthId
-						// table and add if missing
-						Integer healthIdCount = healthIDRepo.getCountOfHealthIdNumber(health.getHealthIdNumber());
-						if (healthIdCount < 1) {
-							JsonObject jsonRequest = JsonParser.parseString(request).getAsJsonObject();
-							JsonObject abhaProfileJson = jsonRequest.getAsJsonObject("ABHAProfile");
-							HealthIDResponse healthID = InputMapper.gson().fromJson(abhaProfileJson,
-									HealthIDResponse.class);
+    	    health = InputMapper.gson().fromJson(request, BenHealthIDMapping.class);
 
-							healthID.setHealthIdNumber(abhaProfileJson.get("ABHANumber").getAsString());
-							JsonArray phrAddressArray = abhaProfileJson.getAsJsonArray("phrAddress");
-							StringBuilder abhaAddressBuilder = new StringBuilder();
-
-							for (int i = 0; i < phrAddressArray.size(); i++) {
-								abhaAddressBuilder.append(phrAddressArray.get(i).getAsString());
-								if (i < phrAddressArray.size() - 1) {
-									abhaAddressBuilder.append(", ");
-								}
-							}
-							healthID.setHealthId(abhaAddressBuilder.toString());
-							healthID.setName(abhaProfileJson.get("firstName").getAsString() + " "
-									+ abhaProfileJson.get("middleName").getAsString() + " "
-									+ abhaProfileJson.get("lastName").getAsString());
-							SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
-							Date date = simpleDateFormat.parse(abhaProfileJson.get("dob").getAsString());
-							SimpleDateFormat year = new SimpleDateFormat("yyyy");
-							SimpleDateFormat month = new SimpleDateFormat("MM");
-							SimpleDateFormat day = new SimpleDateFormat("dd");
-							healthID.setYearOfBirth(year.format(date));
-							healthID.setMonthOfBirth(month.format(date));
-							healthID.setDayOfBirth(day.format(date));
-							healthID.setCreatedBy(jsonRequest.get("createdBy").getAsString());
-							healthID.setProviderServiceMapID(jsonRequest.get("providerServiceMapId").getAsInt());
-							healthID.setIsNewAbha(jsonRequest.get("isNew").getAsBoolean());
-							healthIDRepo.save(healthID);
-						}
-					}
-				}
+			if (health.getBeneficiaryRegID() == null && health.getBeneficiaryID() == null) {
+				throw new FHIRException("BeneficiaryRegID or BeneficiaryID must be provided");
 			}
-		} catch (Exception e) {
-			throw new FHIRException("Error in saving data");
-		}
-		return new Gson().toJson(health);
-	}
+
+			String healthIdNumber = health.getHealthIdNumber();
+			if (healthIdNumber != null && !healthIdNumber.trim().isEmpty()) {
+
+				// Avoid fetching entire list - use exists check
+				boolean alreadyLinked = benHealthIDMappingRepo.existsByHealthIdNumber(healthIdNumber);
+				if (alreadyLinked) {
+					return "HealthId is already linked to another beneficiary ID";
+				}
+
+				// Save mapping
+				if (health.getBeneficiaryRegID() != null) {
+					health = benHealthIDMappingRepo.save(health);
+				} else if (health.getBeneficiaryID() != null) {
+					Long benRegId = benHealthIDMappingRepo.getBenRegID(health.getBeneficiaryID());
+					health.setBeneficiaryRegID(benRegId);
+					health = benHealthIDMappingRepo.save(health);
+				}
+
+				// Add to healthId table if missing
+				boolean healthIdExists = healthIDRepo.existsByHealthIdNumber(healthIdNumber);
+				if (!healthIdExists) {
+					HealthIDResponse healthID = InputMapper.gson().fromJson(abhaProfileJson, HealthIDResponse.class);
+					healthID.setHealthIdNumber(abhaProfileJson.get("ABHANumber").getAsString());
+
+					// phrAddress as comma-separated
+					JsonArray phrAddressArray = abhaProfileJson.getAsJsonArray("phrAddress");
+					String abhaAddress = IntStream.range(0, phrAddressArray.size())
+						.mapToObj(i -> phrAddressArray.get(i).getAsString())
+						.collect(Collectors.joining(", "));
+					healthID.setHealthId(abhaAddress);
+
+					// Full name
+					String fullName = Stream.of("firstName", "middleName", "lastName")
+						.map(field -> abhaProfileJson.has(field) ? abhaProfileJson.get(field).getAsString() : "")
+						.filter(s -> !s.isEmpty())
+						.collect(Collectors.joining(" "));
+					healthID.setName(fullName.trim());
+
+					// Parse and split DOB
+					LocalDate dob = LocalDate.parse(abhaProfileJson.get("dob").getAsString(), DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+					healthID.setYearOfBirth(String.valueOf(dob.getYear()));
+					healthID.setMonthOfBirth(String.format("%02d", dob.getMonthValue()));
+					healthID.setDayOfBirth(String.format("%02d", dob.getDayOfMonth()));
+
+					// Other fields
+					healthID.setCreatedBy(jsonRequest.get("createdBy").getAsString());
+					healthID.setProviderServiceMapID(jsonRequest.get("providerServiceMapId").getAsInt());
+					healthID.setIsNewAbha(jsonRequest.get("isNew").getAsBoolean());
+
+					healthIDRepo.save(healthID);
+				}
+        }
+
+    } catch (FHIRException e) {
+        throw e; // already custom
+    } catch (Exception e) {
+        logger.error("Unexpected error while mapping HealthID", e);
+        throw new FHIRException("Unexpected error: " + e.getMessage());
+    }
+
+    return new Gson().toJson(health);
+}
+
 
 	public String getBenHealthID(Long benRegID) {
         List<BenHealthIDMapping> healthDetailsList = benHealthIDMappingRepo.getHealthDetails(benRegID);
