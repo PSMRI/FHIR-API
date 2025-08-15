@@ -12,9 +12,12 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{ts,css,html}": [
+    "src/**/*.{ts,js}": [
       "eslint --fix"
-    ]
+    ],
+    "**/*.xml": [
+    "xmllint --noout "
+  ]
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
