@@ -60,21 +60,19 @@ public class AppointmentDataModel implements Serializable {
 	}
 
 	public AppointmentDataModel(Object[] objArr) {
-		this.id = BigInteger.valueOf((long) objArr[0]);
-		this.beneficiaryRegID = BigInteger.valueOf((long) objArr[1]);
-		this.visitCode = BigInteger.valueOf((long) objArr[2]);
-		this.providerServiceMapID = (Integer) objArr[3];
-		this.vanID = (Integer) objArr[4];
-
-		this.status = (String) objArr[5];
-		this.requestDate = (Timestamp) objArr[6];
-		this.userID = (Integer) objArr[7];
-		this.sName = (String) objArr[8];
-		this.designationID = (Integer) objArr[9];
-		this.designationName = (String) objArr[10];
-
-		this.createdDate = (Timestamp) objArr[11];
-		this.createdBy = (String) objArr[12];
+	    this.id = objArr[0] != null ? BigInteger.valueOf(((Number) objArr[0]).longValue()) : null;
+	    this.beneficiaryRegID = objArr[1] != null ? BigInteger.valueOf(((Number) objArr[1]).longValue()) : null;
+	    this.visitCode = objArr[2] != null ? BigInteger.valueOf(((Number) objArr[2]).longValue()) : null;
+	    this.providerServiceMapID = objArr[3] != null ? (Integer) objArr[3] : null;
+	    this.vanID = objArr[4] != null ? (Integer) objArr[4] : null;
+	    this.status = objArr[5] != null ? (String) objArr[5] : null;
+	    this.requestDate = objArr[6] != null ? (Timestamp) objArr[6] : null;
+	    this.userID = objArr[7] != null ? (Integer) objArr[7] : null;
+	    this.sName = objArr[8] != null ? (String) objArr[8] : null;
+	    this.designationID = objArr[9] != null ? (Integer) objArr[9] : null;
+	    this.designationName = objArr[10] != null ? (String) objArr[10] : null;
+	    this.createdDate = objArr[11] != null ? (Timestamp) objArr[11] : null;
+	    this.createdBy = objArr[12] != null ? (String) objArr[12] : null;
 
 	}
 

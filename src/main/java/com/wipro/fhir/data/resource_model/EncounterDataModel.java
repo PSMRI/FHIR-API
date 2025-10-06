@@ -55,21 +55,16 @@ public class EncounterDataModel implements Serializable {
 	}
 
 	public EncounterDataModel(Object[] objArr) {
-		this.id = BigInteger.valueOf((long) objArr[0]);
-		this.beneficiaryRegID = BigInteger.valueOf((long) objArr[1]);
-		this.visitCode = BigInteger.valueOf((long) objArr[2]);
-		this.providerServiceMapID = (Integer) objArr[3];
-		this.vanID = (Integer) objArr[4];
-
-		if (objArr[5] != null)
-			this.nurseFlag = ((Short) objArr[5]).intValue();
-		if (objArr[6] != null)
-			this.docFlag = ((Short) objArr[6]).intValue();
-		if (objArr[7] != null)
-			this.specialistFlag = ((Short) objArr[7]).intValue();
-
-		this.createdDate = (Timestamp) objArr[8];
-		this.createdBy = (String) objArr[9];
+	    this.id = objArr[0] != null ? BigInteger.valueOf(((Number) objArr[0]).longValue()) : null;
+	    this.beneficiaryRegID = objArr[1] != null ? BigInteger.valueOf(((Number) objArr[1]).longValue()) : null;
+	    this.visitCode = objArr[2] != null ? BigInteger.valueOf(((Number) objArr[2]).longValue()) : null;
+	    this.providerServiceMapID = objArr[3] != null ? (Integer) objArr[3] : null;
+	    this.vanID = objArr[4] != null ? (Integer) objArr[4] : null;
+	    this.nurseFlag = objArr[5] != null ? ((Number) objArr[5]).intValue() : null;
+	    this.docFlag = objArr[6] != null ? ((Number) objArr[6]).intValue() : null;
+	    this.specialistFlag = objArr[7] != null ? ((Number) objArr[7]).intValue() : null;
+	    this.createdDate = objArr[8] != null ? (Timestamp) objArr[8] : null;
+	    this.createdBy = objArr[9] != null ? (String) objArr[9] : null;
 
 	}
 

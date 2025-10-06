@@ -40,7 +40,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -65,6 +64,7 @@ import com.wipro.fhir.data.patient.PatientDemographic;
 import com.wipro.fhir.data.patient_data_handler.PatientDemographicModel_NDHM_Patient_Profile;
 import com.wipro.fhir.data.request_handler.PatientEligibleForResourceCreation;
 import com.wipro.fhir.data.request_handler.ResourceRequestHandler;
+import com.wipro.fhir.data.users.User;
 import com.wipro.fhir.repo.common.PatientEligibleForResourceCreationRepo;
 import com.wipro.fhir.repo.healthID.BenHealthIDMappingRepo;
 import com.wipro.fhir.repo.mongo.amrit_resource.AMRIT_ResourceMongoRepo;
@@ -96,16 +96,18 @@ public class CommonServiceImpl implements CommonService {
 
 	@Value("${patient-search-page-size}")
 	private String patient_search_page_size;
-	
+
 	@Value("${abhaMode}")
 	private String abhaMode;
 
 	private static String authKey;
 	private UUID uuid;
 
-	//public static String NDHM_AUTH_TOKEN;
-	//public static Long NDHM_TOKEN_EXP;
-	//public static String NDHM_OTP_TOKEN;
+
+	// public static String NDHM_AUTH_TOKEN;
+	// public static Long NDHM_TOKEN_EXP;
+	// public static String NDHM_OTP_TOKEN;
+
 
 	@Value("${clientID}")
 	private String clientID;
@@ -127,7 +129,6 @@ public class CommonServiceImpl implements CommonService {
 	private APIChannel aPIChannel;
 	@Autowired
 	private AMRIT_ResourceMongoRepo aMRIT_ResourceMongoRepo;
-	
 
 	@Autowired
 	private PatientCareContextsMongoRepo patientCareContextsMongoRepo;
@@ -148,7 +149,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Autowired
 	private PatientDataGatewayService patientDataGatewayService;
-	
+
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
@@ -159,7 +160,7 @@ public class CommonServiceImpl implements CommonService {
 	private PatientDemographic patientDemographic;
 	@Autowired
 	private Common_NDHMService common_NDHMService;
-	
+
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
 
@@ -168,68 +169,74 @@ public class CommonServiceImpl implements CommonService {
 		String response = null;
 		// list of patient eligible for resource creation
 		List<PatientEligibleForResourceCreation> pList = getPatientListForResourceEligible();
-		logger.info("No of records available to create FHIR in last 2 dagetPatientListForResourceEligibleys : " + pList.size());
+		logger.info("No of records available to create FHIR in last 2 dagetPatientListForResourceEligibleys : "
+				+ pList.size());
 		ResourceRequestHandler resourceRequestHandler;
 		for (PatientEligibleForResourceCreation p : pList) {
-
-			logger.info("Bundle creation is started for BenID : " + p.getBeneficiaryId() + " | BenRegID : "
-					+ p.getBeneficiaryRegID() + " | VisitCode : " + p.getVisitCode());
-
-			resourceRequestHandler = new ResourceRequestHandler();
-			resourceRequestHandler.setBeneficiaryID(p.getBeneficiaryId());
-			resourceRequestHandler.setVisitCode(p.getVisitCode());
-			resourceRequestHandler.setBeneficiaryRegID(p.getBeneficiaryRegID());
-
-// ----------------------------------------------------------------------------------------------
 			try {
+				logger.info("Bundle creation is started for BenID : " + p.getBeneficiaryId() + " | BenRegID : "
+						+ p.getBeneficiaryRegID() + " | VisitCode : " + p.getVisitCode());
 
-				logger.info("*****Fetch beneficiary Id: " + resourceRequestHandler.getBeneficiaryRegID());
-				List<Object[]> rsObjList = patientEligibleForResourceCreationRepo
-						.callPatientDemographicSP(resourceRequestHandler.getBeneficiaryRegID());
-				logger.info("*****Fetch beneficiary Id response recevied :", rsObjList);
+				resourceRequestHandler = new ResourceRequestHandler();
+				resourceRequestHandler.setBeneficiaryID(p.getBeneficiaryId());
+				resourceRequestHandler.setVisitCode(p.getVisitCode());
+				resourceRequestHandler.setBeneficiaryRegID(p.getBeneficiaryRegID());
 
-				PatientDemographic patientDemographicOBJ = patientDemographic.getPatientDemographic(rsObjList);
-				logger.info("*****Fetch patient after fetching demographics");
-				if (patientDemographicOBJ != null) {
-					addCareContextToMongo(patientDemographicOBJ, p);
-					logger.info("*****Add to mongo success done");
-					if (patientDemographicOBJ.getPreferredPhoneNo() != null)
-						sendAbdmAdvSMS(patientDemographicOBJ.getPreferredPhoneNo());
-					else
-						throw new FHIRException("Advertisement sms could not be sent as beneficiary phone no not found");
+// ----------------------------------------------------------------------------------------------
+				try {
+
+					logger.info("*****Fetch beneficiary Id: " + resourceRequestHandler.getBeneficiaryRegID());
+					List<Object[]> rsObjList = patientEligibleForResourceCreationRepo
+							.callPatientDemographicSP(resourceRequestHandler.getBeneficiaryRegID());
+					logger.info("*****Fetch beneficiary Id response recevied :", rsObjList);
+
+					PatientDemographic patientDemographicOBJ = patientDemographic.getPatientDemographic(rsObjList);
+					logger.info("*****Fetch patient after fetching demographics");
+					if (patientDemographicOBJ != null) {
+						addCareContextToMongo(patientDemographicOBJ, p);
+						logger.info("*****Add to mongo success done");
+						if (patientDemographicOBJ.getPreferredPhoneNo() != null)
+							sendAbdmAdvSMS(patientDemographicOBJ.getPreferredPhoneNo());
+						else
+							logger.error(
+									"Advertisement sms could not be sent as beneficiary phone no not found");
+					} else
+						throw new FHIRException(
+								"Beneficiary not found, benRegId = " + resourceRequestHandler.getBeneficiaryRegID());
+
+				} catch (Exception e) {
+					logger.error(e.getMessage());
 				}
-				else
-					throw new FHIRException("Beneficiary not found, benRegId = " +resourceRequestHandler.getBeneficiaryRegID());
-
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-			}
 // ----------------------------------------------------------------------------------------------
 
-			// 1. OP consult resource bundle
-			int i = oPConsultRecordBundle.processOPConsultRecordBundle(resourceRequestHandler, p);
-			// 2. diagnostic report record budle
-			int j = diagnosticReportRecordBundle.processDiagnosticReportRecordBundle(resourceRequestHandler, p);
-			// 3. prescription Bundle
-			int k = prescriptionBundle.processPrescriptionRecordBundle(resourceRequestHandler, p);
+				// 1. OP consult resource bundle
+				int i = oPConsultRecordBundle.processOPConsultRecordBundle(resourceRequestHandler, p);
+				// 2. diagnostic report record budle
+				int j = diagnosticReportRecordBundle.processDiagnosticReportRecordBundle(resourceRequestHandler, p);
+				// 3. prescription Bundle
+				int k = prescriptionBundle.processPrescriptionRecordBundle(resourceRequestHandler, p);
 
-			if (i > 0 && j > 0 && k > 0) {
+				logger.info("The value of i: " + i + " The value of j: " + j + " The value of k: " + k);
 
-				// update the processed flag in trigger table
-				p.setProcessed(true);
-				PatientEligibleForResourceCreation resultSet = patientEligibleForResourceCreationRepo.save(p);
-				if (resultSet != null && resultSet.getId().compareTo(BigInteger.ZERO) > 0)
-					logger.info("processed flag updated successfully after FHIR resource creation");
+				if (i > 0 && j > 0 && k > 0) {
 
-				response = "Bundle creation is success for BenID : " + p.getBeneficiaryId() + " | BenRegID : "
-						+ p.getBeneficiaryRegID() + " | VisitCode : " + p.getVisitCode();
+					// update the processed flag in trigger table
+					p.setProcessed(true);
+					PatientEligibleForResourceCreation resultSet = patientEligibleForResourceCreationRepo.save(p);
+					if (resultSet != null && resultSet.getId().compareTo(BigInteger.ZERO) > 0)
+						logger.info("processed flag updated successfully after FHIR resource creation");
 
-				logger.info("Bundle creation is success for BenID : " + p.getBeneficiaryId() + " | BenRegID : "
-						+ p.getBeneficiaryRegID() + " | VisitCode : " + p.getVisitCode());
+					response = "Bundle creation is success for BenID : " + p.getBeneficiaryId() + " | BenRegID : "
+							+ p.getBeneficiaryRegID() + " | VisitCode : " + p.getVisitCode();
+
+					logger.info("Bundle creation is success for BenID : " + p.getBeneficiaryId() + " | BenRegID : "
+							+ p.getBeneficiaryRegID() + " | VisitCode : " + p.getVisitCode());
+				}
+
+				// adv SMS - ABDM notify2 API
+			} catch (Exception e) {
+				logger.error("Fhir Schedule run failed " +e.getMessage());
 			}
-
-			// adv SMS - ABDM notify2 API
-
 		}
 		return response;
 	}
@@ -289,11 +296,11 @@ public class CommonServiceImpl implements CommonService {
 
 	// 31-03-2021
 	// @Override
-	public int addCareContextToMongo(PatientDemographic pDemo, PatientEligibleForResourceCreation pVisit)
+	public void addCareContextToMongo(PatientDemographic pDemo, PatientEligibleForResourceCreation pVisit)
 			throws FHIRException {
-		int response = 0;
 
 		if (pDemo != null && pVisit != null) {
+
 
 //			JsonObject jsnOBJ = new JsonObject();
 //			JsonParser jsnParser = new JsonParser();
@@ -324,56 +331,80 @@ public class CommonServiceImpl implements CommonService {
 			// get benid
 //			if (benRegID != null)
 //				benID = benHealthIDMappingRepo.getBenID(benRegID);
-			
-			// fetch abdm facility id  
-			logger.info("********t_benvisistData fetch request pvisit data :" ,  pVisit);
+
+
+			// fetch abdm facility id
+			logger.info("********t_benvisistData fetch request pvisit data :", pVisit);
 
 			List<Object[]> res = benHealthIDMappingRepo.getAbdmFacilityAndlinkedDate(pVisit.getVisitCode());
-			
+
 			// check care context record in mongo against beneficiaryID
 			ArrayList<CareContexts> ccList = new ArrayList<>();
 
 			CareContexts cc = new CareContexts();
+
 			logger.info("********t_benvisistData fetch response : {}", res);
 
 			cc.setReferenceNumber(pVisit.getVisitCode() != null ? pVisit.getVisitCode().toString() : null);
-			cc.setDisplay(pVisit.getVisitCategory() != null ? pVisit.getVisitCategory().toString() : null);	
+			cc.setDisplay(pVisit.getVisitCategory() != null ? pVisit.getVisitCategory().toString() : null);
 			Object[] resData = null;
 			if (res.get(0) != null) {
 				resData = res.get(0);
-			cc.setAbdmFacilityId(resData[0] != null ? resData[0].toString() : null );
-			cc.setCareContextLinkedDate(resData[1] != null ? resData[1].toString() : null);
+				cc.setAbdmFacilityId(resData[0] != null ? resData[0].toString() : null);
+				cc.setCareContextLinkedDate(resData[1] != null ? resData[1].toString() : null);
 			}
-			
-			logger.info("********data to be saved in mongo :" ,  cc);
+
+
+			logger.info("********data to be saved in mongo :", cc);
 			PatientCareContexts pcc;
 			PatientCareContexts resultSet = null;
 
 
+			logger.info("********data to be saved in mongo :", cc);
+			PatientCareContexts pcc1; 
+
 			if (pDemo.getBeneficiaryID() != null) {
-				pcc = patientCareContextsMongoRepo.findByIdentifier(pDemo.getBeneficiaryID().toString());
+				pcc1 = patientCareContextsMongoRepo.findByIdentifier(pDemo.getBeneficiaryID().toString());
 
-				if (pcc != null && pcc.getIdentifier() != null) {
-					ccList = pcc.getCareContextsList();
-					ccList.add(cc);
-					pcc.setCareContextsList(ccList);
-					resultSet = patientCareContextsMongoRepo.save(pcc);
+				if (pcc1 != null && pcc1.getIdentifier() != null) {
+					// Get the existing careContextsList
+					if (pcc1.getCareContextsList() != null && pcc1.getCareContextsList().size() > 0) {
+						ccList = pcc1.getCareContextsList();
 
+						// Check if the visitCode is already in the careContextsList
+						for (CareContexts existingContext : ccList) {
+							if (existingContext.getReferenceNumber() != null
+									&& existingContext.getReferenceNumber().equals(pVisit.getVisitCode().toString())) {
+								logger.info("Visit code already Exisit in Mongo for benId:" + pDemo.getBeneficiaryID().toString() + "and visit code : " + pVisit.getVisitCode() );
+								return;
+							}
+						}
+						ccList.add(cc);
+						pcc1.setCareContextsList(ccList);
+						patientCareContextsMongoRepo.save(pcc1);
+					}
+//				}
+//					if (pcc != null && pcc.getIdentifier() != null) {
+//						ccList = pcc.getCareContextsList();
+//						ccList.add(cc);
+//						pcc.setCareContextsList(ccList);
+//						resultSet = patientCareContextsMongoRepo.save(pcc);
+//
 				} else {
-					pcc = new PatientCareContexts();
-					pcc.setCaseReferenceNumber(pDemo.getBeneficiaryID().toString());
-					pcc.setIdentifier(pDemo.getBeneficiaryID().toString());
+					pcc1 = new PatientCareContexts();
+					pcc1.setCaseReferenceNumber(pDemo.getBeneficiaryID().toString());
+					pcc1.setIdentifier(pDemo.getBeneficiaryID().toString());
 					if (pDemo.getGenderID() != null) {
 						switch (pDemo.getGenderID()) {
 						case 1:
-							pcc.setGender("M");
+							pcc1.setGender("M");
 							break;
 						case 2:
-							pcc.setGender("F");
+							pcc1.setGender("F");
 							break;
 
 						case 3:
-							pcc.setGender("O");
+							pcc1.setGender("O");
 							break;
 
 						default:
@@ -381,27 +412,23 @@ public class CommonServiceImpl implements CommonService {
 						}
 					}
 					if (pDemo.getName() != null)
-						pcc.setName(pDemo.getName());
+						pcc1.setName(pDemo.getName());
 					if (pDemo.getDOB() != null)
-						pcc.setYearOfBirth(pDemo.getDOB().toString().split("-")[0]);
+						pcc1.setYearOfBirth(pDemo.getDOB().toString().split("-")[0]);
 					if (pDemo.getPreferredPhoneNo() != null)
-						pcc.setPhoneNumber(pDemo.getPreferredPhoneNo());
+						pcc1.setPhoneNumber(pDemo.getPreferredPhoneNo());
 					if (pDemo.getHealthID() != null)
-						pcc.setHealthId(pDemo.getHealthID());
+						pcc1.setHealthId(pDemo.getHealthID());
 					if (pDemo.getHealthIdNo() != null)
-						pcc.setHealthNumber(pDemo.getHealthIdNo());
+						pcc1.setHealthNumber(pDemo.getHealthIdNo());
 					ccList.add(cc);
-					pcc.setCareContextsList(ccList);
+					pcc1.setCareContextsList(ccList);
 					// save carecontext back to mongo
-					resultSet = patientCareContextsMongoRepo.save(pcc);
+					patientCareContextsMongoRepo.save(pcc1);
 				}
-
-				if (resultSet != null && resultSet.get_id() != null)
-					response = 1;
 			}
 
 		}
-		return response;
 	}
 
 	@Deprecated
@@ -423,7 +450,7 @@ public class CommonServiceImpl implements CommonService {
 				JsonParser jsnParser = new JsonParser();
 				JsonElement jsnElmnt = jsnParser.parse(responseStrLogin);
 				jsnOBJ = jsnElmnt.getAsJsonObject();
-				//NDHM_AUTH_TOKEN = "Bearer" + " " + jsnOBJ.get("accessToken").getAsString();
+				// NDHM_AUTH_TOKEN = "Bearer" + " " + jsnOBJ.get("accessToken").getAsString();
 				Integer expiry = jsnOBJ.get("expiresIn").getAsInt();
 				double time = expiry / 60;
 				Date date = new Date();
@@ -431,7 +458,7 @@ public class CommonServiceImpl implements CommonService {
 				Calendar ndhmCalendar = Calendar.getInstance();
 				ndhmCalendar.setTime(sqlDate);
 				ndhmCalendar.add(Calendar.MINUTE, (int) time);
-			
+
 				res = "success";
 			} else
 				res = "Error while accessing authenticate API";
@@ -477,7 +504,7 @@ public class CommonServiceImpl implements CommonService {
 	 * @author SH20094090
 	 * @return
 	 * 
-	 * 		get the UUID and isoTimestamp for NDMH API's
+	 *         get the UUID and isoTimestamp for NDMH API's
 	 */
 	@Deprecated
 	@Override
@@ -541,7 +568,7 @@ public class CommonServiceImpl implements CommonService {
 	 * @param reqID
 	 * @return
 	 * 
-	 * 		hitting MongoDB
+	 *         hitting MongoDB
 	 */
 	@Deprecated
 	NDHMResponse getResponseMongo(String reqID) {
@@ -628,8 +655,8 @@ public class CommonServiceImpl implements CommonService {
 			SMSNotify smsNotify = new SMSNotify(obj.getRequestId(), obj.getTimestamp(), notification);
 			String requestOBJ = new Gson().toJson(smsNotify);
 			logger.info("NDHM_FHIR Generate Notify SMS request Obj: " + requestOBJ);
-			if(abhaMode !=null && !(abhaMode.equalsIgnoreCase("abdm") || abhaMode.equalsIgnoreCase("sbx")))
-				abhaMode="sbx";
+			if (abhaMode != null && !(abhaMode.equalsIgnoreCase("abdm") || abhaMode.equalsIgnoreCase("sbx")))
+				abhaMode = "sbx";
 			HttpHeaders headers = common_NDHMService.getHeaders(ndhmAuthToken, abhaMode);
 			ResponseEntity<String> responseEntity = httpUtils.postWithResponseEntity(generateABDM_NotifySMS, requestOBJ,
 					headers);

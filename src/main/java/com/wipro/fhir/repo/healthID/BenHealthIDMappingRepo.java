@@ -45,6 +45,12 @@ public interface BenHealthIDMappingRepo extends CrudRepository<BenHealthIDMappin
 	@Query(" SELECT bvd from BenHealthIDMapping bvd WHERE bvd.beneficiaryRegID = :benRegID")
 	public ArrayList<BenHealthIDMapping> getHealthDetails(@Param("benRegID") Long benRegID);
 	
+	@Query("SELECT bvd.beneficiaryRegID from BenHealthIDMapping bvd WHERE bvd.healthIdNumber = :healthIdNumber")
+	public String[] getBenIdForHealthId(@Param("healthIdNumber") String healthIdNumber);
+	
+	@Query(value = "SELECT BeneficiaryID FROM db_identity.m_beneficiaryregidmapping where BenRegId in (:benIds)", nativeQuery = true)
+	public String[] getBeneficiaryIds(@Param("benIds") String[] benIds);
+	
 	@Transactional
 	@Modifying
 	@Query(value = "UPDATE db_iemr.t_benvisitdetail SET HealthID= :healthID,HealthIdNumber= :healthIdNumber,CarecontextLinkDate=CURRENT_TIMESTAMP() WHERE VisitCode= :visitCode ", nativeQuery = true)
@@ -75,5 +81,14 @@ public interface BenHealthIDMappingRepo extends CrudRepository<BenHealthIDMappin
 	@Modifying
 	@Query(value = "UPDATE db_iemr.t_benvisitdetail SET AbdmFacilityID = :abdmFacilityId WHERE VisitCode= :visitCode", nativeQuery = true)
 	Integer updateFacilityIdForVisit(@Param("visitCode") BigInteger visitCode, @Param("abdmFacilityId") String abdmFacilityId);
+	
+	@Query(value = "select isNewAbha from t_healthid where HealthIdNumber=:healthIdNumber order by 1 desc limit 1", nativeQuery = true)
+	boolean getIsNewAbha(@Param("healthIdNumber") String healthIdNumber);
+
+	@Query(value = "SELECT HealthIdNumber, isNewAbha FROM t_healthid WHERE HealthIdNumber IN :healthIdNumbers ORDER BY HealthIdNumber, isNewAbha DESC", nativeQuery = true)
+	List<Object[]> getIsNewAbhaBatch(@Param("healthIdNumbers") List<String> healthIdNumbers);
+
+	boolean existsByHealthIdNumber(String healthIdNumber);
+	
 
 }

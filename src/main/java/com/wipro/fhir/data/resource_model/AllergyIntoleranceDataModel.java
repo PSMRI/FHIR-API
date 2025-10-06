@@ -61,19 +61,18 @@ public class AllergyIntoleranceDataModel implements Serializable {
 	}
 
 	public AllergyIntoleranceDataModel(Object[] objArr) {
-		this.id = BigInteger.valueOf((long) objArr[0]);
-		this.beneficiaryRegID = BigInteger.valueOf((long) objArr[1]);
-		this.visitCode = BigInteger.valueOf((long) objArr[2]);
-		this.providerServiceMapID = (Integer) objArr[3];
-		this.vanID = (Integer) objArr[4];
-		this.allergyStatus = (String) objArr[5];
-		this.allergyType = (String) objArr[6];
-		this.sctcode = (String) objArr[7];
-		this.sctTerm = (String) objArr[8];
-		this.createdDate = (Timestamp) objArr[9];
-		this.createdBy = (String) objArr[10];
-		this.allergicReactionType = (String) objArr[11];
-
+	    this.id = objArr[0] != null ? BigInteger.valueOf(((Number) objArr[0]).longValue()) : null;
+	    this.beneficiaryRegID = objArr[1] != null ? BigInteger.valueOf(((Number) objArr[1]).longValue()) : null;
+	    this.visitCode = objArr[2] != null ? BigInteger.valueOf(((Number) objArr[2]).longValue()) : null;
+	    this.providerServiceMapID = objArr[3] != null ? (Integer) objArr[3] : null;
+	    this.vanID = objArr[4] != null ? (Integer) objArr[4] : null;
+	    this.allergyStatus = objArr[5] != null ? (String) objArr[5] : null;
+	    this.allergyType = objArr[6] != null ? (String) objArr[6] : null;
+	    this.sctcode = objArr[7] != null ? (String) objArr[7] : null;
+	    this.sctTerm = objArr[8] != null ? (String) objArr[8] : null;
+	    this.createdDate = objArr[9] != null ? (Timestamp) objArr[9] : null;
+	    this.createdBy = objArr[10] != null ? (String) objArr[10] : null;
+	    this.allergicReactionType = objArr[11] != null ? (String) objArr[11] : null;
 	}
 
 	public List<AllergyIntoleranceDataModel> getAllergyList(List<Object[]> resultSetList) {

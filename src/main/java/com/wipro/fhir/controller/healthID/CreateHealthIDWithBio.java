@@ -3,7 +3,7 @@ package com.wipro.fhir.controller.healthID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -17,7 +17,6 @@ import com.wipro.fhir.utils.response.OutputResponse;
 import io.lettuce.core.dynamic.annotation.Param;
 import io.swagger.v3.oas.annotations.Operation;
 
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/healthIDWithBio", headers = "Authorization")
 public class CreateHealthIDWithBio {
@@ -26,7 +25,6 @@ public class CreateHealthIDWithBio {
 	@Autowired
 	private HealthIDWithBioService healthIDWithBioService;
 	
-	@CrossOrigin
 	@Operation(summary = "Verify Bio")
 	@PostMapping(value = { "/verifyBio" })
 	public String verifyBio(@Param(value = "{\"Aadhaar\":\"String\", \"pid\":\"String\",\"bioType\":\"String\"}") @RequestBody String request,
@@ -48,9 +46,6 @@ public class CreateHealthIDWithBio {
 		logger.info("NDHM_FHIR verify Bio API response" + response.toString());
 		return response.toString();
 	}
-	
-	
-	@CrossOrigin
 	@Operation(summary = "generate Mobile OTP")
 	@PostMapping(value = { "/generateMobileOTP" })
 	public String checkAndGenerateMobileOTP(
@@ -72,7 +67,6 @@ public class CreateHealthIDWithBio {
 		return response.toString();
 	}
 
-	@CrossOrigin
 	@Operation(summary = "Confirm with Aadhaar Bio")
 	@PostMapping(value = { "/confirmWithAadhaarBio" })
 	public String confirmWithAadhaarBio(@Param(value = "{\"txnId\":\"String\", \"pid\":\"String\",\"bioType\":\"String\",\"authType\":\"String\"}") @RequestBody String request,

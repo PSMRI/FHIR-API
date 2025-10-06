@@ -7,8 +7,9 @@ public class LoginMethod {
 	
 	private String loginId;
 	private String loginMethod;
+	private String loginHint;
 	private String pId;
-	private String tnxId;
+	private String txnId;
 	private String mobileNumber;
 	private String createdBy;
 	private int providerServiceMapId;

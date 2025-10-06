@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class RequestOTPEnrollment {
 	
-		String tnxId;
+		String txnId;
 		String[] scope;
 		String loginHint;
 		String loginId;

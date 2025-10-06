@@ -8,4 +8,8 @@ public interface LoginAbhaV3Service {
 
 	String verifyAbhaLogin(String request) throws FHIRException;
 
+	String verifyProfileLoginUser(String tToken, String txnId, String abhaNumber) throws FHIRException;
+
+	String getWebLoginPhrCard(String reqObj) throws FHIRException;
+
 }

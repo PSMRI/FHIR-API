@@ -6,6 +6,7 @@
 /out-tsc
 /target
 /logs
+command_output.log
 
 # dependencies
 /node_modules

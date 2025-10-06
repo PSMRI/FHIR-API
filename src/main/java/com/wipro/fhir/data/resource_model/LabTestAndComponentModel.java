@@ -67,24 +67,24 @@ public class LabTestAndComponentModel {
 	}
 
 	public LabTestAndComponentModel(Object[] objArr) {
-		this.id = BigInteger.valueOf((long) objArr[0]);
-		this.beneficiaryRegID = BigInteger.valueOf((long) objArr[1]);
-		this.visitCode = BigInteger.valueOf((long) objArr[2]);
-		this.providerServiceMapID = (Integer) objArr[3];
-		this.vanID = (Integer) objArr[4];
-		this.procedureID = (Integer) objArr[5];
-		this.componentID = (Integer) objArr[6];
-		this.procedureName = (String) objArr[7];
-		this.testComponentName = (String) objArr[8];
-		this.testResultValue = (String) objArr[9];
-		this.rangeMin = (BigDecimal) objArr[10];
-		this.rangeMax = (BigDecimal) objArr[11];
-		this.loincCode = (String) objArr[12];
-		this.loincValue = (String) objArr[13];
-		this.createdDate = (Timestamp) objArr[14];
-		this.createdBy = (String) objArr[15];
-		this.remarks = (String) objArr[16];
-		this.testResultUnit = (String) objArr[17];
+	    this.id = objArr[0] != null ? BigInteger.valueOf(((Number) objArr[0]).longValue()) : null;
+	    this.beneficiaryRegID = objArr[1] != null ? BigInteger.valueOf(((Number) objArr[1]).longValue()) : null;
+	    this.visitCode = objArr[2] != null ? BigInteger.valueOf(((Number) objArr[2]).longValue()) : null;
+	    this.providerServiceMapID = objArr[3] != null ? (Integer) objArr[3] : null;
+	    this.vanID = objArr[4] != null ? (Integer) objArr[4] : null;
+	    this.procedureID = objArr[5] != null ? (Integer) objArr[5] : null;
+	    this.componentID = objArr[6] != null ? (Integer) objArr[6] : null;
+	    this.procedureName = objArr[7] != null ? (String) objArr[7] : null;
+	    this.testComponentName = objArr[8] != null ? (String) objArr[8] : null;
+	    this.testResultValue = objArr[9] != null ? (String) objArr[9] : null;
+	    this.rangeMin = objArr[10] != null ? (BigDecimal) objArr[10] : null;
+	    this.rangeMax = objArr[11] != null ? (BigDecimal) objArr[11] : null;
+	    this.loincCode = objArr[12] != null ? (String) objArr[12] : null;
+	    this.loincValue = objArr[13] != null ? (String) objArr[13] : null;
+	    this.createdDate = objArr[14] != null ? (Timestamp) objArr[14] : null;
+	    this.createdBy = objArr[15] != null ? (String) objArr[15] : null;
+	    this.remarks = objArr[16] != null ? (String) objArr[16] : null;
+	    this.testResultUnit = objArr[17] != null ? (String) objArr[17] : null;
 
 	}
 

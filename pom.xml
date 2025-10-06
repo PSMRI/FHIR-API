@@ -10,8 +10,8 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.wipro.fhir.r4</groupId>
-	<artifactId>FHIR_API</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>fhir-api</artifactId>
+	<version>3.1.0</version>
 	<packaging>war</packaging>
 	<name>FHIR-API</name>
 	<description>FHIR_NDHM standard integration in AMRIT</description>
@@ -27,7 +27,7 @@
 
 		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
 		<org.mapstruct.version>1.2.0.Final</org.mapstruct.version>
-		<org.projectlombok.version>1.16.18</org.projectlombok.version>
+		<org.projectlombok.version>1.18.36</org.projectlombok.version>
 
 		<environment>${ENV_VAR}</environment>
 		<target-properties>target/classes/application.properties
@@ -58,10 +58,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
-		<dependency> 
-			<groupId>co.elastic.logging</groupId> 
-			<artifactId>logback-ecs-encoder</artifactId> 
-			<version>1.3.2</version> 
+		<dependency>
+			<groupId>co.elastic.logging</groupId>
+			<artifactId>logback-ecs-encoder</artifactId>
+			<version>1.3.2</version>
 		</dependency>
 
 		<dependency>
@@ -131,16 +131,6 @@
 			<artifactId>json</artifactId>
 			<version>20231013</version>
 		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.17.0-rc1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>2.17.0-rc1</version>
-		</dependency>
 
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -156,8 +146,12 @@
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-joda</artifactId>
-			<version>2.17.0</version>
 		</dependency>
 
 		<dependency>
@@ -189,21 +183,40 @@
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 
-		<!--
-		https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/hapi-fhir-structures-r4 -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.14.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.14.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.14.2</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/hapi-fhir-structures-r4 -->
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-r4</artifactId>
-			<version>7.0.2</version>
+			<version>6.10.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>ca.uhn.hapi</groupId>
+			<artifactId>hapi-base</artifactId>
+			<version>2.6.0</version>
 		</dependency>
 
-
-		<!--
-		https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/org.hl7.fhir.utilities -->
+		<!-- https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/org.hl7.fhir.utilities -->
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>org.hl7.fhir.utilities</artifactId>
-			<version>6.3.6</version>
+			<version>6.5.18</version>
 		</dependency>
 
 		<!-- lombok -->
@@ -235,11 +248,32 @@
 			<artifactId>json-path</artifactId>
 			<version>2.9.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.12.6</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.12.6</version>
+			<scope>runtime</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.12.6</version>
+			<scope>runtime</scope>
+		</dependency>
+
 
 	</dependencies>
 
 	<build>
-		<finalName>fhirapi-v3.0.0</finalName>
+		<finalName>${artifactId}-${version}</finalName>
 
 		<plugins>
 			<plugin>
@@ -250,7 +284,7 @@
 					<format>HTML</format>
 					<nvdApiServerId>nvd</nvdApiServerId>
 				</configuration>
-				
+
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -273,7 +307,7 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<version>${lombok.version}</version>
+							<version>${org.projectlombok.version}</version>
 						</path>
 						<path>
 							<groupId>org.mapstruct</groupId>
@@ -329,8 +363,7 @@
 									${target-properties} and
 									${source-properties}
 								</echo>
-								<concat destfile="${target-properties}"
-									append="yes"
+								<concat destfile="${target-properties}" append="yes"
 									force="yes">
 									<fileset file="${source-properties}">
 									</fileset>
@@ -390,9 +423,47 @@
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
 			</plugin>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>3.3.1</version>
+				<dependencies>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>10.12.7</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<configLocation>checkstyle.xml</configLocation>
+					<encoding>UTF-8</encoding>
+					<consoleOutput>true</consoleOutput>
+					<failsOnError>true</failsOnError>
+					<linkXRef>false</linkXRef>
+				</configuration>
+				<executions>
+					<execution>
+						<id>validate</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>3.2.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
-
 	</build>
 	<dependencyManagement>
 		<dependencies>

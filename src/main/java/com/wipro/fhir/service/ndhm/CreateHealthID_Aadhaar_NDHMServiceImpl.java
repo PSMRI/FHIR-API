@@ -177,7 +177,7 @@ public class CreateHealthID_Aadhaar_NDHMServiceImpl implements CreateHealthID_Aa
 				JsonParser jsnParser = new JsonParser();
 				JsonElement jsnElmnt = jsnParser.parse(responseStrLogin);
 				jsnOBJ = jsnElmnt.getAsJsonObject();
-				resMap.put("tnxId", jsnOBJ.get("txnId").getAsString());
+				resMap.put("txnId", jsnOBJ.get("txnId").getAsString());
 				res = new Gson().toJson(resMap);
 			} else 
 				throw new FHIRException("NDHM_FHIR Error while verifying the OTP");
@@ -210,7 +210,7 @@ public class CreateHealthID_Aadhaar_NDHMServiceImpl implements CreateHealthID_Aa
 				jsnOBJ = jsnElmnt.getAsJsonObject();
 				//String mobileLinked = jsnOBJ.get("mobileLinked").getAsString();
 				resMap.put("mobileLinked", jsnOBJ.get("mobileLinked").getAsString());
-				resMap.put("tnxId", jsnOBJ.get("txnId").getAsString());
+				resMap.put("txnId", jsnOBJ.get("txnId").getAsString());
 				res = new Gson().toJson(resMap);
 				
 			} else 
@@ -242,7 +242,7 @@ public class CreateHealthID_Aadhaar_NDHMServiceImpl implements CreateHealthID_Aa
 				JsonParser jsnParser = new JsonParser();
 				JsonElement jsnElmnt = jsnParser.parse(responseStrLogin);
 				jsnOBJ = jsnElmnt.getAsJsonObject();
-				resMap.put("tnxId", jsnOBJ.get("txnId").getAsString());
+				resMap.put("txnId", jsnOBJ.get("txnId").getAsString());
 				res = new Gson().toJson(resMap);
 			} else 
 				throw new FHIRException("NDHM_FHIR Error while verifiying mobile OTP");
@@ -367,7 +367,7 @@ public class CreateHealthID_Aadhaar_NDHMServiceImpl implements CreateHealthID_Aa
 				jsnOBJ = jsnElmnt.getAsJsonObject();
 				// String mobileLinked = jsnOBJ.get("mobileLinked").getAsString();
 				// resMap.put("mobileLinked", jsnOBJ.get("mobileLinked").getAsString());
-				resMap.put("tnxId", jsnOBJ.get("txnId").getAsString());
+				resMap.put("txnId", jsnOBJ.get("txnId").getAsString());
 				res = new Gson().toJson(resMap);
 
 			} else

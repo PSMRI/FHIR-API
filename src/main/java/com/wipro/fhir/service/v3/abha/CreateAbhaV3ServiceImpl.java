@@ -26,6 +26,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.wipro.fhir.data.healthID.HealthIDResponse;
@@ -48,7 +49,7 @@ import com.wipro.fhir.utils.mapper.InputMapper;
 public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 
 	@Autowired
-	private GenerateSession_NDHMService generateSession_NDHM;
+	private GenerateAuthSessionService generateAuthSessionService;
 	@Autowired
 	private Common_NDHMService common_NDHMService;
 	@Autowired
@@ -86,7 +87,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 		String publicKeyString = null;
 
 		try {
-			String ndhmAuthToken = generateSession_NDHM.getNDHMAuthToken();
+			String abhaAuthToken = generateAuthSessionService.getAbhaAuthToken();
 
 			MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
 			headers.add("Content-Type", MediaType.APPLICATION_JSON + ";charset=utf-8");
@@ -97,12 +98,12 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 			df.setTimeZone(tz);
 			String nowAsISO = df.format(new Date());
 			headers.add("TIMESTAMP", nowAsISO);
-			headers.add("Authorization", ndhmAuthToken);
+			headers.add("Authorization", abhaAuthToken);
 
 			RequestOTPEnrollment reqOtpEnrollment = new RequestOTPEnrollment();
 			LoginMethod loginMethod = InputMapper.gson().fromJson(request, LoginMethod.class);
 
-			publicKeyString = certificateKeyService.getCertPublicKey();
+			publicKeyString = certificateKeyService.getCertPublicKey(abhaAuthToken);
 			if (loginMethod.getLoginId() != null) {
 				encryptedLoginId = encryption.encrypt(loginMethod.getLoginId(), publicKeyString);
 			}
@@ -114,7 +115,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 				reqOtpEnrollment.setScope(new String[] { "abha-enrol" });
 			} else if ("MOBILE".equalsIgnoreCase(loginMethod.getLoginMethod())) {
 				reqOtpEnrollment.setLoginId(encryptedLoginId);
-				reqOtpEnrollment.setTnxId(loginMethod.getTnxId());
+				reqOtpEnrollment.setTxnId(loginMethod.getTxnId());
 				reqOtpEnrollment.setOtpSystem("abdm");
 				reqOtpEnrollment.setLoginHint("mobile");
 				reqOtpEnrollment.setScope(new String[] { "abha-enrol", "mobile-verify" });
@@ -155,7 +156,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 		String requestObj = null;
 
 		try {
-			String ndhmAuthToken = generateSession_NDHM.getNDHMAuthToken();
+			String abhaAuthToken = generateAuthSessionService.getAbhaAuthToken();
 			MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
 			headers.add("Content-Type", MediaType.APPLICATION_JSON.toString());
 			headers.add("REQUEST-ID", UUID.randomUUID().toString());
@@ -165,13 +166,12 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 			df.setTimeZone(tz);
 			String nowAsISO = df.format(new Date());
 			headers.add("TIMESTAMP", nowAsISO);
-			headers.add("Authorization", ndhmAuthToken);
+			headers.add("Authorization", abhaAuthToken);
 
 			// Create the enrollByAadhar object
-			EnrollByAadhaar enrollByAadhar = new EnrollByAadhaar();
 			LoginMethod loginData = InputMapper.gson().fromJson(request, LoginMethod.class);
 
-			publicKeyString = certificateKeyService.getCertPublicKey();
+			publicKeyString = certificateKeyService.getCertPublicKey(abhaAuthToken);
 			if (loginData.getLoginId() != null) {
 				encryptedLoginId = encryption.encrypt(loginData.getLoginId(), publicKeyString);
 			}
@@ -211,6 +211,11 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 						constructHealthIdResponse(healthIDResp, abhaProfileAsJsonObj);
 						healthIDResp.setProviderServiceMapID(loginData.getProviderServiceMapId());
 						healthIDResp.setCreatedBy(loginData.getCreatedBy());
+						if(jsonResponse.get("isNew") != null && "true".equals(jsonResponse.get("isNew").getAsString())) {
+							healthIDResp.setIsNewAbha(true);
+						} else {
+							healthIDResp.setIsNewAbha(false);
+						}
 						Integer healthIdCount = healthIDRepo.getCountOfHealthIdNumber(healthIDResp.getHealthIdNumber());
 						HealthIDResponse save = healthIDResp;
 						if (healthIdCount < 1) {
@@ -247,7 +252,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 		String publicKeyString = null;
 
 		try {
-			String ndhmAuthToken = generateSession_NDHM.getNDHMAuthToken();
+			String abhaAuthToken = generateAuthSessionService.getAbhaAuthToken();
 
 			MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
 			headers.add("Content-Type", MediaType.APPLICATION_JSON + ";charset=utf-8");
@@ -258,11 +263,11 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 			df.setTimeZone(tz);
 			String nowAsISO = df.format(new Date());
 			headers.add("TIMESTAMP", nowAsISO);
-			headers.add("Authorization", ndhmAuthToken);
+			headers.add("Authorization", abhaAuthToken);
 
 			LoginMethod loginMethod = InputMapper.gson().fromJson(request, LoginMethod.class);
 
-			publicKeyString = certificateKeyService.getCertPublicKey();
+			publicKeyString = certificateKeyService.getCertPublicKey(abhaAuthToken);
 			if (loginMethod.getLoginId() != null) {
 				encryptedLoginId = encryption.encrypt(loginMethod.getLoginId(), publicKeyString);
 			}
@@ -275,8 +280,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 			DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
 			String formattedTimestamp = now.format(formatter);
 			otp.setTimestamp(formattedTimestamp);
-
-			otp.setTxnId(loginMethod.getTnxId());
+			otp.setTxnId(loginMethod.getTxnId());
 			otp.setOtpValue(encryptedLoginId);
 			
 			String[] scope;
@@ -327,7 +331,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 		String formattedTimestamp = now.format(formatter);
 		otp.setTimestamp(formattedTimestamp);
 
-		otp.setTxnId(loginData.getTnxId());
+		otp.setTxnId(loginData.getTxnId());
 		otp.setOtpValue(encryptedLoginId);
 		otp.setMobile(loginData.getMobileNumber());
 
@@ -359,7 +363,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 		String formattedTimestamp = now.format(formatter);
 		bio.setTimestamp(formattedTimestamp);
 
-		bio.setTxnId(loginData.getTnxId());
+		bio.setTxnId(loginData.getTxnId());
 		
 		bio.setAadhaar(encryptedLoginId);
 		bio.setFingerPrintAuthPid(loginData.getPId());
@@ -391,7 +395,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 
 
 		try {
-			String ndhmAuthToken = generateSession_NDHM.getNDHMAuthToken();
+			String abhaAuthToken = generateAuthSessionService.getAbhaAuthToken();
 
 			MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
 			headers.add("Content-Type", MediaType.APPLICATION_JSON + ";charset=utf-8");
@@ -402,7 +406,7 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 			df.setTimeZone(tz);
 			String nowAsISO = df.format(new Date());
 			headers.add("TIMESTAMP", nowAsISO);
-			headers.add("Authorization", ndhmAuthToken);
+			headers.add("Authorization", abhaAuthToken);
 
 			JsonObject stringReqObj = JsonParser.parseString(reqObj).getAsJsonObject();
 			if (stringReqObj.has("xToken") && stringReqObj.get("xToken") != null) {
@@ -431,8 +435,16 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 
 	private void constructHealthIdResponse(HealthIDResponse healthIDResp, JsonObject profile) throws ParseException {
 		healthIDResp.setHealthIdNumber(profile.get("ABHANumber").getAsString());
-		String abhaAddress = profile.get("phrAddress").getAsString().replace("[", "").replace("]", "");
-		healthIDResp.setHealthId(abhaAddress);
+		JsonArray phrAddressArray = profile.getAsJsonArray("phrAddress");
+		StringBuilder abhaAddressBuilder = new StringBuilder();
+
+		for (int i = 0; i < phrAddressArray.size(); i++) {
+		    abhaAddressBuilder.append(phrAddressArray.get(i).getAsString());
+		    if (i < phrAddressArray.size() - 1) {
+		        abhaAddressBuilder.append(", ");
+		    }
+		}
+		healthIDResp.setHealthId(abhaAddressBuilder.toString());
 		healthIDResp.setName(
 				healthIDResp.getFirstName() + " " + healthIDResp.getMiddleName() + " " + healthIDResp.getLastName());
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
@@ -444,5 +456,5 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 		healthIDResp.setMonthOfBirth(month.format(date));
 		healthIDResp.setDayOfBirth(day.format(date));
 	}
-
+	
 }

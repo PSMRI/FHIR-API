@@ -3,7 +3,7 @@ package com.wipro.fhir.controller.v3.abha;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +15,6 @@ import com.wipro.fhir.utils.response.OutputResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/abhaLogin", headers = "Authorization")
 public class LoginAbhaV3Controller {
@@ -25,7 +24,6 @@ public class LoginAbhaV3Controller {
 	@Autowired
 	private LoginAbhaV3Service loginAbhaV3Service;
 
-	@CrossOrigin
 	@Operation(summary = "Request OTP for Abha LOgin")
 	@PostMapping(value = { "/abhaLoginRequestOtp" })
 	public String requestOtpForAbhaLogin(@RequestBody String request) {
@@ -44,8 +42,6 @@ public class LoginAbhaV3Controller {
 		logger.info("NDHM_FHIR generate OTP for ABHA login API response " + response.toString());
 		return response.toString();
 	}
-	
-	@CrossOrigin
 	@Operation(summary = "verify OTP for Abha LOgin")
 	@PostMapping(value = { "/verifyAbhaLogin" })
 	public String verifyAbhaLogin(@RequestBody String request) {
@@ -62,6 +58,23 @@ public class LoginAbhaV3Controller {
 			logger.error(e.toString());
 		}
 		logger.info("NDHM_FHIR Verify abha login API response " + response.toString());
+		return response.toString();
+	}
+	@Operation(summary = "Print PHR card - abha address web login")
+	@PostMapping(value = { "/printWebLoginPhrCard" })
+	public String printWebLoginPhrCard(@RequestBody String request) {
+		OutputResponse response = new OutputResponse();
+		try {
+			if (request != null) {
+				String s = loginAbhaV3Service.getWebLoginPhrCard(request);
+				response.setResponse(s);
+			} else
+				throw new FHIRException("NDHM_FHIR Empty request object");
+		} catch (FHIRException e) {
+			response.setError(5000, e.getMessage());
+			logger.error(e.toString());
+		}
+		logger.info("NDHM_FHIR generate OTP for ABHA card API respponse " + response.toString());
 		return response.toString();
 	}
 
