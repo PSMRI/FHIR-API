@@ -33,8 +33,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.wipro.fhir.data.mongo.care_context.GenerateTokenAbdmResponses;
 import com.wipro.fhir.data.mongo.care_context.NDHMRequest;
 import com.wipro.fhir.data.mongo.care_context.NDHMResponse;
+import com.wipro.fhir.repo.mongo.generateToken_response.GenerateTokenAbdmResponsesRepo;
 import com.wipro.fhir.repo.mongo.ndhm_response.NDHMResponseRepo;
 import com.wipro.fhir.utils.exception.FHIRException;
 
@@ -43,6 +45,9 @@ public class Common_NDHMServiceImpl implements Common_NDHMService {
 	@Autowired
 	private NDHMResponseRepo nDHMResponseRepo;
 
+	@Autowired
+	private GenerateTokenAbdmResponsesRepo generateTokenAbdmResponsesRepo;
+	
 	/***
 	 * @author SH20094090
 	 * @return headers for the NDHM API's
@@ -149,6 +154,19 @@ public class Common_NDHMServiceImpl implements Common_NDHMService {
 		} else
 			return null;
 	}
+	
+	@Override
+	public GenerateTokenAbdmResponses getLinkToken(String requestId) throws FHIRException {
+		GenerateTokenAbdmResponses res = generateTokenAbdmResponsesRepo.findByRequestId(requestId);
+		if(res != null) {
+			return res;
+		} else {
+			return null;
+		}
+		
+	}
+	
+	
 
 	@Override
 	public String getBody(ResponseEntity<String> res) throws FHIRException {

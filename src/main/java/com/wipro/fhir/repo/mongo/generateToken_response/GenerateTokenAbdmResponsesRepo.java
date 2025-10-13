@@ -12,6 +12,6 @@ public interface GenerateTokenAbdmResponsesRepo extends MongoRepository<Generate
 
 	GenerateTokenAbdmResponses findByAbhaAddress(String abhaAddress);
 	
-	
+	GenerateTokenAbdmResponses findByRequestId(String requestId);
 
 }

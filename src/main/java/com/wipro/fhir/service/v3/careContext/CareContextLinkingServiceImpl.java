@@ -140,23 +140,31 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 				String responseStrLogin = common_NDHMService.getBody(responseEntity);
 				JsonParser jsnParser = new JsonParser();
 				if (responseEntity.getStatusCode() == HttpStatusCode.valueOf(202)) {
-					String mongoResponse = common_NDHMService.getMongoNDHMResponse(requestId);
+					GenerateTokenAbdmResponses mongoResponse = common_NDHMService.getLinkToken(requestId);
 					responseMap.put("requestId", requestId);
-					if (!mongoResponse.equalsIgnoreCase("failure")) {
-						JsonElement jsnElmnt1 = jsnParser.parse(mongoResponse);
-						JsonObject jsnOBJ1 = new JsonObject();
-						jsnOBJ1 = jsnElmnt1.getAsJsonObject();
-						try {
-							if (jsnOBJ1.get("linkToken") != null) {
-								linkToken = jsnOBJ1.getAsJsonObject("linkToken").getAsString();
-								responseMap.put("linkToken", linkToken);
-							} else
-								throw new FHIRException(
-										"NDHM_FHIR " + jsnOBJ1.getAsJsonObject("Error").get("Message").getAsString());
-						} catch (Exception e) {
-							throw new FHIRException(
-									"NDHM_FHIR " + jsnOBJ1.getAsJsonObject("Error").get("Message").getAsString());
-						}
+					if (mongoResponse != null && mongoResponse.getResponse() != null) {
+				    String abhaResponse = mongoResponse.getResponse();
+				    JsonElement jsonElement = jsnParser.parse(abhaResponse);
+				    JsonObject jsonObject = jsonElement.getAsJsonObject();
+
+					    try {
+					        JsonElement linkTokenElement = jsonObject.get("LinkToken");
+					        
+					        if (linkTokenElement != null && !linkTokenElement.isJsonNull()) {
+					            linkToken = linkTokenElement.getAsString();
+					            responseMap.put("X-LINK-TOKEN", linkToken);
+					        } else {
+					        	if (jsonObject.has("Error") && !jsonObject.get("Error").isJsonNull()) {
+					        	    JsonObject errorObject = jsonObject.getAsJsonObject("Error");
+					        	    responseMap.put("Error", errorObject.toString());
+					        	} else {
+					        	    responseMap.put("Error", "Unknown error");
+					        	}
+					        }
+					    } catch (Exception e) {
+					        throw new FHIRException("ABDM_FHIR Error while parsing response: " + e.getMessage());
+					    }
+
 					}
 
 				} else {
@@ -187,82 +195,93 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 			if (null != addCareContextRequest.getLinkToken()) {
 				headers.add("X-LINK-TOKEN", addCareContextRequest.getLinkToken());
 			} else { // if link token is not found then fetch from mongo DB
-				String mongoResponse = common_NDHMService.getMongoNDHMResponse(addCareContextRequest.getRequestId());
-				if (!mongoResponse.equalsIgnoreCase("failure")) {
-					JsonElement jsnElmnt1 = jsnParser.parse(mongoResponse);
-					JsonObject jsnOBJ1 = new JsonObject();
-					jsnOBJ1 = jsnElmnt1.getAsJsonObject();
+				GenerateTokenAbdmResponses mongoResponse = common_NDHMService
+						.getLinkToken(addCareContextRequest.getRequestId());
+				if (mongoResponse != null && mongoResponse.getResponse() != null) {
+					String abhaResponse = mongoResponse.getResponse();
+					JsonElement jsonElement = jsnParser.parse(abhaResponse);
+					JsonObject jsonObject = jsonElement.getAsJsonObject();
+
 					try {
-						if (jsnOBJ1.get("linkToken") != null) {
-							linkToken = jsnOBJ1.getAsJsonObject("linkToken").getAsString();
+						JsonElement linkTokenElement = jsonObject.get("LinkToken"); 
+ 						if (linkTokenElement != null && !linkTokenElement.isJsonNull()) {
+							linkToken = linkTokenElement.getAsString();
 							headers.add("X-LINK-TOKEN", linkToken);
-						} else
-							throw new FHIRException(
-									"ABDM_FHIR " + jsnOBJ1.getAsJsonObject("Error").get("Message").getAsString());
+						}  else {
+				        	if (jsonObject.has("Error") && !jsonObject.get("Error").isJsonNull()) {
+				        	    JsonObject errorObject = jsonObject.getAsJsonObject("Error");
+				        	    responseMap.put("Error", errorObject.toString());
+				        	} else {
+				        	    responseMap.put("Error", "Unknown error");
+				        	}
+				        }
 					} catch (Exception e) {
-						throw new FHIRException(
-								"ABDM_FHIR " + jsnOBJ1.getAsJsonObject("Error").get("Message").getAsString());
+						throw new FHIRException("ABDM_FHIR Error while parsing response: " + e.getMessage());
 					}
 				}
 
 			}
+			
+			if (linkToken != null) {
 
-			headers.add("Content-Type", MediaType.APPLICATION_JSON + ";charset=utf-8");
-			headers.add("REQUEST-ID", UUID.randomUUID().toString());
+				headers.add("Content-Type", MediaType.APPLICATION_JSON + ";charset=utf-8");
+				headers.add("REQUEST-ID", UUID.randomUUID().toString());
 
-			TimeZone tz = TimeZone.getTimeZone("UTC");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			df.setTimeZone(tz);
-			String nowAsISO = df.format(new Date());
-			headers.add("TIMESTAMP", nowAsISO);
-			headers.add("Authorization", abhaAuthToken);
-			headers.add("X-CM-ID", abhaMode);
-			if (null != addCareContextRequest.getAbdmFacilityId() && "" != addCareContextRequest.getAbdmFacilityId()) {
-				headers.add("X-HIP-ID", addCareContextRequest.getAbdmFacilityId());
-			} else {
-				headers.add("X-HIP-ID", abdmFacilityId);
-			}
+				TimeZone tz = TimeZone.getTimeZone("UTC");
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+				df.setTimeZone(tz);
+				String nowAsISO = df.format(new Date());
+				headers.add("TIMESTAMP", nowAsISO);
+				headers.add("Authorization", abhaAuthToken);
+				headers.add("X-CM-ID", abhaMode);
+				if (null != addCareContextRequest.getAbdmFacilityId()
+						&& "" != addCareContextRequest.getAbdmFacilityId()) {
+					headers.add("X-HIP-ID", addCareContextRequest.getAbdmFacilityId());
+				} else {
+					headers.add("X-HIP-ID", abdmFacilityId);
+				}
 
-			LinkCareContextRequest linkCareContextRequest = new LinkCareContextRequest();
-			CareContexts careContexts = new CareContexts();
-			PatientCareContext patient = new PatientCareContext();
+				LinkCareContextRequest linkCareContextRequest = new LinkCareContextRequest();
+				CareContexts careContexts = new CareContexts();
+				PatientCareContext patient = new PatientCareContext();
 
-			ArrayList<CareContexts> cc = new ArrayList<CareContexts>();
-			careContexts.setReferenceNumber(addCareContextRequest.getVisitCode());
-			careContexts.setDisplay(addCareContextRequest.getDisplay());
-			cc.add(careContexts);
+				ArrayList<CareContexts> cc = new ArrayList<CareContexts>();
+				careContexts.setReferenceNumber(addCareContextRequest.getVisitCode());
+				careContexts.setDisplay(addCareContextRequest.getDisplay());
+				cc.add(careContexts);
 
-			ArrayList<PatientCareContext> pcc = new ArrayList<PatientCareContext>();
-			patient.setReferenceNumber(addCareContextRequest.getVisitCode());
-			patient.setDisplay(addCareContextRequest.getDisplay());
-			patient.setDisplay(addCareContextRequest.getDisplay());
-			patient.setCount(1);
-			patient.setCareContexts(cc);
-			pcc.add(patient);
+				ArrayList<PatientCareContext> pcc = new ArrayList<PatientCareContext>();
+				patient.setReferenceNumber(addCareContextRequest.getVisitCode());
+				patient.setDisplay(addCareContextRequest.getDisplay());
+				patient.setDisplay(addCareContextRequest.getDisplay());
+				patient.setCount(1);
+				patient.setCareContexts(cc);
+				pcc.add(patient);
 
-			if (null != addCareContextRequest.getAbhaNumber() && "" != addCareContextRequest.getAbhaNumber()) {
-				String abha = addCareContextRequest.getAbhaNumber();
-				String abhaNumber = abha.replace("-", "");
-				linkCareContextRequest.setAbhaNumber(abhaNumber);
-			}
+				if (null != addCareContextRequest.getAbhaNumber() && "" != addCareContextRequest.getAbhaNumber()) {
+					String abha = addCareContextRequest.getAbhaNumber();
+					String abhaNumber = abha.replace("-", "");
+					linkCareContextRequest.setAbhaNumber(abhaNumber);
+				}
 
-			linkCareContextRequest.setAbhaAddress(addCareContextRequest.getAbhaAddress());
-			linkCareContextRequest.setPatient(pcc);
+				linkCareContextRequest.setAbhaAddress(addCareContextRequest.getAbhaAddress());
+				linkCareContextRequest.setPatient(pcc);
 
-			String requestOBJ = new Gson().toJson(linkCareContextRequest);
-			logger.info("ABDM reqobj for generate token link for carecontext : " + requestOBJ);
+				String requestOBJ = new Gson().toJson(linkCareContextRequest);
+				logger.info("ABDM reqobj for generate token link for carecontext : " + requestOBJ);
 
-			HttpEntity<String> httpEntity = new HttpEntity<>(requestOBJ, headers);
-			ResponseEntity<String> responseEntity = restTemplate.exchange(linkCareContext, HttpMethod.POST, httpEntity,
-					String.class);
+				HttpEntity<String> httpEntity = new HttpEntity<>(requestOBJ, headers);
+				ResponseEntity<String> responseEntity = restTemplate.exchange(linkCareContext, HttpMethod.POST,
+						httpEntity, String.class);
 
-			logger.info("ABDM response for generate token link for carecontext : " + responseEntity);
-			String responseStrLogin = common_NDHMService.getBody(responseEntity);
-			if (responseEntity.getStatusCode() == HttpStatusCode.valueOf(202)) {
-				res = "Care Context added successfully";
+				logger.info("ABDM response for generate token link for carecontext : " + responseEntity);
+				String responseStrLogin = common_NDHMService.getBody(responseEntity);
+				if (responseEntity.getStatusCode() == HttpStatusCode.valueOf(202)) {
+					res = "Care Context added successfully";
 
-			} else {
-				throw new FHIRException(responseEntity.getBody());
+				} else {
+					throw new FHIRException(responseEntity.getBody());
+				}
 			}
 		} catch (Exception e) {
 			throw new FHIRException(e.getMessage());
@@ -281,7 +300,7 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 			Date threeMonthsAgo = cal.getTime();
 			String linkResponse = result.getResponse();
 
-			if (result.getCreatedDate().isAfter(threeMonthsAgo.getTime())) {
+			if (result.getCreatedDate().after(threeMonthsAgo)) {
 				if (linkResponse != null) {
 					try {
 						ObjectMapper mapper = new ObjectMapper();

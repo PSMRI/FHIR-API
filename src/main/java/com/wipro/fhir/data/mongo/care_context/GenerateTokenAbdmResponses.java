@@ -1,8 +1,8 @@
 package com.wipro.fhir.data.mongo.care_context;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
-import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -25,7 +25,7 @@ public class GenerateTokenAbdmResponses {
 	private String abhaAddress;
 	
 	@Expose
-	@Field(value = "requestid")
+	@Field(value = "requestId")
 	private String requestId;
 
 	@Expose
@@ -34,6 +34,6 @@ public class GenerateTokenAbdmResponses {
 	
 	@Expose
 	@Field(value = "createdDate")
-	private DateTime createdDate;
+	private Date createdDate;
 
 }

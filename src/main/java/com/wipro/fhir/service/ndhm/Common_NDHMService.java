@@ -24,6 +24,7 @@ package com.wipro.fhir.service.ndhm;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 
+import com.wipro.fhir.data.mongo.care_context.GenerateTokenAbdmResponses;
 import com.wipro.fhir.data.mongo.care_context.NDHMRequest;
 import com.wipro.fhir.utils.exception.FHIRException;
 
@@ -36,4 +37,5 @@ public interface Common_NDHMService {
 	public String getStatusCode(ResponseEntity<String> res) throws FHIRException;
 	public HttpHeaders getHeadersWithXtoken(String ndhmAuthToken,String X_Token);
 	public HttpHeaders getHeadersWithAadhaarBioXtoken(String ndhmAuthToken, String X_Token);
+	public GenerateTokenAbdmResponses getLinkToken(String requestId) throws FHIRException;
 }
