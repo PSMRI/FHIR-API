@@ -153,12 +153,14 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 					        if (linkTokenElement != null && !linkTokenElement.isJsonNull()) {
 					            linkToken = linkTokenElement.getAsString();
 					            responseMap.put("X-LINK-TOKEN", linkToken);
+					            logger.info("Mongo has link token");
 					        } else {
 					        	if (jsonObject.has("Error") && !jsonObject.get("Error").isJsonNull()) {
 					        	    JsonObject errorObject = jsonObject.getAsJsonObject("Error");
-					        	    responseMap.put("Error", errorObject.toString());
+						        	logger.info("Mongo has no link token other message - " + errorObject.toString());
+					        	    responseMap.put("error", errorObject.toString());
 					        	} else {
-					        	    responseMap.put("Error", "Unknown error");
+					        	    responseMap.put("error", "Unknown error");
 					        	}
 					        }
 					    } catch (Exception e) {
@@ -179,9 +181,7 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 	}
 
 	@Override
-	public String linkCareContext(String request) throws FHIRException {
-		String res = null;
-		String linkToken = null;
+	public String linkCareContext(String request) throws FHIRException {		String linkToken = null;
 		Map<String, String> responseMap = new HashMap<>();
 		RestTemplate restTemplate = new RestTemplate();
 
@@ -210,9 +210,9 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 						}  else {
 				        	if (jsonObject.has("Error") && !jsonObject.get("Error").isJsonNull()) {
 				        	    JsonObject errorObject = jsonObject.getAsJsonObject("Error");
-				        	    responseMap.put("Error", errorObject.toString());
+				        	    responseMap.put("error", errorObject.toString());
 				        	} else {
-				        	    responseMap.put("Error", "Unknown error");
+				        	    responseMap.put("error", "Unknown error");
 				        	}
 				        }
 					} catch (Exception e) {
@@ -222,7 +222,7 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 
 			}
 			
-			if (linkToken != null) {
+			if (linkToken != null) { 
 
 				headers.add("Content-Type", MediaType.APPLICATION_JSON + ";charset=utf-8");
 				headers.add("REQUEST-ID", UUID.randomUUID().toString());
@@ -277,7 +277,7 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 				logger.info("ABDM response for generate token link for carecontext : " + responseEntity);
 				String responseStrLogin = common_NDHMService.getBody(responseEntity);
 				if (responseEntity.getStatusCode() == HttpStatusCode.valueOf(202)) {
-					res = "Care Context added successfully";
+					responseMap.put("message", "Care Context added successfully");
 
 				} else {
 					throw new FHIRException(responseEntity.getBody());
@@ -287,7 +287,7 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 			throw new FHIRException(e.getMessage());
 		}
 
-		return res;
+		return responseMap.toString();
 	}
 
 	public String checkRecordExisits(String abhaAddress) {

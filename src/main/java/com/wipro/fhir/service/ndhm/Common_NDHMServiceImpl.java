@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -47,6 +49,8 @@ public class Common_NDHMServiceImpl implements Common_NDHMService {
 
 	@Autowired
 	private GenerateTokenAbdmResponsesRepo generateTokenAbdmResponsesRepo;
+	
+	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 	
 	/***
 	 * @author SH20094090
@@ -158,6 +162,7 @@ public class Common_NDHMServiceImpl implements Common_NDHMService {
 	@Override
 	public GenerateTokenAbdmResponses getLinkToken(String requestId) throws FHIRException {
 		GenerateTokenAbdmResponses res = generateTokenAbdmResponsesRepo.findByRequestId(requestId);
+    	logger.info("Mongo response returned " + res);
 		if(res != null) {
 			return res;
 		} else {
