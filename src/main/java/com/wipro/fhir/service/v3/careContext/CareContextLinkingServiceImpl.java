@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -42,6 +43,7 @@ import com.wipro.fhir.data.v3.careContext.GenerateCareContextTokenRequest;
 import com.wipro.fhir.data.v3.careContext.LinkCareContextRequest;
 import com.wipro.fhir.data.v3.careContext.PatientCareContext;
 import com.wipro.fhir.repo.mongo.generateToken_response.GenerateTokenAbdmResponsesRepo;
+import com.wipro.fhir.repo.v3.careContext.CareContextRepo;
 import com.wipro.fhir.data.v3.careContext.AddCareContextRequest;
 import com.wipro.fhir.service.ndhm.Common_NDHMService;
 import com.wipro.fhir.service.v3.abha.GenerateAuthSessionService;
@@ -68,10 +70,13 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 
 	@Value("${generateTokenForLinkCareContext}")
 	String generateTokenForLinkCareContext;
-
+ 
 	@Value("${linkCareContext}")
 	String linkCareContext;
 
+	@Autowired
+	private CareContextRepo careContextRepo;
+	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
 	@Override
@@ -240,23 +245,29 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 				} else {
 					headers.add("X-HIP-ID", abdmFacilityId);
 				}
-
+				
+				String[] hiTypes = findHiTypes(addCareContextRequest.getVisitCode(), addCareContextRequest.getVisitCategory());
+				
 				LinkCareContextRequest linkCareContextRequest = new LinkCareContextRequest();
 				CareContexts careContexts = new CareContexts();
-				PatientCareContext patient = new PatientCareContext();
-
-				ArrayList<CareContexts> cc = new ArrayList<CareContexts>();
-				careContexts.setReferenceNumber(addCareContextRequest.getVisitCode());
-				careContexts.setDisplay(addCareContextRequest.getDisplay());
-				cc.add(careContexts);
-
 				ArrayList<PatientCareContext> pcc = new ArrayList<PatientCareContext>();
-				patient.setReferenceNumber(addCareContextRequest.getVisitCode());
-				patient.setDisplay(addCareContextRequest.getDisplay());
-				patient.setDisplay(addCareContextRequest.getDisplay());
-				patient.setCount(1);
-				patient.setCareContexts(cc);
-				pcc.add(patient);
+
+				for (String hiType : hiTypes) {
+					PatientCareContext patient = new PatientCareContext();
+
+					ArrayList<CareContexts> cc = new ArrayList<CareContexts>();
+					careContexts.setReferenceNumber(addCareContextRequest.getVisitCode());
+					careContexts.setDisplay(addCareContextRequest.getVisitCategory());
+					cc.add(careContexts);
+
+					patient.setReferenceNumber(addCareContextRequest.getVisitCode());
+					patient.setDisplay(addCareContextRequest.getVisitCategory() + " care context of " + addCareContextRequest.getAbhaNumber());
+					patient.setCount(1);
+					patient.setCareContexts(cc);
+					patient.setHiType(hiType);
+					pcc.add(patient);
+				}
+				
 
 				if (null != addCareContextRequest.getAbhaNumber() && "" != addCareContextRequest.getAbhaNumber()) {
 					String abha = addCareContextRequest.getAbhaNumber();
@@ -293,12 +304,13 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 	public String checkRecordExisits(String abhaAddress) {
 		GenerateTokenAbdmResponses result = generateTokenAbdmResponsesRepo.findByAbhaAddress(abhaAddress);
 		logger.info("find by abha address result - ", result);
+		String linkResponse = null;
 
 		if (result != null && result.getCreatedDate() != null) {
 			Calendar cal = Calendar.getInstance();
 			cal.add(Calendar.MONTH, -3);
 			Date threeMonthsAgo = cal.getTime();
-			String linkResponse = result.getResponse();
+			linkResponse = result.getResponse();
 
 			if (result.getCreatedDate().after(threeMonthsAgo)) {
 				if (linkResponse != null) {
@@ -317,7 +329,39 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 			}
 		}
 
-		return null;
+		return linkResponse;
+	}
+	
+	public String[] findHiTypes(String visitCode, String visitCategory) {
+
+		List<String> hiTypes = new ArrayList<>();
+		if (visitCategory.equalsIgnoreCase("General OPD")) {
+			hiTypes.add("OPConsultation");
+		} else if (visitCategory.equalsIgnoreCase("General OPD (QC)")) {
+			hiTypes.add("OPConsultation");
+		}
+		hiTypes.add("DischargeSummary");
+		
+		int hasPhyVitals = careContextRepo.hasPhyVitals(visitCode);
+		if(hasPhyVitals > 0) {
+			hiTypes.add("WellnessRecord");
+		}
+		int hasPrescription = careContextRepo.hasPrescribedDrugs(visitCode);
+		if (hasPrescription > 0) {
+			hiTypes.add("Prescription");
+		}
+
+		int hasLabTests = careContextRepo.hasLabtestsDone(visitCode);
+		if (hasLabTests > 0) {
+			hiTypes.add("DiagnoticsReport");
+		}
+		int hasVaccineDetails = careContextRepo.hasVaccineDetails(visitCode);
+		if (hasVaccineDetails > 0) {
+			hiTypes.add("ImmunizationRecord");
+		}
+
+		return hiTypes.toArray(new String[0]);
 	}
 
 }
+
