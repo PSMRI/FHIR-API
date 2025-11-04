@@ -356,11 +356,12 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 		if (hasLabTests > 0) {
 			hiTypes.add("DiagnoticsReport");
 		}
+		
 		int hasVaccineDetails = careContextRepo.hasVaccineDetails(visitCode);
 		if (hasVaccineDetails > 0) {
 			hiTypes.add("ImmunizationRecord");
 		}
-
+		logger.info("HiTypes", hiTypes);		
 		return hiTypes.toArray(new String[0]);
 	}
 
