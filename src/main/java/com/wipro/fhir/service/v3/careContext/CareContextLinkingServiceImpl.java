@@ -198,6 +198,7 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 			JsonParser jsnParser = new JsonParser();
 
 			if (null != addCareContextRequest.getLinkToken()) {
+				linkToken = addCareContextRequest.getLinkToken();
 				headers.add("X-LINK-TOKEN", addCareContextRequest.getLinkToken());
 			} else { // if link token is not found then fetch from mongo DB
 				GenerateTokenAbdmResponses mongoResponse = common_NDHMService
