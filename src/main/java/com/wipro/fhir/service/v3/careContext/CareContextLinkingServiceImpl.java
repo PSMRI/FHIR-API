@@ -182,7 +182,7 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 			throw new FHIRException(e.getMessage());
 		}
 
-		return responseMap.toString();
+		return new Gson().toJson(responseMap);
 	}
 
 	@Override
@@ -292,14 +292,21 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 					responseMap.put("message", "Care Context added successfully");
 
 				} else {
-					throw new FHIRException(responseEntity.getBody());
+					JsonObject json = JsonParser.parseString(responseEntity.getBody()).getAsJsonObject();
+			        if (json.has("error")) {
+			            JsonObject errorObj = json.getAsJsonObject("error");
+			            String message = errorObj.has("message") ? errorObj.get("message").getAsString() : "Unknown error";
+			            responseMap.put("error", message);
+			        } else {
+			            responseMap.put("error", "Unknown error");
+			        }
 				}
 			}
 		} catch (Exception e) {
 			throw new FHIRException(e.getMessage());
 		}
 
-		return responseMap.toString();
+		return new Gson().toJson(responseMap);
 	}
 
 	public String checkRecordExisits(String abhaAddress) {
