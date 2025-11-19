@@ -119,6 +119,7 @@ public class LinkCareContext_NDHMServiceImpl implements LinkCareContext_NDHMServ
 				HttpHeaders headers = common_NDHMService.getHeaders(ndhmAuthToken, abhaMode);
 			ResponseEntity<String> responseEntity = httpUtils.postWithResponseEntity(generateOTPForCareContext,
 					requestOBJ, headers);
+			logger.info("NDHM_FHIR Carecontext generateOTP API response - " + responseEntity);
 			String responseStrLogin = common_NDHMService.getStatusCode(responseEntity);
 			String numericStatusCodeStr = responseStrLogin.split(" ")[0]; // Extracts "202" from "202 ACCEPTED"
 			int numericStatusCode = Integer.parseInt(numericStatusCodeStr);

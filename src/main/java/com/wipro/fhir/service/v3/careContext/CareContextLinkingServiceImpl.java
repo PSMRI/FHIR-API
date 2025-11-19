@@ -85,6 +85,7 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 		String linkToken = null;
 		Map<String, String> responseMap = new HashMap<>();
 		RestTemplate restTemplate = new RestTemplate();
+		String linkExists = null;
 
 		try {
 			String abhaAuthToken = generateAuthSessionService.getAbhaAuthToken();
@@ -92,7 +93,9 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 					CareContextLinkTokenRequest.class);
 
 			if (null != careContextLinkRequest.getAbhaAddress()) {
-				String linkExists = checkRecordExisits(careContextLinkRequest.getAbhaAddress());
+				linkExists = checkRecordExisits(careContextLinkRequest.getAbhaAddress());
+			}
+			if(linkExists != null) {
 				responseMap.put("linkToken", linkExists);
 			} else {
 
