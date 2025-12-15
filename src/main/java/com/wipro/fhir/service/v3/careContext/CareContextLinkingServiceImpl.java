@@ -267,7 +267,7 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 					cc.add(careContexts);
 
 					patient.setReferenceNumber(addCareContextRequest.getVisitCode());
-					patient.setDisplay(hiType + " care context of "
+					patient.setDisplay(addCareContextRequest.getVisitCategory() + " - " + hiType + " care context of "
 							+ addCareContextRequest.getAbhaNumber());
 					patient.setCount(1);
 					patient.setCareContexts(cc);
