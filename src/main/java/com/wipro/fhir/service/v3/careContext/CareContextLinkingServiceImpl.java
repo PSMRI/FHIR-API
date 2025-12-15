@@ -189,7 +189,8 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 	}
 
 	@Override
-	public String linkCareContext(String request) throws FHIRException {		String linkToken = null;
+	public String linkCareContext(String request) throws FHIRException {
+		String linkToken = null;
 		Map<String, String> responseMap = new HashMap<>();
 		RestTemplate restTemplate = new RestTemplate();
 
@@ -212,26 +213,26 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 					JsonObject jsonObject = jsonElement.getAsJsonObject();
 
 					try {
-						JsonElement linkTokenElement = jsonObject.get("LinkToken"); 
- 						if (linkTokenElement != null && !linkTokenElement.isJsonNull()) {
+						JsonElement linkTokenElement = jsonObject.get("LinkToken");
+						if (linkTokenElement != null && !linkTokenElement.isJsonNull()) {
 							linkToken = linkTokenElement.getAsString();
 							headers.add("X-LINK-TOKEN", linkToken);
-						}  else {
-				        	if (jsonObject.has("Error") && !jsonObject.get("Error").isJsonNull()) {
-				        	    JsonObject errorObject = jsonObject.getAsJsonObject("Error");
-				        	    responseMap.put("error", errorObject.toString());
-				        	} else {
-				        	    responseMap.put("error", "Unknown error");
-				        	}
-				        }
+						} else {
+							if (jsonObject.has("Error") && !jsonObject.get("Error").isJsonNull()) {
+								JsonObject errorObject = jsonObject.getAsJsonObject("Error");
+								responseMap.put("error", errorObject.toString());
+							} else {
+								responseMap.put("error", "Unknown error");
+							}
+						}
 					} catch (Exception e) {
 						throw new FHIRException("ABDM_FHIR Error while parsing response: " + e.getMessage());
 					}
 				}
 
 			}
-			
-			if (linkToken != null) { 
+
+			if (linkToken != null) {
 
 				headers.add("Content-Type", MediaType.APPLICATION_JSON + ";charset=utf-8");
 				headers.add("REQUEST-ID", UUID.randomUUID().toString());
@@ -249,9 +250,10 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 				} else {
 					headers.add("X-HIP-ID", abdmFacilityId);
 				}
-				
-				String[] hiTypes = findHiTypes(addCareContextRequest.getVisitCode(), addCareContextRequest.getVisitCategory());
-				
+
+				String[] hiTypes = findHiTypes(addCareContextRequest.getVisitCode(),
+						addCareContextRequest.getVisitCategory());
+
 				LinkCareContextRequest linkCareContextRequest = new LinkCareContextRequest();
 				CareContexts careContexts = new CareContexts();
 				ArrayList<PatientCareContext> pcc = new ArrayList<PatientCareContext>();
@@ -265,13 +267,13 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 					cc.add(careContexts);
 
 					patient.setReferenceNumber(addCareContextRequest.getVisitCode());
-					patient.setDisplay(addCareContextRequest.getVisitCategory() + " care context of " + addCareContextRequest.getAbhaNumber());
+					patient.setDisplay(hiType + " care context of "
+							+ addCareContextRequest.getAbhaNumber());
 					patient.setCount(1);
 					patient.setCareContexts(cc);
 					patient.setHiType(hiType);
 					pcc.add(patient);
 				}
-				
 
 				if (null != addCareContextRequest.getAbhaNumber() && "" != addCareContextRequest.getAbhaNumber()) {
 					String abha = addCareContextRequest.getAbhaNumber();
@@ -283,7 +285,7 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 				linkCareContextRequest.setPatient(pcc);
 
 				String requestOBJ = new Gson().toJson(linkCareContextRequest);
-				logger.info("ABDM reqobj for generate token link for carecontext : " + requestOBJ);
+				logger.info("ABDM reqobj for link for carecontext : " + requestOBJ);
 
 				HttpEntity<String> httpEntity = new HttpEntity<>(requestOBJ, headers);
 				ResponseEntity<String> responseEntity = restTemplate.exchange(linkCareContext, HttpMethod.POST,
@@ -296,16 +298,40 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 
 				} else {
 					JsonObject json = JsonParser.parseString(responseEntity.getBody()).getAsJsonObject();
-			        if (json.has("error")) {
-			            JsonObject errorObj = json.getAsJsonObject("error");
-			            String message = errorObj.has("message") ? errorObj.get("message").getAsString() : "Unknown error";
-			            responseMap.put("error", message);
-			        } else {
-			            responseMap.put("error", "Unknown error");
-			        }
+					if (json.has("error")) {
+						JsonObject errorObj = json.getAsJsonObject("error");
+						String message = errorObj.has("message") ? errorObj.get("message").getAsString()
+								: "Unknown error";
+						responseMap.put("error", message);
+					} else {
+						responseMap.put("error", "Unknown error");
+					}
 				}
 			}
 		} catch (Exception e) {
+			String msg = e.getMessage();
+			String jsonString = null;
+			int start = msg.indexOf("{");
+			int end = msg.lastIndexOf("}");
+
+			if (start != -1 && end != -1) {
+				jsonString = msg.substring(start, end + 1);
+			}
+
+			if (jsonString != null) {
+				try {
+					JsonObject json = JsonParser.parseString(jsonString).getAsJsonObject();
+					if (json.has("error")) {
+						JsonObject errorObj = json.getAsJsonObject("error");
+						String message = errorObj.has("message") ? errorObj.get("message").getAsString()
+								: "Unknown error";
+						throw new FHIRException(message);
+					}
+				} catch (Exception ex) {
+					throw new FHIRException("Error parsing API error response");
+				}
+			}
+
 			throw new FHIRException(e.getMessage());
 		}
 
@@ -364,7 +390,7 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 
 		int hasLabTests = careContextRepo.hasLabtestsDone(visitCode);
 		if (hasLabTests > 0) {
-			hiTypes.add("DiagnoticsReport");
+			hiTypes.add("DiagnoticReport");
 		}
 		
 		int hasVaccineDetails = careContextRepo.hasVaccineDetails(visitCode);
