@@ -63,8 +63,7 @@ public class ObservationResource {
 	@Autowired
 	private VitalsAnthropometryModel vitalsAnthropometryModel;
 
-	public List<Observation> getObservationVitals(Patient patient, Encounter encounter,
-			ResourceRequestHandler resourceRequestHandler) {
+	public List<Observation> getObservationVitals(Patient patient, ResourceRequestHandler resourceRequestHandler) {
 
 		List<Object[]> vitals = patientEligibleForResourceCreationRepo.callVitals_AnthropometrySP(
 				resourceRequestHandler.getBeneficiaryRegID(), resourceRequestHandler.getVisitCode());

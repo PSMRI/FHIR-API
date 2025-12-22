@@ -64,7 +64,6 @@ import com.wipro.fhir.data.patient.PatientDemographic;
 import com.wipro.fhir.data.patient_data_handler.PatientDemographicModel_NDHM_Patient_Profile;
 import com.wipro.fhir.data.request_handler.PatientEligibleForResourceCreation;
 import com.wipro.fhir.data.request_handler.ResourceRequestHandler;
-import com.wipro.fhir.data.users.User;
 import com.wipro.fhir.repo.common.PatientEligibleForResourceCreationRepo;
 import com.wipro.fhir.repo.healthID.BenHealthIDMappingRepo;
 import com.wipro.fhir.repo.mongo.amrit_resource.AMRIT_ResourceMongoRepo;
@@ -72,13 +71,17 @@ import com.wipro.fhir.repo.mongo.amrit_resource.PatientCareContextsMongoRepo;
 import com.wipro.fhir.repo.mongo.amrit_resource.TempCollectionRepo;
 import com.wipro.fhir.repo.mongo.ndhm_response.NDHMResponseRepo;
 import com.wipro.fhir.repo.patient_data_handler.PatientDemographicModel_NDHM_Patient_Profile_Repo;
+import com.wipro.fhir.repo.v3.careContext.CareContextRepo;
 import com.wipro.fhir.service.api_channel.APIChannel;
+import com.wipro.fhir.service.bundle_creation.DiagnosticRecordResourceBundle;
+import com.wipro.fhir.service.bundle_creation.DischargeSummaryResourceBundle;
+import com.wipro.fhir.service.bundle_creation.ImmunizationRecordResourceBundle;
+import com.wipro.fhir.service.bundle_creation.OPConsultResourceBundle;
+import com.wipro.fhir.service.bundle_creation.PrescriptionResourceBundleImpl;
+import com.wipro.fhir.service.bundle_creation.WellnessRecordResourceBundle;
 import com.wipro.fhir.service.ndhm.Common_NDHMService;
 import com.wipro.fhir.service.ndhm.GenerateSession_NDHMService;
 import com.wipro.fhir.service.patient_data_handler.PatientDataGatewayService;
-import com.wipro.fhir.service.resource_gateway.DiagnosticReportRecord;
-import com.wipro.fhir.service.resource_gateway.OPConsultRecordBundle;
-import com.wipro.fhir.service.resource_gateway.PrescriptionRecordBundle;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.http.HttpUtils;
 
@@ -134,13 +137,6 @@ public class CommonServiceImpl implements CommonService {
 	private PatientCareContextsMongoRepo patientCareContextsMongoRepo;
 
 	@Autowired
-	private OPConsultRecordBundle oPConsultRecordBundle;
-	@Autowired
-	private PrescriptionRecordBundle prescriptionBundle;
-	@Autowired
-	private DiagnosticReportRecord diagnosticReportRecordBundle;
-
-	@Autowired
 	private TempCollectionRepo tempCollectionRepo;
 	@Autowired
 	private NDHMResponseRepo nDHMResponseRepo;
@@ -163,6 +159,27 @@ public class CommonServiceImpl implements CommonService {
 
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
+	
+	@Autowired
+	private PrescriptionResourceBundleImpl prescriptionResourceBundle;
+	
+	@Autowired
+	private OPConsultResourceBundle oPConsultResourceBundle;
+	
+	@Autowired
+	private DiagnosticRecordResourceBundle diagnosticReportResourceBundle;
+	
+	@Autowired
+	private WellnessRecordResourceBundle wellnessRecordResourceBundle;
+	
+	@Autowired
+	private ImmunizationRecordResourceBundle immunizationRecordResourceBundle;
+	
+	@Autowired
+	private DischargeSummaryResourceBundle dischargeSummaryResourceBundle;
+	
+	@Autowired
+	private CareContextRepo careContextRepo;
 
 	@Override
 	public String processResourceOperation() throws FHIRException {
@@ -209,17 +226,66 @@ public class CommonServiceImpl implements CommonService {
 				}
 // ----------------------------------------------------------------------------------------------
 
+
+				boolean processed = true;
+
 				// 1. OP consult resource bundle
-				int i = oPConsultRecordBundle.processOPConsultRecordBundle(resourceRequestHandler, p);
-				// 2. diagnostic report record budle
-				int j = diagnosticReportRecordBundle.processDiagnosticReportRecordBundle(resourceRequestHandler, p);
+				if (p.getVisitCategory().equalsIgnoreCase("General OPD")
+						|| p.getVisitCategory().equalsIgnoreCase("General OPD (QC)")) {
+					int opConsult = oPConsultResourceBundle.processOpConsultRecordBundle(resourceRequestHandler, p);
+					if (opConsult <= 0)
+						processed = false;
+					logger.info(" The value of opConsult proceesed: " + processed);
+				}
+
+				// 2. diagnostic report record bundle
+				int hasLabTests = careContextRepo.hasLabtestsDone(p.getVisitCode().toString());
+				if (hasLabTests > 0) {
+					int diagReport = diagnosticReportResourceBundle
+							.processDiagnosticReportRecordBundle(resourceRequestHandler, p);
+					if (diagReport <= 0)
+						processed = false;
+					logger.info(" The value of diagReport proceesed: " + processed);
+				}
+
 				// 3. prescription Bundle
-				int k = prescriptionBundle.processPrescriptionRecordBundle(resourceRequestHandler, p);
+				int hasPrescription = careContextRepo.hasPrescribedDrugs(p.getVisitCode().toString());
+				if (hasPrescription > 0) {
+					int presp = prescriptionResourceBundle.processPrescriptionRecordBundle(resourceRequestHandler, p);
+					if (presp <= 0)
+						processed = false;
+					logger.info(" The value of presp proceesed: " + processed);
+				}
 
-				logger.info("The value of i: " + i + " The value of j: " + j + " The value of k: " + k);
+				// 4. wellness Bundle
+				int hasPhyVitals = careContextRepo.hasPhyVitals(p.getVisitCode().toString());
+				if (hasPhyVitals > 0) {
+					int wellness = wellnessRecordResourceBundle.processWellnessRecordBundle(resourceRequestHandler, p);
+					if (wellness <= 0)
+						processed = false;
+					logger.info(" The value of wellness proceesed: " + processed);
+				}
 
-				if (i > 0 && j > 0 && k > 0) {
+				// 5. Immunization record
+				int hasVaccineDetails = careContextRepo.hasVaccineDetails(p.getVisitCode().toString());
+				if (hasVaccineDetails > 0) {
+					int immunization = immunizationRecordResourceBundle
+							.processImmunizationRecordBundle(resourceRequestHandler, p);
+					if (immunization <= 0)
+						processed = false;
+					logger.info(" The value of immunization proceesed: " + processed);
+				}
 
+				// 6. Discharge Summary
+				int dischargeSummary = dischargeSummaryResourceBundle
+						.processDischargeSummaryRecordBundle(resourceRequestHandler, p);
+				if (dischargeSummary <= 0)
+					processed = false;
+				logger.info(" The value of dischargeSummary proceesed: " + processed);
+
+				logger.info(" The value of final proceesed: " + processed);
+
+				if (processed) {
 					// update the processed flag in trigger table
 					p.setProcessed(true);
 					PatientEligibleForResourceCreation resultSet = patientEligibleForResourceCreationRepo.save(p);

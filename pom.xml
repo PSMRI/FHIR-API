@@ -186,37 +186,72 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.14.2</version>
+			<version>2.15.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.14.2</version>
+			<version>2.15.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
-			<version>2.14.2</version>
+			<version>2.15.2</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/hapi-fhir-structures-r4 -->
+		<!--
+		https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/hapi-fhir-structures-r4 -->
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-r4</artifactId>
-			<version>6.10.0</version>
+			<version>8.4.0</version>
 		</dependency>
-		
+
+		<!--
+		https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/hapi-fhir-validation -->
+		<dependency>
+			<groupId>ca.uhn.hapi.fhir</groupId>
+			<artifactId>hapi-fhir-validation</artifactId>
+			<version>8.4.0</version>
+		</dependency>
+
+		<!--
+		https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/hapi-fhir-structures-r4 -->
+		<dependency>
+			<groupId>ca.uhn.hapi.fhir</groupId>
+			<artifactId>hapi-fhir-structures-r4</artifactId>
+			<version>8.4.0</version>
+		</dependency>
+
+
+		<!-- Choose a HAPI version that matches the rest of your modules -->
+		<dependency>
+			<groupId>ca.uhn.hapi.fhir</groupId>
+			<artifactId>hapi-fhir-caching-caffeine</artifactId>
+			<version>8.4.0</version> <!-- example; align with your HAPI version -->
+		</dependency>
+
+
 		<dependency>
 			<groupId>ca.uhn.hapi</groupId>
 			<artifactId>hapi-base</artifactId>
 			<version>2.6.0</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/org.hl7.fhir.utilities -->
+		<!--
+		https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/org.hl7.fhir.utilities -->
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>org.hl7.fhir.utilities</artifactId>
 			<version>6.5.18</version>
+		</dependency>
+
+		<!--
+		https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/hapi-fhir-validation-resources-r4 -->
+		<dependency>
+			<groupId>ca.uhn.hapi.fhir</groupId>
+			<artifactId>hapi-fhir-validation-resources-r4</artifactId>
+			<version>8.4.0</version>
 		</dependency>
 
 		<!-- lombok -->
@@ -363,7 +398,8 @@
 									${target-properties} and
 									${source-properties}
 								</echo>
-								<concat destfile="${target-properties}" append="yes"
+								<concat destfile="${target-properties}"
+									append="yes"
 									force="yes">
 									<fileset file="${source-properties}">
 									</fileset>
