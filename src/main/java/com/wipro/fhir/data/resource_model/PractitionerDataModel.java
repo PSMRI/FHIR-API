@@ -5,6 +5,8 @@ import java.util.Date;
 
 import org.springframework.stereotype.Component;
 
+import com.wipro.fhir.utils.exception.FHIRException;
+
 import lombok.Data;
 
 @Data
@@ -37,27 +39,41 @@ public class PractitionerDataModel {
 	public PractitionerDataModel() {
 	}
 
-	public PractitionerDataModel(Object[] objArr) {
+	public PractitionerDataModel(Object[] objArr) throws FHIRException {
 
-		this.benVisitID = objArr[0] != null ? ((Number) objArr[0]).intValue() : null;
-		this.userID = objArr[1] != null ? ((Number) objArr[1]).intValue() : null;
-		this.fullName = (String) objArr[2];
-		this.dob = (Date) objArr[3];
-		this.employeeID = (String) objArr[4];
-		this.contactNo = (String) objArr[5];
-		this.emailID = (String) objArr[6];
-		this.qualificationName = (String) objArr[7];
-		this.designationName = (String) objArr[8];
-		this.genderName = (String) objArr[9];
-		this.genderID = objArr[10] != null ? ((Number) objArr[10]).intValue() : null;
-		this.serviceProviderID = objArr[11] != null ? ((Number) objArr[11]).intValue() : null;
-		this.visitCode = objArr[12] != null ? ((Number) objArr[12]).longValue() : null;
-		this.createdBy = (String) objArr[13];
-		this.createdDate = (Timestamp) objArr[14];
+		try {
+
+			this.benVisitID = objArr[0] != null ? Integer.parseInt(objArr[0].toString()) : null;
+			this.userID = objArr[1] != null ? Integer.parseInt(objArr[1].toString()) : null;
+
+			this.fullName = objArr[2] != null ? objArr[2].toString() : null;
+
+			this.dob = objArr[3] != null ? (objArr[3] instanceof Date ? (Date) objArr[3] : null) : null;
+
+			this.employeeID = objArr[4] != null ? objArr[4].toString() : null;
+			this.contactNo = objArr[5] != null ? objArr[5].toString() : null;
+			this.emailID = objArr[6] != null ? objArr[6].toString() : null;
+			this.qualificationName = objArr[7] != null ? objArr[7].toString() : null;
+			this.designationName = objArr[8] != null ? objArr[8].toString() : null;
+			this.genderName = objArr[9] != null ? objArr[9].toString() : null;
+
+			this.genderID = objArr[10] != null ? Integer.parseInt(objArr[10].toString()) : null;
+			this.serviceProviderID = objArr[11] != null ? Integer.parseInt(objArr[11].toString()) : null;
+
+			this.visitCode = objArr[12] != null ? Long.parseLong(objArr[12].toString()) : null;
+
+			this.createdBy = objArr[13] != null ? objArr[13].toString() : null;
+
+			this.createdDate = objArr[14] != null ? (objArr[14] instanceof Timestamp ? (Timestamp) objArr[14] : null)
+					: null;
+		} catch (Exception e) {
+			throw new FHIRException("Practioner resource failed with error - " + e.getMessage());
+		}
+
 	}
 	
 
-	public PractitionerDataModel getPractitioner(Object[] resultSet) {
+	public PractitionerDataModel getPractitioner(Object[] resultSet) throws FHIRException {
 		if (resultSet == null || resultSet.length == 0) {
 			return null;
 		}
