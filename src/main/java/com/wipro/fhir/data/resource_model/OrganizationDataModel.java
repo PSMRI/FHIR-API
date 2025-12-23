@@ -71,7 +71,7 @@ public class OrganizationDataModel {
 			this.providerServiceMapID = objArr[15] != null ? Integer.parseInt(objArr[15].toString()) : null;
 
 		} catch (Exception e) {
-			throw new FHIRException("Practioner resource failed with error - " + e.getMessage());
+			throw new FHIRException("Organization resource failed with error - " + e.getMessage());
 		}
 
 	}
