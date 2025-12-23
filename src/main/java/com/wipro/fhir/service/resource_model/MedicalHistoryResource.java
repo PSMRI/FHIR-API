@@ -27,7 +27,7 @@ public class MedicalHistoryResource {
 	@Autowired
 	private PatientEligibleForResourceCreationRepo patientEligibleForResourceCreationRepo;
 
-	public List<MedicationStatement> getMedicalHistory(Patient patient, ResourceRequestHandler resourceRequestHandler) {
+	public List<MedicationStatement> getMedicalHistory(Patient patient, ResourceRequestHandler resourceRequestHandler) throws Exception {
 
 		List<Object[]> rsObjList = patientEligibleForResourceCreationRepo.callMedicalHistorySp(resourceRequestHandler.getVisitCode());
 
