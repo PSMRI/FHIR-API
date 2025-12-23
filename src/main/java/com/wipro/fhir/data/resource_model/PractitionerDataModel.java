@@ -67,7 +67,7 @@ public class PractitionerDataModel {
 			this.createdDate = objArr[14] != null ? (objArr[14] instanceof Timestamp ? (Timestamp) objArr[14] : null)
 					: null;
 		} catch (Exception e) {
-			throw new FHIRException("Practioner resource failed with error - " + e.getMessage());
+			throw new FHIRException("Practitioner resource failed with error - " + e.getMessage());
 		}
 
 	}
