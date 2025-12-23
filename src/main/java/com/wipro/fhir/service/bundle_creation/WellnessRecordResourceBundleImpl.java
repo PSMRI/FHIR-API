@@ -56,7 +56,7 @@ public class WellnessRecordResourceBundleImpl implements WellnessRecordResourceB
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
 
-	@Value("${systemUrl}")
+	@Value("${hipSystemUrl}")
 	private String systemUrl;
 
 	@Override

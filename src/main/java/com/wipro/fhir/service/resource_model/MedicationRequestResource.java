@@ -99,7 +99,7 @@ public class MedicationRequestResource {
 			c = new Coding();
 			cList = new ArrayList<>();
 
-			medicationRequest.setId("MedicationRequest - " + index + "/" + commonService.getUUID());
+			medicationRequest.setId("MedicationRequest-" + index + "/" + commonService.getUUID());
 
 			medicationRequest.setStatus(MedicationRequestStatus.ACTIVE);
 			medicationRequest.setIntent(MedicationRequestIntent.ORDER);

@@ -95,7 +95,7 @@ public class DischargeSummaryResourceBundleImpl implements DischargeSummaryResou
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
 	
-	@Value("${systemUrl}")
+	@Value("${hipSystemUrl}")
 	private String systemUrl;
 	
 	@Override

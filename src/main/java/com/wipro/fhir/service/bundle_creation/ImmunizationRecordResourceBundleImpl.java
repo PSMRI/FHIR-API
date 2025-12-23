@@ -56,7 +56,7 @@ public class ImmunizationRecordResourceBundleImpl implements ImmunizationRecordR
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
 
-	@Value("${systemUrl}")
+	@Value("${hipSystemUrl}")
 	private String systemUrl;
 	
 	@Override

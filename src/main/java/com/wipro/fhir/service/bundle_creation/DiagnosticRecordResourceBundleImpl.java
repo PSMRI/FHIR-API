@@ -63,7 +63,7 @@ public class DiagnosticRecordResourceBundleImpl implements DiagnosticRecordResou
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
 
-	@Value("${systemUrl}")
+	@Value("${hipSystemUrl}")
 	private String systemUrl;
 	
 	@Override

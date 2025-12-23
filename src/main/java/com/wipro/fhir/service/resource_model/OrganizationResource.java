@@ -45,17 +45,20 @@ public class OrganizationResource {
 	
 	public Organization getOrganizationResource(ResourceRequestHandler resourceRequestHandler) throws FHIRException {
 
-	    List<Object[]> rsObj = patientEligibleForResourceCreationRepo.callOrganizationSp(resourceRequestHandler.getVisitCode());
+		List<Object[]> rsObj = patientEligibleForResourceCreationRepo
+				.callOrganizationSp(resourceRequestHandler.getVisitCode());
 
-	    OrganizationDataModel orgData = organizationDataModel.getOrganization(rsObj.get(0));
-	    
-	    if (orgData != null) {
-	    	return generateOrganizationResource(orgData);
-	    } else {
-	        throw new FHIRException("Organization not found");
-	    }
+		if (rsObj != null && !rsObj.isEmpty()) {
+			OrganizationDataModel orgData = organizationDataModel.getOrganization(rsObj.get(0));
+			if (orgData != null) {
+				return generateOrganizationResource(orgData);
+			} else {
+				throw new FHIRException("Organization data not found");
+			}
+		} else {
+			throw new FHIRException("Organization not found");
+		}
 	}
-
 
 private Organization generateOrganizationResource(OrganizationDataModel orgData) {
 	

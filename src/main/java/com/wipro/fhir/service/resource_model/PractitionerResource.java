@@ -49,7 +49,7 @@ public class PractitionerResource {
 	@Autowired
 	private PractitionerDataModel practitionerDataModel;
 	
-	@Value("${systemUrl}")
+	@Value("${hipSystemUrl}")
 	private String systemUrl;
 
 	public Practitioner getPractitionerResource(ResourceRequestHandler resourceRequestHandler)

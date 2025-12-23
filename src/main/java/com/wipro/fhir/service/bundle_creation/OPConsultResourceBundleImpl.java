@@ -79,7 +79,7 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
 	
-	@Value("${systemUrl}")
+	@Value("${hipSystemUrl}")
 	private String systemUrl;
 	
 	@Override

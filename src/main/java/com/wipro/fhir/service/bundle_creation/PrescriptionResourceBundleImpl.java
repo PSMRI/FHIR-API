@@ -56,7 +56,7 @@ public class PrescriptionResourceBundleImpl implements PrescriptionResourceBundl
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
 	
-	@Value("${systemUrl}")
+	@Value("${hipSystemUrl}")
 	private String systemUrl;
 	
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
