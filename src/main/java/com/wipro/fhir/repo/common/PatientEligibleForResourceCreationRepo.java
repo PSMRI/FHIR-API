@@ -121,8 +121,7 @@ public interface PatientEligibleForResourceCreationRepo
 	List<Object[]> callMedicalHistorySp(@Param("visitCode_IN") BigInteger visitCode_IN);
 	
 	//Immunization record
-	@Query(nativeQuery = true, value = "CALL db_iemr.FHIR_R_Immunization(:beneficiaryRegID_IN, :visitCode_IN, @0, "
-			+ "@1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12)")
+	@Query(nativeQuery = true, value = "CALL db_iemr.FHIR_R_Immunization(:beneficiaryRegID_IN, :visitCode_IN)")
 	List<Object[]> callImmunizationSP(@Param("beneficiaryRegID_IN") BigInteger beneficiaryRegID_IN, @Param("visitCode_IN") BigInteger visitCode_IN);
 
 	@Query(nativeQuery = true, value = "CALL db_iemr.FHIR_R_OrganizationDetails(:visitCode_IN)")

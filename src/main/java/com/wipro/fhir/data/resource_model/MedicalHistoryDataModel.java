@@ -19,49 +19,31 @@ public class MedicalHistoryDataModel implements Serializable {
 
 
 	private BigInteger id;
-	private BigInteger beneficiaryRegID;
-	private String visitCode;
+	private BigInteger providerServiceMapID;
 	private String currentMedication;
-	private Integer currentMedYear;
-	private String yearOfIllness;
-	private String finalIllnessType;
-	private String yearOfSurgery;
-	private String finalSurgeryType;
-	private Timestamp createdDate;
+	private Timestamp currentMedYear;
 	private String createdBy;
+	private Timestamp createdDate;
 	public MedicalHistoryDataModel() {
 	}
 	
 	public MedicalHistoryDataModel(Object[] objArr) throws Exception {
 		    try {
 
-		        this.id = objArr[0] != null
-		                ? BigInteger.valueOf(Long.parseLong(objArr[0].toString()))
-		                : null;
+		        this.id = objArr[0] != null ? BigInteger.valueOf(Long.parseLong(objArr[0].toString())) : null;
+		        
+		        this.providerServiceMapID = objArr[1] != null ? BigInteger.valueOf(Long.parseLong(objArr[1].toString())) : null;
 
-		        this.beneficiaryRegID = objArr[1] != null
-		                ? BigInteger.valueOf(Long.parseLong(objArr[1].toString()))
-		                : null;
+		        this.currentMedication = objArr[2] != null ? objArr[2].toString() : null;
 
-		        // visitCode is STRING only
-		        this.visitCode = objArr[2] != null ? objArr[2].toString() : null;
+		        this.currentMedYear = objArr[3] instanceof Timestamp ? (Timestamp) objArr[3] : null;
 
-		        this.currentMedication = objArr[3] != null ? objArr[3].toString() : null;
+		        this.createdBy = objArr[4] != null ? objArr[4].toString() : null;
 
-		        this.currentMedYear = objArr[4] != null
-		                ? Integer.parseInt(objArr[4].toString())
-		                : null;
-
-		        this.yearOfIllness = objArr[5] != null ? objArr[5].toString() : null;
-		        this.finalIllnessType = objArr[6] != null ? objArr[6].toString() : null;
-		        this.yearOfSurgery = objArr[7] != null ? objArr[7].toString() : null;
-		        this.finalSurgeryType = objArr[8] != null ? objArr[8].toString() : null;
-
-		        this.createdDate = objArr[9] instanceof Timestamp ? (Timestamp) objArr[9] : null;
-		        this.createdBy = objArr[10] != null ? objArr[10].toString() : null;
+		        this.createdDate = objArr[5] instanceof Timestamp ? (Timestamp) objArr[5] : null;
 
 		    } catch (Exception e) {
-		    	throw new Exception("Medical statement resource model failed with error - " + e.getMessage());
+		    	throw new Exception("Medical History resource model failed with error - " + e.getMessage());
 		    }
 
 	}
