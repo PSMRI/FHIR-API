@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.wipro.fhir.r4</groupId>
 	<artifactId>fhir-api</artifactId>
-	<version>3.9.0</version>
+	<version>3.6.1</version>
 	<packaging>war</packaging>
 	<name>FHIR-API</name>
 	<description>FHIR_NDHM standard integration in AMRIT</description>
