@@ -23,14 +23,14 @@ public interface DischargeSummaryResourceBundle {
 	int processDischargeSummaryRecordBundle(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p) throws FHIRException;
 
-	Composition PopulateDischargeSummaryComposition(ResourceRequestHandler resourceRequestHandler,
+	Composition populateDischargeSummaryComposition(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p, Practitioner practitioner, Organization organization, Patient patient,
 			Encounter encounter, List<Condition> chiefComplaints, List<Condition> physicalExam,
 			List<AllergyIntolerance> allergyList, FamilyMemberHistory familyMemberHistory,
 			List<MedicationStatement> pastMedicalHistoryConditions, List<MedicationRequest> medicationRequests,
 			List<DiagnosticReport> procedures);
 
-	String PopulateDischargeSummaryResourceBundle(ResourceRequestHandler resourceRequestHandler,
+	String populateDischargeSummaryResourceBundle(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p) throws FHIRException;
 
 }

@@ -119,7 +119,7 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 				}
 
 				GenerateCareContextTokenRequest generateTokenRequest = new GenerateCareContextTokenRequest();
-				if (null != careContextLinkRequest.getAbhaNumber() && "" != careContextLinkRequest.getAbhaNumber()) {
+				if (null != careContextLinkRequest.getAbhaNumber() && careContextLinkRequest.getAbhaNumber().isEmpty() ) {
 					String abha = careContextLinkRequest.getAbhaNumber();
 					String abhaNumber = abha.replace("-", "");
 					generateTokenRequest.setAbhaNumber(abhaNumber);
@@ -245,7 +245,7 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 				headers.add("Authorization", abhaAuthToken);
 				headers.add("X-CM-ID", abhaMode);
 				if (null != addCareContextRequest.getAbdmFacilityId()
-						&& "" != addCareContextRequest.getAbdmFacilityId()) {
+						&& addCareContextRequest.getAbdmFacilityId().isEmpty()) {
 					headers.add("X-HIP-ID", addCareContextRequest.getAbdmFacilityId());
 				} else {
 					headers.add("X-HIP-ID", abdmFacilityId);
@@ -275,7 +275,7 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 					pcc.add(patient);
 				}
 
-				if (null != addCareContextRequest.getAbhaNumber() && "" != addCareContextRequest.getAbhaNumber()) {
+				if (null != addCareContextRequest.getAbhaNumber() && addCareContextRequest.getAbhaNumber().isEmpty()) {
 					String abha = addCareContextRequest.getAbhaNumber();
 					String abhaNumber = abha.replace("-", "");
 					linkCareContextRequest.setAbhaNumber(abhaNumber);

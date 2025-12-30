@@ -17,7 +17,7 @@ public interface ImmunizationRecordResourceBundle {
 	Composition populateImmunizationComposition(Patient patient, Practitioner practitioner, Organization organization,
 			List<Immunization> immunizations);
 
-	String PopulateImmunizationResourceBundle(ResourceRequestHandler resourceRequestHandler,
+	String populateImmunizationResourceBundle(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p) throws FHIRException;
 
 	int processImmunizationRecordBundle(ResourceRequestHandler resourceRequestHandler,

@@ -4,21 +4,22 @@ import java.math.BigInteger;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import com.wipro.fhir.data.request_handler.PatientEligibleForResourceCreation;
 
 public interface CareContextRepo extends CrudRepository<PatientEligibleForResourceCreation, BigInteger> {
 	
 	@Query(value="SELECT COUNT(*) FROM t_phy_vitals WHERE VisitCode = :visitCode", nativeQuery = true)
-	public int hasPhyVitals(String visitCode);
+	public int hasPhyVitals(@Param("visitCode") String visitCode);
 	
 	@Query(value="SELECT COUNT(*) FROM t_prescribeddrug WHERE VisitCode = :visitCode", nativeQuery = true)
-	public int hasPrescribedDrugs(String visitCode);
+	public int hasPrescribedDrugs(@Param("visitCode") String visitCode);
 	
 	@Query(value="SELECT COUNT(*) FROM t_lab_testorder WHERE VisitCode = :visitCode", nativeQuery = true)
-	public int hasLabtestsDone(String visitCode);
+	public int hasLabtestsDone(@Param("visitCode") String visitCode);
 	
 	@Query(value="SELECT COUNT(*) FROM t_childvaccinedetail1 WHERE VisitCode = :visitCode", nativeQuery = true)
-	public int hasVaccineDetails(String visitCode);
+	public int hasVaccineDetails(@Param("visitCode") String visitCode);
 	
 }

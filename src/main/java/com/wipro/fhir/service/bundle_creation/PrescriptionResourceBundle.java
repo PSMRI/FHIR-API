@@ -13,10 +13,10 @@ import com.wipro.fhir.utils.exception.FHIRException;
 
 public interface PrescriptionResourceBundle {
 
-	 String PopulatePrescriptionResourceBundle(ResourceRequestHandler resourceRequestHandler,
+	 String populatePrescriptionResourceBundle(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p) throws FHIRException;
 
-	Composition PopulatePrescriptionComposition(ResourceRequestHandler resourceRequestHandler,
+	Composition populatePrescriptionComposition(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p, List<MedicationRequest> medicationRequest, Practitioner practitioner,
 			Organization organization);
 

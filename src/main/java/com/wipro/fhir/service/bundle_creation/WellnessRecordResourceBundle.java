@@ -13,10 +13,10 @@ import com.wipro.fhir.utils.exception.FHIRException;
 
 public interface WellnessRecordResourceBundle {
 
-	String PopulateWellnessRecordResourceBundle(ResourceRequestHandler resourceRequestHandler,
+	String populateWellnessRecordResourceBundle(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p) throws FHIRException;
 
-	Composition PopulateWellnessRecordComposition(ResourceRequestHandler resourceRequestHandler,
+	Composition populateWellnessRecordComposition(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p, Practitioner practitioner, Organization organization,
 			List<Observation> observationVitalList);
 

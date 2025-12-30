@@ -16,7 +16,7 @@ import com.wipro.fhir.utils.exception.FHIRException;
 
 public interface OPConsultResourceBundle {
 
-	Composition PopulateOpConsultComposition(ResourceRequestHandler resourceRequestHandler,
+	Composition populateOpConsultComposition(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p, Practitioner practitioner, Organization organization,
 			List<Condition> conditionListChiefComplaints, List<Condition> conditionListDiagnosis,
 			List<AllergyIntolerance> allergyList, FamilyMemberHistory familyMemberHistory,
@@ -25,7 +25,7 @@ public interface OPConsultResourceBundle {
 	int processOpConsultRecordBundle(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p) throws FHIRException;
 
-	String PopulateOPConsultRecordResourceBundle(ResourceRequestHandler resourceRequestHandler,
+	String populateOPConsultRecordResourceBundle(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p) throws FHIRException;
 
 }

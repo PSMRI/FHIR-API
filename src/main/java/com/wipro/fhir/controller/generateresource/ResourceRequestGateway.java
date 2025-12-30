@@ -78,7 +78,7 @@ public class ResourceRequestGateway {
 
 		OutputResponse response = new OutputResponse();
 		try {
-			String s = opConsultRecordBundle.PopulateOPConsultRecordResourceBundle(patientResourceRequest, null);
+			String s = opConsultRecordBundle.populateOPConsultRecordResourceBundle(patientResourceRequest, null);
 
 			response.setResponse(s);
 		} catch (FHIRException e) {
@@ -104,7 +104,7 @@ public class ResourceRequestGateway {
 
 		OutputResponse response = new OutputResponse();
 		try {
-			String s = diagnosticReportRecord.PopulateDiagnosticReportResourceBundle(patientResourceRequest, null);
+			String s = diagnosticReportRecord.populateDiagnosticReportResourceBundle(patientResourceRequest, null);
 
 			response.setResponse(s);
 		} catch (FHIRException e) {
@@ -129,7 +129,7 @@ public class ResourceRequestGateway {
 
 		OutputResponse response = new OutputResponse();
 		try {
-			String s = prescriptionRecordBundle.PopulatePrescriptionResourceBundle(patientResourceRequest, null);
+			String s = prescriptionRecordBundle.populatePrescriptionResourceBundle(patientResourceRequest, null);
 
 			response.setResponse(s);
 		} catch (FHIRException e) {

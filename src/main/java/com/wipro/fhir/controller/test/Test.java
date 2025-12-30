@@ -57,7 +57,7 @@ public class Test {
 		OutputResponse response = new OutputResponse();
 		String s = null;
 		try {
-			s = oPConsultRecordBundleImpl.PopulateOPConsultRecordResourceBundle(resourceRequestHandler, null);
+			s = oPConsultRecordBundleImpl.populateOPConsultRecordResourceBundle(resourceRequestHandler, null);
 			response.setResponse(s);
 		} catch (Exception e) {
 			logger.error("Unexpected error:" , e);

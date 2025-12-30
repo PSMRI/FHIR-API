@@ -64,7 +64,7 @@ public class WellnessRecordResourceBundleImpl implements WellnessRecordResourceB
 			PatientEligibleForResourceCreation p) throws FHIRException, Exception {
 		int i = 0;
 		// call method to generate Prescription resource
-		String wellnessBundle = PopulateWellnessRecordResourceBundle(resourceRequestHandler, p);
+		String wellnessBundle = populateWellnessRecordResourceBundle(resourceRequestHandler, p);
 
 		// call private method to create mongo object with resource data
 		AMRIT_ResourceMongo aMRIT_ResourceMongo = createPrescriptionBundleMongo(p, wellnessBundle);
@@ -78,7 +78,7 @@ public class WellnessRecordResourceBundleImpl implements WellnessRecordResourceB
 	}
 
 	@Override
-	public String PopulateWellnessRecordResourceBundle(ResourceRequestHandler resourceRequestHandler,
+	public String populateWellnessRecordResourceBundle(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p) throws FHIRException {
 		Bundle wellnessBundle = new Bundle();
 		String serializeBundle = null;
@@ -110,7 +110,7 @@ public class WellnessRecordResourceBundleImpl implements WellnessRecordResourceB
 					resourceRequestHandler);
 
 			// Composition
-			Composition composition = PopulateWellnessRecordComposition(resourceRequestHandler, p, practitioner,
+			Composition composition = populateWellnessRecordComposition(resourceRequestHandler, p, practitioner,
 					organization, observationVitalList);
 
 			List<BundleEntryComponent> bundleEnteries = new ArrayList<>();
@@ -158,7 +158,7 @@ public class WellnessRecordResourceBundleImpl implements WellnessRecordResourceB
 	}
 
 	@Override
-	public Composition PopulateWellnessRecordComposition(ResourceRequestHandler resourceRequestHandler,
+	public Composition populateWellnessRecordComposition(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p, Practitioner practitioner, Organization organization,
 			List<Observation> observationVitalList) {
 		Composition comp = new Composition();

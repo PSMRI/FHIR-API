@@ -71,7 +71,7 @@ public class DiagnosticRecordResourceBundleImpl implements DiagnosticRecordResou
 			PatientEligibleForResourceCreation p) throws FHIRException {
 		int i = 0;
 		// call method to generate Prescription resource
-		String diagnosticReportRecordBundle = PopulateDiagnosticReportResourceBundle(resourceRequestHandler, p);
+		String diagnosticReportRecordBundle = populateDiagnosticReportResourceBundle(resourceRequestHandler, p);
 
 		// call private method to create mongo object with resource data
 		AMRIT_ResourceMongo aMRIT_ResourceMongo = createDiagnosticReportRecordBundleMongo(p,
@@ -88,7 +88,7 @@ public class DiagnosticRecordResourceBundleImpl implements DiagnosticRecordResou
 	}
 
 	@Override
-	public String PopulateDiagnosticReportResourceBundle(ResourceRequestHandler resourceRequestHandler,
+	public String populateDiagnosticReportResourceBundle(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p) throws FHIRException {
 
 		Bundle diagReportBundle = new Bundle();
@@ -129,7 +129,7 @@ public class DiagnosticRecordResourceBundleImpl implements DiagnosticRecordResou
 			List<DiagnosticReport> diagnosticResourceList = diagnosticReportResource.getDiagnosticReport(patient,
 					new Encounter(), resourceRequestHandler, observationMap);
 
-			Composition composition = PopulateDiagnosticReportComposition(resourceRequestHandler, p,
+			Composition composition = populateDiagnosticReportComposition(resourceRequestHandler, p,
 					diagnosticResourceList, practitioner, organization);
 
 			List<BundleEntryComponent> bundleEntries = new ArrayList<>();
@@ -193,7 +193,7 @@ public class DiagnosticRecordResourceBundleImpl implements DiagnosticRecordResou
 	}
 
 	@Override
-	public Composition PopulateDiagnosticReportComposition(ResourceRequestHandler resourceRequestHandler,
+	public Composition populateDiagnosticReportComposition(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p, List<DiagnosticReport> diagnosticReports, Practitioner practitioner, Organization organization) {
 
 		Composition composition = new Composition();

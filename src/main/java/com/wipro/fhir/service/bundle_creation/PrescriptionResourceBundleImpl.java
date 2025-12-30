@@ -67,7 +67,7 @@ public class PrescriptionResourceBundleImpl implements PrescriptionResourceBundl
 			PatientEligibleForResourceCreation p) throws FHIRException {
 		int i = 0;
 		// call method to generate Prescription resource
-		String prescriptionBundle = PopulatePrescriptionResourceBundle(resourceRequestHandler, p);
+		String prescriptionBundle = populatePrescriptionResourceBundle(resourceRequestHandler, p);
 
 		// call private method to create mongo object with resource data
 		AMRIT_ResourceMongo aMRIT_ResourceMongo = createPrescriptionBundleMongo(p,
@@ -84,7 +84,7 @@ public class PrescriptionResourceBundleImpl implements PrescriptionResourceBundl
 	}
 	
 	@Override
-	public String PopulatePrescriptionResourceBundle(ResourceRequestHandler resourceRequestHandler, PatientEligibleForResourceCreation p) throws FHIRException {
+	public String populatePrescriptionResourceBundle(ResourceRequestHandler resourceRequestHandler, PatientEligibleForResourceCreation p) throws FHIRException {
 
 		Bundle prescriptionBundle = new Bundle();
 		String serializeBundle = null;
@@ -117,7 +117,7 @@ public class PrescriptionResourceBundleImpl implements PrescriptionResourceBundl
 			List<MedicationRequest> medicationRequest = medicationRequestResource.getMedicationRequest(patient,
 					resourceRequestHandler, practitioner, null);
 			// composition
-			Composition composition = PopulatePrescriptionComposition(resourceRequestHandler, p, medicationRequest, practitioner, organization);
+			Composition composition = populatePrescriptionComposition(resourceRequestHandler, p, medicationRequest, practitioner, organization);
 			
 			List<BundleEntryComponent> bundleEnteries = new ArrayList<>();
 			
@@ -166,7 +166,7 @@ public class PrescriptionResourceBundleImpl implements PrescriptionResourceBundl
 	}
  
 	@Override
-	public Composition PopulatePrescriptionComposition(ResourceRequestHandler resourceRequestHandler,
+	public Composition populatePrescriptionComposition(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p, List<MedicationRequest> medicationRequest, Practitioner practitioner, Organization organization) {
 
 		Composition composition = new Composition();

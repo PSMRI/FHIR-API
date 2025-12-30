@@ -87,7 +87,7 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 			PatientEligibleForResourceCreation p) throws FHIRException {
 		int i = 0;
 		// call method to generate Prescription resource
-		String opConsultBundle = PopulateOPConsultRecordResourceBundle(resourceRequestHandler, p);
+		String opConsultBundle = populateOPConsultRecordResourceBundle(resourceRequestHandler, p);
 
 		// call private method to create mongo object with resource data
 		AMRIT_ResourceMongo aMRIT_ResourceMongo = createOpConsultBundleMongo(p,
@@ -105,7 +105,7 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 	
 	
 	@Override
-	public String PopulateOPConsultRecordResourceBundle(ResourceRequestHandler resourceRequestHandler, PatientEligibleForResourceCreation p) throws FHIRException {
+	public String populateOPConsultRecordResourceBundle(ResourceRequestHandler resourceRequestHandler, PatientEligibleForResourceCreation p) throws FHIRException {
 
 		Bundle opConsultBundle = new Bundle();
 		String serializeBundle = null;
@@ -157,7 +157,7 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 			List<MedicationStatement> medicationStatement = medicalHistoryResource.getMedicalHistory(patient, resourceRequestHandler);
 			
 			// composition
-			Composition composition = PopulateOpConsultComposition(resourceRequestHandler, p, practitioner, organization, conditionListChiefComplaints, 
+			Composition composition = populateOpConsultComposition(resourceRequestHandler, p, practitioner, organization, conditionListChiefComplaints, 
 					conditionListDiagnosis, allergyList,familyMemberHistory, medicationStatement);
 			
 			List<BundleEntryComponent> bundleEnteries = new ArrayList<>();
@@ -238,7 +238,7 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 	}
 	
 	@Override
-	public Composition PopulateOpConsultComposition(ResourceRequestHandler resourceRequestHandler,PatientEligibleForResourceCreation p, 
+	public Composition populateOpConsultComposition(ResourceRequestHandler resourceRequestHandler,PatientEligibleForResourceCreation p, 
 			Practitioner practitioner, Organization organization, List<Condition> conditionListChiefComplaints, List<Condition> conditionListDiagnosis, 
 			List<AllergyIntolerance> allergyList, FamilyMemberHistory familyMemberHistory, List<MedicationStatement> medicationStatement) {
 

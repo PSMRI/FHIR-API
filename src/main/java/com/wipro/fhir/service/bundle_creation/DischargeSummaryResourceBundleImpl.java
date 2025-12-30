@@ -103,7 +103,7 @@ public class DischargeSummaryResourceBundleImpl implements DischargeSummaryResou
 			PatientEligibleForResourceCreation p) throws FHIRException {
 		int i = 0;
 		// call method to generate Prescription resource
-		String dischargeSummaryBundle = PopulateDischargeSummaryResourceBundle(resourceRequestHandler, p);
+		String dischargeSummaryBundle = populateDischargeSummaryResourceBundle(resourceRequestHandler, p);
 
 		// call private method to create mongo object with resource data
 		AMRIT_ResourceMongo aMRIT_ResourceMongo = createDischargeSummaryBundleMongo(p,
@@ -121,7 +121,7 @@ public class DischargeSummaryResourceBundleImpl implements DischargeSummaryResou
 	
 	
 	@Override
-	public String PopulateDischargeSummaryResourceBundle(ResourceRequestHandler resourceRequestHandler, PatientEligibleForResourceCreation p) throws FHIRException {
+	public String populateDischargeSummaryResourceBundle(ResourceRequestHandler resourceRequestHandler, PatientEligibleForResourceCreation p) throws FHIRException {
 
 		Bundle dischargeSummaryBundle = new Bundle();
 		String serializeBundle = null;
@@ -185,7 +185,7 @@ public class DischargeSummaryResourceBundleImpl implements DischargeSummaryResou
 					new Encounter(), resourceRequestHandler, observationMap);
 			
 			// composition
-			Composition composition = PopulateDischargeSummaryComposition(resourceRequestHandler, p, practitioner, organization, patient, encounter, conditionListChiefComplaints, 
+			Composition composition = populateDischargeSummaryComposition(resourceRequestHandler, p, practitioner, organization, patient, encounter, conditionListChiefComplaints, 
 					conditionListDiagnosis, allergyList, familyMemberHistory, medicationStatement, medicationRequest, diagnosticResourceList);
 			
 			List<BundleEntryComponent> bundleEnteries = new ArrayList<>();
@@ -290,7 +290,7 @@ public class DischargeSummaryResourceBundleImpl implements DischargeSummaryResou
 	
 	@Override
 
-	public Composition PopulateDischargeSummaryComposition(
+	public Composition populateDischargeSummaryComposition(
 			ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p,
 			Practitioner practitioner,

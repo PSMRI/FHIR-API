@@ -17,11 +17,11 @@ public interface DiagnosticRecordResourceBundle {
 	int processDiagnosticReportRecordBundle(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p) throws FHIRException;
 
-	Composition PopulateDiagnosticReportComposition(ResourceRequestHandler resourceRequestHandler,
+	Composition populateDiagnosticReportComposition(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p, List<DiagnosticReport> diagnosticReports, Practitioner practitioner,
 			Organization organization);
 
-	String PopulateDiagnosticReportResourceBundle(ResourceRequestHandler resourceRequestHandler,
+	String populateDiagnosticReportResourceBundle(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p) throws FHIRException;
 
 }

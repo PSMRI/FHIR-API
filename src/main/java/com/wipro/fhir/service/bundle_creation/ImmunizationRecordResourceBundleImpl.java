@@ -64,7 +64,7 @@ public class ImmunizationRecordResourceBundleImpl implements ImmunizationRecordR
 			PatientEligibleForResourceCreation p) throws FHIRException {
 		int i = 0;
 		// call method to generate Prescription resource
-		String immunizationBundle = PopulateImmunizationResourceBundle(resourceRequestHandler, p);
+		String immunizationBundle = populateImmunizationResourceBundle(resourceRequestHandler, p);
 
 		// call private method to create mongo object with resource data
 		AMRIT_ResourceMongo aMRIT_ResourceMongo = createImmunizationBundleMongo(p,
@@ -81,7 +81,7 @@ public class ImmunizationRecordResourceBundleImpl implements ImmunizationRecordR
 	}
 	
 	@Override
-	public String PopulateImmunizationResourceBundle(ResourceRequestHandler resourceRequestHandler,
+	public String populateImmunizationResourceBundle(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p) throws FHIRException {
 
 		Bundle diagReportBundle = new Bundle();
