@@ -8,7 +8,9 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +35,18 @@ public class ElasticsearchConfig {
     @Value("${elasticsearch.password}")
     private String esPassword;
 
+    @Value("${elasticsearch.connection.timeout:10000}")
+    private int connectionTimeout;
+
+    @Value("${elasticsearch.socket.timeout:120000}")
+    private int socketTimeout;
+
+    @Value("${elasticsearch.max.connections:200}")
+    private int maxConnections;
+
+    @Value("${elasticsearch.max.connections.per.route:100}")
+    private int maxConnectionsPerRoute;
+
     @Bean
     public ElasticsearchClient elasticsearchClient() {
         BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -41,11 +55,32 @@ public class ElasticsearchConfig {
             new UsernamePasswordCredentials(esUsername, esPassword)
         );
 
-        RestClient restClient = RestClient.builder(
+        RestClientBuilder builder = RestClient.builder(
             new HttpHost(esHost, esPort, "http")
-        ).setHttpClientConfigCallback(httpClientBuilder -> 
-            httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
-        ).build();
+        );
+
+        // Apply timeout configurations
+        builder.setRequestConfigCallback(requestConfigBuilder -> 
+            requestConfigBuilder
+                .setConnectTimeout(connectionTimeout)
+                .setSocketTimeout(socketTimeout)
+                .setConnectionRequestTimeout(connectionTimeout)
+        );
+
+        // Apply connection pool settings
+        builder.setHttpClientConfigCallback(httpClientBuilder -> 
+            httpClientBuilder
+                .setDefaultCredentialsProvider(credentialsProvider)
+                .setMaxConnTotal(maxConnections)
+                .setMaxConnPerRoute(maxConnectionsPerRoute)
+                .setDefaultIOReactorConfig(
+                    IOReactorConfig.custom()
+                        .setSoTimeout(socketTimeout)
+                        .build()
+                )
+        );
+
+        RestClient restClient = builder.build();
 
         ElasticsearchTransport transport = new RestClientTransport(
             restClient,
@@ -58,10 +93,11 @@ public class ElasticsearchConfig {
     @Bean(name = "esAsyncExecutor")
     public Executor asyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(5);
-        executor.setQueueCapacity(100);
+        executor.setCorePoolSize(5);  
+        executor.setMaxPoolSize(20);  
+        executor.setQueueCapacity(500);  
         executor.setThreadNamePrefix("es-sync-");
+        executor.setRejectedExecutionHandler(new java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy());
         executor.initialize();
         return executor;
     }

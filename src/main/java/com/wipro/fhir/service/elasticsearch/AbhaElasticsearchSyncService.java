@@ -41,57 +41,73 @@ public class AbhaElasticsearchSyncService {
      * This method updates only ABHA fields, doesn't require full beneficiary data
      */
     @Async("esAsyncExecutor")
-    public void updateAbhaInElasticsearch(Long benRegId, String healthId, String healthIdNumber, String createdDate) {
-        if (!esEnabled) {
-            logger.debug("Elasticsearch is disabled, skipping ABHA sync");
-            return;
-        }
+public void updateAbhaInElasticsearch(Long benRegId, String healthId, String healthIdNumber, String createdDate) {
+    if (!esEnabled) {
+        logger.debug("Elasticsearch is disabled, skipping ABHA sync");
+        return;
+    }
 
-        if (benRegId == null) {
-            logger.warn("benRegId is null, cannot sync ABHA to ES");
-            return;
-        }
+    if (benRegId == null) {
+        logger.warn("benRegId is null, cannot sync ABHA to ES");
+        return;
+    }
 
+    int maxRetries = 3;
+    int retryDelay = 2000; // 2 seconds
+
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-            logger.info("Syncing ABHA details to ES for benRegId: {}", benRegId);
+            logger.info("Syncing ABHA details to ES for benRegId: {} (attempt {}/{})", benRegId, attempt, maxRetries);
 
-            // Prepare ABHA update data
             Map<String, Object> abhaData = new HashMap<>();
             abhaData.put("healthID", healthId);
             abhaData.put("abhaID", healthIdNumber);
             abhaData.put("abhaCreatedDate", createdDate);
 
-            // Use benRegId as document ID (same as identity-api)
             String documentId = String.valueOf(benRegId);
-
-            // Check if document exists first
             boolean exists = checkDocumentExists(documentId);
 
             if (exists) {
-                // Update existing document with ABHA fields
                 UpdateRequest<Object, Object> updateRequest = UpdateRequest.of(u -> u
                     .index(beneficiaryIndex)
                     .id(documentId)
-                    .doc(abhaData).refresh(Refresh.WaitFor)
-                    .docAsUpsert(false) // Don't create if missing
+                    .doc(abhaData)
+                    .refresh(Refresh.True)  
+                    .docAsUpsert(false)
+                    .retryOnConflict(3) 
                 );
 
                 esClient.update(updateRequest, Object.class);
-                logger.info("Successfully updated ABHA in ES: benRegId={}, healthID={}, abhaID={}", 
-                           benRegId, healthId, healthIdNumber);
+                logger.info("Successfully updated ABHA in ES: benRegId={}", benRegId);
+                return; 
 
             } else {
-                logger.warn("Document not found in ES for benRegId={}. " +
-                           "Beneficiary might not be synced yet from identity-api", benRegId);
-                
-                // Optional: Retry after delay
-                retryAfterDelay(benRegId, healthId, healthIdNumber, createdDate);
+                logger.warn("Document not found in ES for benRegId={} (attempt {}/{})", benRegId, attempt, maxRetries);
+                if (attempt < maxRetries) {
+                    Thread.sleep(retryDelay * attempt); 
+                }
             }
 
+        } catch (java.net.SocketTimeoutException e) {
+            logger.error("Timeout updating ABHA in ES for benRegId {} (attempt {}/{}): {}", 
+                        benRegId, attempt, maxRetries, e.getMessage());
+            if (attempt < maxRetries) {
+                try {
+                    Thread.sleep(retryDelay * attempt);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+            }
         } catch (Exception e) {
-            logger.error("Error updating ABHA in ES for benRegId {}: {}", benRegId, e.getMessage(), e);
+            logger.error("Error updating ABHA in ES for benRegId {} (attempt {}/{}): {}", 
+                        benRegId, attempt, maxRetries, e.getMessage());
+            if (attempt == maxRetries) {
+                logger.error("Failed to sync ABHA after {} attempts for benRegId {}", maxRetries, benRegId);
+            }
         }
     }
+}
 
     /**
      * Check if document exists in ES
