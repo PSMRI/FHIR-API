@@ -161,8 +161,8 @@ public class JwtUserIdValidationFilter implements Filter {
 				|| path.startsWith(contextPath + "/swagger-ui")
 				|| path.startsWith(contextPath + "/v3/api-docs")
 				|| path.startsWith(contextPath + "/public")
-				|| path.startsWith(contextPath + "/version")
-				|| path.startsWith(contextPath + "/health");
+				|| path.equals(contextPath +"/version")
+				|| path.equals(contextPath +"/health");
 	}
 
 	private String getJwtTokenFromCookies(HttpServletRequest request) {
