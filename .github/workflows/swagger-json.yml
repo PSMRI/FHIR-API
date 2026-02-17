@@ -97,7 +97,7 @@ jobs:
         with:
           token: ${{ secrets.DOCS_REPO_TOKEN }}
           path: amrit-docs
-          branch: auto/swagger-update-${{ github.run_id }}-${{ github.run_attempt }}
+          branch: auto/swagger-update-fhir-api
           base: main
           commit-message: "chore(docs): auto-update FHIR-API swagger"
           title: "chore(docs): auto-update FHIR-API swagger"
