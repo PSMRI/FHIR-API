@@ -32,7 +32,7 @@ public class HealthController {
     @Operation(summary = "Check infrastructure health", 
                description = "Returns the health status of MySQL, Redis, and other configured services")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "All checked components are UP"),
+        @ApiResponse(responseCode = "200", description = "Services are UP or DEGRADED (operational with warnings)"),
         @ApiResponse(responseCode = "503", description = "One or more critical services are DOWN")
     })
     public ResponseEntity<Map<String, Object>> checkHealth() {
@@ -42,7 +42,8 @@ public class HealthController {
             Map<String, Object> healthStatus = healthService.checkHealth();
             String overallStatus = (String) healthStatus.get("status");
             
-            HttpStatus httpStatus = "UP".equals(overallStatus) ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE;
+            // Return 503 only if DOWN; 200 for both UP and DEGRADED (DEGRADED = operational with warnings)
+            HttpStatus httpStatus = "DOWN".equals(overallStatus) ? HttpStatus.SERVICE_UNAVAILABLE : HttpStatus.OK;
             
             logger.debug("Health check completed with status: {}", overallStatus);
             return new ResponseEntity<>(healthStatus, httpStatus);
