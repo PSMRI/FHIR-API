@@ -216,7 +216,7 @@ public class HealthService {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     // Basic health check passed, now run advanced checks with throttling
-                    boolean isDegraded = performAdvancedMySQLChecksWithThrottle(connection);
+                    boolean isDegraded = performAdvancedMySQLChecksWithThrottle();
                     return new HealthCheckResult(true, null, isDegraded);
                 }
             }
@@ -348,7 +348,7 @@ public class HealthService {
     }
 
     // Internal advanced health checks for MySQL - do not expose details in responses
-    private boolean performAdvancedMySQLChecksWithThrottle(Connection connection) {
+    private boolean performAdvancedMySQLChecksWithThrottle() {
         if (!advancedHealthChecksEnabled) {
             return false; // Advanced checks disabled
         }
@@ -379,7 +379,7 @@ public class HealthService {
             AdvancedCheckResult result;
             java.util.concurrent.CompletableFuture<AdvancedCheckResult> future =
                 java.util.concurrent.CompletableFuture
-                    .supplyAsync(() -> performAdvancedMySQLChecks(connection), advancedCheckExecutor);
+                    .supplyAsync(this::performAdvancedMySQLChecks, advancedCheckExecutor);
             try {
                 result = future.get(ADVANCED_CHECKS_TIMEOUT_MS, TimeUnit.MILLISECONDS);
             } catch (java.util.concurrent.TimeoutException ex) {
@@ -417,28 +417,33 @@ public class HealthService {
         }
     }
 
-    private AdvancedCheckResult performAdvancedMySQLChecks(Connection connection) {
-        try {
-            boolean hasIssues = false;
-            
-            if (hasLockWaits(connection)) {
-                logger.warn(DIAGNOSTIC_LOG_TEMPLATE, DIAGNOSTIC_LOCK_WAIT);
-                hasIssues = true;
+    private AdvancedCheckResult performAdvancedMySQLChecks() {
+        try (Connection connection = dataSource.getConnection()) {
+            try {
+                boolean hasIssues = false;
+                
+                if (hasLockWaits(connection)) {
+                    logger.warn(DIAGNOSTIC_LOG_TEMPLATE, DIAGNOSTIC_LOCK_WAIT);
+                    hasIssues = true;
+                }
+                
+                if (hasSlowQueries(connection)) {
+                    logger.warn(DIAGNOSTIC_LOG_TEMPLATE, DIAGNOSTIC_SLOW_QUERIES);
+                    hasIssues = true;
+                }
+                
+                if (hasConnectionPoolExhaustion()) {
+                    logger.warn(DIAGNOSTIC_LOG_TEMPLATE, DIAGNOSTIC_POOL_EXHAUSTED);
+                    hasIssues = true;
+                }
+                
+                return new AdvancedCheckResult(hasIssues);
+            } catch (Exception e) {
+                logger.debug("Advanced MySQL checks encountered exception, marking degraded");
+                return new AdvancedCheckResult(true);
             }
-            
-            if (hasSlowQueries(connection)) {
-                logger.warn(DIAGNOSTIC_LOG_TEMPLATE, DIAGNOSTIC_SLOW_QUERIES);
-                hasIssues = true;
-            }
-            
-            if (hasConnectionPoolExhaustion()) {
-                logger.warn(DIAGNOSTIC_LOG_TEMPLATE, DIAGNOSTIC_POOL_EXHAUSTED);
-                hasIssues = true;
-            }
-            
-            return new AdvancedCheckResult(hasIssues);
         } catch (Exception e) {
-            logger.debug("Advanced MySQL checks encountered exception, marking degraded");
+            logger.debug("Advanced MySQL checks could not obtain connection: {}", e.getMessage());
             return new AdvancedCheckResult(true);
         }
     }
