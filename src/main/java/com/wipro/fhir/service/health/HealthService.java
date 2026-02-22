@@ -419,31 +419,35 @@ public class HealthService {
 
     private AdvancedCheckResult performAdvancedMySQLChecks() {
         try (Connection connection = dataSource.getConnection()) {
-            try {
-                boolean hasIssues = false;
-                
-                if (hasLockWaits(connection)) {
-                    logger.warn(DIAGNOSTIC_LOG_TEMPLATE, DIAGNOSTIC_LOCK_WAIT);
-                    hasIssues = true;
-                }
-                
-                if (hasSlowQueries(connection)) {
-                    logger.warn(DIAGNOSTIC_LOG_TEMPLATE, DIAGNOSTIC_SLOW_QUERIES);
-                    hasIssues = true;
-                }
-                
-                if (hasConnectionPoolExhaustion()) {
-                    logger.warn(DIAGNOSTIC_LOG_TEMPLATE, DIAGNOSTIC_POOL_EXHAUSTED);
-                    hasIssues = true;
-                }
-                
-                return new AdvancedCheckResult(hasIssues);
-            } catch (Exception e) {
-                logger.debug("Advanced MySQL checks encountered exception, marking degraded");
-                return new AdvancedCheckResult(true);
-            }
+            return performAdvancedCheckLogic(connection);
         } catch (Exception e) {
             logger.debug("Advanced MySQL checks could not obtain connection: {}", e.getMessage());
+            return new AdvancedCheckResult(true);
+        }
+    }
+
+    private AdvancedCheckResult performAdvancedCheckLogic(Connection connection) {
+        try {
+            boolean hasIssues = false;
+            
+            if (hasLockWaits(connection)) {
+                logger.warn(DIAGNOSTIC_LOG_TEMPLATE, DIAGNOSTIC_LOCK_WAIT);
+                hasIssues = true;
+            }
+            
+            if (hasSlowQueries(connection)) {
+                logger.warn(DIAGNOSTIC_LOG_TEMPLATE, DIAGNOSTIC_SLOW_QUERIES);
+                hasIssues = true;
+            }
+            
+            if (hasConnectionPoolExhaustion()) {
+                logger.warn(DIAGNOSTIC_LOG_TEMPLATE, DIAGNOSTIC_POOL_EXHAUSTED);
+                hasIssues = true;
+            }
+            
+            return new AdvancedCheckResult(hasIssues);
+        } catch (Exception e) {
+            logger.debug("Advanced MySQL checks encountered exception, marking degraded");
             return new AdvancedCheckResult(true);
         }
     }
