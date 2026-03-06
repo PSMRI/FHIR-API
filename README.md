@@ -26,14 +26,6 @@ Detailed information on API endpoints can be found in the [API Guide](https://pi
 All features have been exposed as REST endpoints. Refer to the SWAGGER API specification for details.
  
 ## Setting Up Commit Hooks
-
-This project uses Git hooks to enforce consistent code quality and commit message standards. Even though this is a Java project, the hooks are powered by Node.js. Follow these steps to set up the hooks locally:
-
-### Prerequisites
-- Node.js (v14 or later)
-- npm (comes with Node.js)
-
-### Setup Steps
 Enable git hooks (run once after cloning):
    - Run the command `git config core.hooksPath .git-hooks`.
 
