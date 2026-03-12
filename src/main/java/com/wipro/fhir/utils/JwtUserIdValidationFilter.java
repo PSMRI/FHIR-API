@@ -191,7 +191,9 @@ public class JwtUserIdValidationFilter implements Filter {
 				|| path.equalsIgnoreCase(contextPath + "/user/logOutUserFromConcurrentSession")
 				|| path.startsWith(contextPath + "/swagger-ui")
 				|| path.startsWith(contextPath + "/v3/api-docs")
-				|| path.startsWith(contextPath + "/public");
+				|| path.startsWith(contextPath + "/public")
+				|| path.equals(contextPath +"/version")
+				|| path.equals(contextPath +"/health");
 	}
 
 	private String getJwtTokenFromCookies(HttpServletRequest request) {
