@@ -21,77 +21,90 @@
 */
 package com.wipro.fhir.service.resource_model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hl7.fhir.r4.model.Address;
-import org.hl7.fhir.r4.model.ContactPoint;
-import org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Organization;
-import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.StringType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.wipro.fhir.data.request_handler.ResourceRequestHandler;
+import com.wipro.fhir.data.resource_model.OrganizationDataModel;
+import com.wipro.fhir.repo.common.PatientEligibleForResourceCreationRepo;
+import com.wipro.fhir.utils.exception.FHIRException;
 
 @Service
 public class OrganizationResource {
-	private Organization organization;
+	
+	@Autowired
+	private PatientEligibleForResourceCreationRepo patientEligibleForResourceCreationRepo;
+	
+	@Autowired
+	private OrganizationDataModel organizationDataModel;
+	
+	public Organization getOrganizationResource(ResourceRequestHandler resourceRequestHandler) throws FHIRException {
 
-	public Organization getOrganization() {
-		return generateOrganizationResource();
+		List<Object[]> rsObj = patientEligibleForResourceCreationRepo
+				.callOrganizationSp(resourceRequestHandler.getVisitCode());
 
+		if (rsObj != null && !rsObj.isEmpty()) {
+			OrganizationDataModel orgData = organizationDataModel.getOrganization(rsObj.get(0));
+			if (orgData != null) {
+				return generateOrganizationResource(orgData);
+			} else {
+				throw new FHIRException("Organization data not found");
+			}
+		} else {
+			throw new FHIRException("Organization not found");
+		}
 	}
 
-	// generating dummy Practitioner resource
-	private Organization generateOrganizationResource() {
-		organization = new Organization();
+private Organization generateOrganizationResource(OrganizationDataModel orgData) {
+	
+	    Organization organization = new Organization();
 
-		organization.setId("Organization/MaxSaket01");
-		organization.setName("Max Super Speciality Hospital, Saket");
+	    organization.setId("Organization/" + orgData.getServiceProviderID());
 
-		List<StringType> aliasList = new ArrayList<>();
-		StringType alias = new StringType();
-		alias.setValue("Max");
-		aliasList.add(alias);
-		organization.setAlias(aliasList);
+	    if (orgData.getServiceProviderName() != null) {
+	        organization.setName(orgData.getServiceProviderName());
+	    }
 
-		List<Identifier> iList = new ArrayList<>();
-		Identifier i = new Identifier();
-		i.setSystem("https://facilitysbx.ndhm.gov.in");
-		i.setValue("IN0410000183");
-		iList.add(i);
-		organization.setIdentifier(iList);
+	    // Alias
+	    if (orgData.getLocationName() != null) {
+	        organization.addAlias(orgData.getLocationName());
+	    }
 
-		List<ContactPoint> cpList = new ArrayList<>();
-		ContactPoint contactPoint = new ContactPoint();
-		contactPoint.setSystem(ContactPointSystem.PHONE);
-		contactPoint.setValue("(+91) 011-2651-5050");
-		cpList.add(contactPoint);
+	    // Identifier (ABDM Facility ID)
+	    if (orgData.getAbdmFacilityId() != null) {
+	        Identifier identifier = new Identifier();
+	        identifier.setSystem("https://facilitysbx.ndhm.gov.in");
+	        identifier.setValue(orgData.getAbdmFacilityId());
+	        organization.addIdentifier(identifier);
+	    }
 
-		organization.setTelecom(cpList);
+	    // Address
+	    Address address = new Address();
 
-		List<Address> addressList = new ArrayList<>();
-		Address address = new Address();
-		address.setCity("New Delhi");
-		address.setState("New Delhi");
-		address.setPostalCode("New Delhi");
-		address.setCountry("India");
-		List<StringType> addressLineList = new ArrayList<>();
-		StringType addLine = new StringType();
-		addLine.setValue("1, 2, Press Enclave Marg, Saket Institutional Area, Saket");
-		addressLineList.add(addLine);
-		address.setLine(addressLineList);
-		addressList.add(address);
+	    if (orgData.getAddress() != null) {
+	        address.addLine(orgData.getAddress());
+	    }
 
-		organization.setAddress(addressList);
+	    if (orgData.getDistrictName() != null) {
+	        address.setDistrict(orgData.getDistrictName());
+	    }
 
-		List<Reference> rlist = new ArrayList<>();
-		Reference r = new Reference();
-		r.setReference("https://www.max.in/hospital-network/max-super-speciality-hospital-saket");
-		r.setDisplay("Website");
-		rlist.add(r);
-		organization.setEndpoint(rlist);
+	    if (orgData.getStateName() != null) {
+	        address.setState(orgData.getStateName());
+	    }
 
-		return organization;
+	    address.setCountry("India");
+
+	    organization.addAddress(address);
+	    
+
+	    return organization;
 	}
+
+
 }

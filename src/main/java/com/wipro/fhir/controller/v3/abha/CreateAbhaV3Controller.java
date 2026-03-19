@@ -3,7 +3,7 @@ package com.wipro.fhir.controller.v3.abha;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,6 +60,8 @@ public class CreateAbhaV3Controller {
 		logger.info("NDHM_FHIR generate OTP for ABHA card API response " + response.toString());
 		return response.toString();
 	}
+	
+	@CrossOrigin
 	@Operation(summary = "Verify Auth By ABDM for ABHA enrollment")
 	@PostMapping(value = { "/verifyAuthByAbdm" })
 	public String verifyMobileForAuth(@RequestBody String request) {

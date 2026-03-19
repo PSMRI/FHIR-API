@@ -24,57 +24,119 @@ package com.wipro.fhir.service.resource_model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hl7.fhir.r4.model.ContactPoint;
+import org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem;
+import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.StringType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.wipro.fhir.data.request_handler.ResourceRequestHandler;
+import com.wipro.fhir.data.resource_model.PractitionerDataModel;
+import com.wipro.fhir.repo.common.PatientEligibleForResourceCreationRepo;
+import com.wipro.fhir.utils.exception.FHIRException;
 
 @Service
 public class PractitionerResource {
 
+	@Autowired
+	private PatientEligibleForResourceCreationRepo patientEligibleForResourceCreationRepo;
+	
+	@Autowired
+	private PractitionerDataModel practitionerDataModel;
+	
+	@Value("${hipSystemUrl}")
+	private String systemUrl;
 
-	private Practitioner practitioner;
+	public Practitioner getPractitionerResource(ResourceRequestHandler resourceRequestHandler)
+			throws FHIRException {
 
-	public Practitioner getPractitioner() {
-		return generatePractitionerResource();
+		List<Object[]> rsObj = patientEligibleForResourceCreationRepo.callPractitionerSP(resourceRequestHandler.getVisitCode());
 
+		 if (rsObj == null || rsObj.isEmpty()) {
+		        throw new FHIRException("invalid practitioner data");
+		    }
+		
+		PractitionerDataModel practitionerData = practitionerDataModel.getPractitioner(rsObj.get(0));
+		return generatePractitionerResource(practitionerData);
 	}
+	
+	private Practitioner generatePractitionerResource(PractitionerDataModel practitionerData) {
 
-	// generating dummy Practitioner resource
-	private Practitioner generatePractitionerResource() {
-		practitioner = new Practitioner();
+		Practitioner practitioner = new Practitioner();
 
-		practitioner.setId("Practitioner/MAX1456");
+		// ID
+		practitioner.setId("Practitioner/" + practitionerData.getUserID());
 
-		List<Identifier> iList = new ArrayList<>();
-		Identifier i = new Identifier();
-		i.setSystem("https://www.mciindia.in/doctor");
-		i.setValue("MAX1456");
-		iList.add(i);
-		practitioner.setIdentifier(iList);
+		// Identifier (Employee / Registration ID)
+		if (practitionerData.getEmployeeID() != null) {
+			Identifier identifier = new Identifier();
+			identifier.setSystem(systemUrl);
+			identifier.setValue(practitionerData.getEmployeeID());
+			practitioner.addIdentifier(identifier);
+		}
 
-		List<HumanName> pNameList = new ArrayList<>();
-		HumanName hName = new HumanName();
+		// Name
+		HumanName name = new HumanName();
 
-		hName.setText("Harsh Dhave");
+		if (practitionerData.getFullName() != null) {
+			name.setText(practitionerData.getFullName());
+		}
 
-		List<StringType> stList = new ArrayList<>();
-		StringType st = new StringType();
-		st.setValue("Dr");
-		stList.add(st);
-		hName.setPrefix(stList);
+		// Prefix (Designation)
+		if (practitionerData.getDesignationName() != null) {
+			name.addPrefix(practitionerData.getDesignationName());
+		}
 
-		List<StringType> stList1 = new ArrayList<>();
-		StringType st1 = new StringType();
-		st.setValue("MBBS");
-		stList1.add(st1);
-		hName.setSuffix(stList1);
+		// Suffix (Qualification)
+		if (practitionerData.getQualificationName() != null) {
+			name.addSuffix(practitionerData.getQualificationName());
+		}
 
-		pNameList.add(hName);
+		practitioner.addName(name);
 
-		practitioner.setName(pNameList);
+		// Gender
+		if (practitionerData.getGenderName() != null) {
+			switch (practitionerData.getGenderName()) {
+			case "Male":
+				practitioner.setGender(AdministrativeGender.MALE);
+				break;
+			case "Female":
+				practitioner.setGender(AdministrativeGender.FEMALE);
+				break;
+			default:
+				practitioner.setGender(AdministrativeGender.UNKNOWN);
+				break;
+			}
+		}
+
+		// DOB
+		if (practitionerData.getDob() != null) {
+			practitioner.setBirthDate(practitionerData.getDob());
+		}
+
+		// Telecom - Phone
+		if (practitionerData.getContactNo() != null) {
+			ContactPoint phone = new ContactPoint();
+			phone.setSystem(ContactPointSystem.PHONE);
+			phone.setValue(practitionerData.getContactNo());
+			practitioner.addTelecom(phone);
+		}
+
+		// Telecom - Email
+		if (practitionerData.getEmailID() != null) {
+			ContactPoint email = new ContactPoint();
+			email.setSystem(ContactPointSystem.EMAIL);
+			email.setValue(practitionerData.getEmailID());
+			practitioner.addTelecom(email);
+		}
 
 		return practitioner;
 	}
+
+
 }

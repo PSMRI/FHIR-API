@@ -27,14 +27,18 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.wipro.fhir.data.mongo.care_context.GenerateTokenAbdmResponses;
 import com.wipro.fhir.data.mongo.care_context.NDHMRequest;
 import com.wipro.fhir.data.mongo.care_context.NDHMResponse;
+import com.wipro.fhir.repo.mongo.generateToken_response.GenerateTokenAbdmResponsesRepo;
 import com.wipro.fhir.repo.mongo.ndhm_response.NDHMResponseRepo;
 import com.wipro.fhir.utils.exception.FHIRException;
 
@@ -43,6 +47,11 @@ public class Common_NDHMServiceImpl implements Common_NDHMService {
 	@Autowired
 	private NDHMResponseRepo nDHMResponseRepo;
 
+	@Autowired
+	private GenerateTokenAbdmResponsesRepo generateTokenAbdmResponsesRepo;
+	
+	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+	
 	/***
 	 * @author SH20094090
 	 * @return headers for the NDHM API's
@@ -149,6 +158,20 @@ public class Common_NDHMServiceImpl implements Common_NDHMService {
 		} else
 			return null;
 	}
+	
+	@Override
+	public GenerateTokenAbdmResponses getLinkToken(String requestId) throws FHIRException {
+		GenerateTokenAbdmResponses res = generateTokenAbdmResponsesRepo.findByRequestId(requestId);
+    	logger.info("Mongo response returned " + res);
+		if(res != null) {
+			return res;
+		} else {
+			return null;
+		}
+		
+	}
+	
+	
 
 	@Override
 	public String getBody(ResponseEntity<String> res) throws FHIRException {

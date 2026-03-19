@@ -30,10 +30,12 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import com.wipro.fhir.data.users.User;
 
 @SpringBootApplication
+@EnableAsync
 public class FhirApiApplication {
 
 	public static void main(String[] args) {

@@ -21,7 +21,6 @@
 */
 package com.wipro.fhir.service.resource_model;
 
-import java.math.BigInteger;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,14 +90,16 @@ public class MedicationRequestResource {
 
 		List<CodeableConcept> conceptList;
 		List<Reference> ref;
+		int index = 0;
 		for (MedicationRequestDataModel obj : medicationRequestList) {
+			index++;
 			medicationRequest = new MedicationRequest();
 
 			codeableConcept = new CodeableConcept();
 			c = new Coding();
 			cList = new ArrayList<>();
 
-			medicationRequest.setId("MedicationRequest/" + commonService.getUUID());
+			medicationRequest.setId("MedicationRequest-" + index + "/" + commonService.getUUID());
 
 			medicationRequest.setStatus(MedicationRequestStatus.ACTIVE);
 			medicationRequest.setIntent(MedicationRequestIntent.ORDER);
@@ -148,9 +149,11 @@ public class MedicationRequestResource {
 			// reason
 			conceptList = new ArrayList<CodeableConcept>();
 			ref = new ArrayList<Reference>();
+			if(conditionDiagnosis != null && conditionDiagnosis.size() > 0) {
 			for (Condition cond : conditionDiagnosis) {
 				ref.add(new Reference(cond.getId()));
 				conceptList.add(cond.getCode());
+			}
 			}
 			medicationRequest.setReasonCode(conceptList);
 			medicationRequest.setReasonReference(ref);

@@ -62,20 +62,20 @@ public class EncounterResource {
 
 	private Encounter encounter;
 
-	public Encounter getEncounterResource(Patient patient, Appointment appointment,
-			ResourceRequestHandler resourceRequestHandler, List<Condition> conditionListChiefComplaints,
+	public Encounter getEncounterResource(Patient patient, ResourceRequestHandler resourceRequestHandler, 
+			List<Condition> conditionListChiefComplaints,
 			List<Condition> conditionListDiagnosis) {
 
 		List<Object[]> rsObjList = patientEligibleForResourceCreationRepo
 				.callEncounterSP(resourceRequestHandler.getBeneficiaryRegID(), resourceRequestHandler.getVisitCode());
 
 		List<EncounterDataModel> encounterList = encounterDataModel.getEncounterList(rsObjList);
-		return generateEncounterResource(patient, appointment, encounterList, conditionListChiefComplaints,
+		return generateEncounterResource(patient, encounterList, conditionListChiefComplaints,
 				conditionListDiagnosis);
 	}
 
-	private Encounter generateEncounterResource(Patient patient, Appointment appointment,
-			List<EncounterDataModel> encounterList, List<Condition> conditionListChiefComplaints,
+	private Encounter generateEncounterResource(Patient patient, List<EncounterDataModel> encounterList, 
+			List<Condition> conditionListChiefComplaints,
 			List<Condition> conditionListDiagnosis) {
 		encounter = new Encounter();
 

@@ -33,9 +33,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wipro.fhir.data.request_handler.ResourceRequestHandler;
-import com.wipro.fhir.service.resource_gateway.DiagnosticReportRecord;
-import com.wipro.fhir.service.resource_gateway.OPConsultRecordBundle;
-import com.wipro.fhir.service.resource_gateway.PrescriptionRecordBundle;
+import com.wipro.fhir.service.bundle_creation.DiagnosticRecordResourceBundle;
+import com.wipro.fhir.service.bundle_creation.OPConsultResourceBundle;
+import com.wipro.fhir.service.bundle_creation.PrescriptionResourceBundle;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.response.OutputResponse;
 
@@ -55,11 +55,11 @@ public class ResourceRequestGateway {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
 	@Autowired
-	private OPConsultRecordBundle opConsultRecordBundle;
+	private OPConsultResourceBundle opConsultRecordBundle;
 	@Autowired
-	private PrescriptionRecordBundle prescriptionRecordBundle;
+	private PrescriptionResourceBundle prescriptionRecordBundle;
 	@Autowired
-	private DiagnosticReportRecord diagnosticReportRecord;
+	private DiagnosticRecordResourceBundle diagnosticReportRecord;
 
 	/***
 	 * 
@@ -78,7 +78,7 @@ public class ResourceRequestGateway {
 
 		OutputResponse response = new OutputResponse();
 		try {
-			String s = opConsultRecordBundle.getOPConsultRecordBundle(patientResourceRequest, null);
+			String s = opConsultRecordBundle.populateOPConsultRecordResourceBundle(patientResourceRequest, null);
 
 			response.setResponse(s);
 		} catch (FHIRException e) {
@@ -104,7 +104,7 @@ public class ResourceRequestGateway {
 
 		OutputResponse response = new OutputResponse();
 		try {
-			String s = diagnosticReportRecord.getDiagnosticReportRecordBundle(patientResourceRequest, null);
+			String s = diagnosticReportRecord.populateDiagnosticReportResourceBundle(patientResourceRequest, null);
 
 			response.setResponse(s);
 		} catch (FHIRException e) {
@@ -129,7 +129,7 @@ public class ResourceRequestGateway {
 
 		OutputResponse response = new OutputResponse();
 		try {
-			String s = prescriptionRecordBundle.getPrescriptionRecordBundle(patientResourceRequest, null);
+			String s = prescriptionRecordBundle.populatePrescriptionResourceBundle(patientResourceRequest, null);
 
 			response.setResponse(s);
 		} catch (FHIRException e) {

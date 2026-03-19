@@ -34,9 +34,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.wipro.fhir.data.request_handler.ResourceRequestHandler;
 import com.wipro.fhir.service.atoms.feed.bahmni.ClinicalFeedWorker;
-import com.wipro.fhir.service.resource_gateway.OPConsultRecordBundle;
-import com.wipro.fhir.service.resource_gateway.OPConsultRecordBundleImpl;
-import com.wipro.fhir.service.resource_gateway.PrescriptionRecordBundleImpl;
+import com.wipro.fhir.service.bundle_creation.OPConsultResourceBundleImpl;
 import com.wipro.fhir.utils.http.HttpUtils;
 import com.wipro.fhir.utils.response.OutputResponse;
 
@@ -50,7 +48,7 @@ public class Test {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 	
 	@Autowired
-	private OPConsultRecordBundleImpl oPConsultRecordBundleImpl;
+	private OPConsultResourceBundleImpl oPConsultRecordBundleImpl;
 
 	@Operation(summary = "Test parse ATOM Feeds")
 	@PostMapping(value = { "/parse/feed/ATOM" })
@@ -59,7 +57,7 @@ public class Test {
 		OutputResponse response = new OutputResponse();
 		String s = null;
 		try {
-			s = oPConsultRecordBundleImpl.getOPConsultRecordBundle(resourceRequestHandler, null);
+			s = oPConsultRecordBundleImpl.populateOPConsultRecordResourceBundle(resourceRequestHandler, null);
 			response.setResponse(s);
 		} catch (Exception e) {
 			logger.error("Unexpected error:" , e);

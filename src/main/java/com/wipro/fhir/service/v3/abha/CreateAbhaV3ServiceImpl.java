@@ -280,7 +280,6 @@ public class CreateAbhaV3ServiceImpl implements CreateAbhaV3Service {
 			DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
 			String formattedTimestamp = now.format(formatter);
 			otp.setTimestamp(formattedTimestamp);
-
 			otp.setTxnId(loginMethod.getTxnId());
 			otp.setOtpValue(encryptedLoginId);
 			
