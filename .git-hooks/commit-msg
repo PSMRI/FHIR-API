@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+
+npx --yes @commitlint/cli@20.4.3 --edit "$1"
