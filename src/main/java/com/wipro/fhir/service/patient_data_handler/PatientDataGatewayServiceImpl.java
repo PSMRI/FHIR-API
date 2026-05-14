@@ -35,6 +35,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.Gson;
 import com.wipro.fhir.data.healthID.BenHealthIDMapping;
@@ -89,8 +90,9 @@ public class PatientDataGatewayServiceImpl implements PatientDataGatewayService 
 	}
 
 	@Override
+	@Transactional(rollbackFor = FHIRException.class)
 	public String generatePatientProfileAMRIT_SaveTo_Mongo(String Authorization) throws FHIRException {
-		
+
 		List<PatientDemographicModel_NDHM_Patient_Profile> ppList = new ArrayList<>();
 
 		List<TRG_PatientResourceData> resultSetList = tRG_PatientResourceData_Repo
@@ -112,9 +114,10 @@ public class PatientDataGatewayServiceImpl implements PatientDataGatewayService 
 	}
 
 	@Override
+	@Transactional(rollbackFor = FHIRException.class)
 	public String generatePatientProfileAMRIT_SaveTo_Mongo(String Authorization,
 			ResourceRequestHandler resourceRequestHandler) throws FHIRException {
-		
+
 		List<PatientDemographicModel_NDHM_Patient_Profile> ppList = new ArrayList<>();
 
 		List<TRG_PatientResourceData> resultSetList = tRG_PatientResourceData_Repo
@@ -291,8 +294,8 @@ public class PatientDataGatewayServiceImpl implements PatientDataGatewayService 
 				address.setState(pd.getI_bendemographics().getStateName());
 
 			if (pd.getI_bendemographics().getAddressLine1() != null
-					|| pd.getI_bendemographics().getAddressLine1() != null
-					|| pd.getI_bendemographics().getAddressLine1() != null) {
+					|| pd.getI_bendemographics().getAddressLine2() != null
+					|| pd.getI_bendemographics().getAddressLine3() != null) {
 				String address1 = (pd.getI_bendemographics().getAddressLine1() != null)
 						? pd.getI_bendemographics().getAddressLine1()
 						: "";

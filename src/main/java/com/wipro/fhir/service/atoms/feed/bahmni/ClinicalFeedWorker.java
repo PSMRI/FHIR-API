@@ -92,7 +92,14 @@ public class ClinicalFeedWorker {
 		if (feed != null && feed.getId() != null && feed.getLinkSelf() != null) {
 
 			String[] arr = feed.getLinkSelf().split("/");
-			pointer = Integer.parseInt(arr[arr.length - 1]);
+			if (arr.length > 0 && !arr[arr.length - 1].isEmpty()) {
+				try {
+					pointer = Integer.parseInt(arr[arr.length - 1]);
+				} catch (NumberFormatException e) {
+					logger.error("Invalid feed page pointer in linkSelf URL: {}", feed.getLinkSelf());
+					pointer = atomsFeedStartPage;
+				}
+			}
 
 		} else if (feed == null
 				|| (feed.getLinkSelf() == null && feed.getLinkVia() == null && feed.getLinkPrevArchive() == null)) {
@@ -173,10 +180,10 @@ public class ClinicalFeedWorker {
 												feedPageCompleted);
 										returnList.add(encounterFullRepresentation);
 									} else
-										throw new Exception("Error in saving clinical data for patient : "
+										throw new FHIRException("Error in saving clinical data for patient : "
 												+ encounterFullRepresentation.getPatientId());
 								} else
-									throw new Exception("Patient ID not available");
+									throw new FHIRException("Patient ID not available");
 							}
 
 						}
@@ -209,23 +216,29 @@ public class ClinicalFeedWorker {
 					if (link.getRel() != null && link.getHref() != null
 							&& link.getRel().equalsIgnoreCase("next-archive")) {
 						String[] arr = link.getHref().split("/");
-						tempPointer = Integer.parseInt(arr[arr.length - 1]);
+						if (arr.length > 0 && !arr[arr.length - 1].isEmpty()) {
+							try {
+								tempPointer = Integer.parseInt(arr[arr.length - 1]);
+							} catch (NumberFormatException e) {
+								logger.error("Invalid next-archive pointer in feed URL: {}", link.getHref());
+							}
+						}
 						break;
-
 					}
 				}
 				pointer = tempPointer;
 
 			} catch (IllegalArgumentException e) {
+				logger.error("Invalid argument while processing feed page {}: {}", pointer, e.getMessage());
 				pointer = 0;
-				
 			} catch (FeedException e) {
+				logger.error("Feed parsing error on page {}: {}", pointer, e.getMessage());
 				pointer = 0;
-				
 			} catch (IOException e) {
+				logger.error("IO error reading feed page {}: {}", pointer, e.getMessage());
 				pointer = 0;
-				
 			} catch (Exception e) {
+				logger.error("Unexpected error processing feed page {}: {}", pointer, e.getMessage());
 				pointer = 0;
 			}
 			nextFeed = true;

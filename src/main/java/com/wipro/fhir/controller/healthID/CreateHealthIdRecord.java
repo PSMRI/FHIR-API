@@ -3,6 +3,8 @@ package com.wipro.fhir.controller.healthID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,9 +35,9 @@ public class CreateHealthIdRecord {
 	 */
 	@Operation(summary = "Map ABHA to beneficiary")
 	@PostMapping(value = { "/mapHealthIDToBeneficiary" })
-	public String mapHealthIDToBeneficiary(
+	public ResponseEntity<String> mapHealthIDToBeneficiary(
 			@RequestBody String request, @RequestHeader(value = "Authorization") String Authorization) {
-		logger.info("NDHM_FHIR Map ABHA to beneficiary API request " + request);
+		logger.info("NDHM_FHIR Map ABHA to beneficiary API request received");
 		OutputResponse response = new OutputResponse();
 		try {
 			if (request != null) {
@@ -45,16 +47,18 @@ public class CreateHealthIdRecord {
 				throw new FHIRException("NDHM_FHIR Empty request object");
 		} catch (FHIRException e) {
 			response.setError(5000, e.getMessage());
-			logger.error(e.toString());
+			logger.error("NDHM_FHIR error mapping ABHA to beneficiary: {}", e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response.toString());
 		}
-		logger.info("NDHM_FHIR Map ABHA to beneficiary API response " + response.toString());
-		return response.toString();
+		logger.info("NDHM_FHIR Map ABHA to beneficiary API response sent successfully");
+		return ResponseEntity.ok(response.toString());
 	}
+
 	@Operation(summary = "Add New health ID record to healthId table")
 	@PostMapping(value = { "/addHealthIdRecord" })
-	public String addRecordToHealthIdTable(
+	public ResponseEntity<String> addRecordToHealthIdTable(
 			@RequestBody String request, @RequestHeader(value = "Authorization") String Authorization) {
-		logger.info("NDHM_FHIR API to add the new health record coming from FLW request " + request);
+		logger.info("NDHM_FHIR API to add new health record request received");
 		OutputResponse response = new OutputResponse();
 		try {
 			if (request != null) {
@@ -64,10 +68,11 @@ public class CreateHealthIdRecord {
 				throw new FHIRException("NDHM_FHIR Empty request object");
 		} catch (FHIRException e) {
 			response.setError(5000, e.getMessage());
-			logger.error(e.toString());
+			logger.error("NDHM_FHIR error adding health record: {}", e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response.toString());
 		}
-		logger.info("NDHM_FHIR API to add the new health record coming from FLW response " + response.toString());
-		return response.toString();
+		logger.info("NDHM_FHIR API to add new health record response sent successfully");
+		return ResponseEntity.ok(response.toString());
 	}
 
 
