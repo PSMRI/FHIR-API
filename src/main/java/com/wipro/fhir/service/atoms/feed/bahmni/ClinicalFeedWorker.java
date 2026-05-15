@@ -94,11 +94,14 @@ public class ClinicalFeedWorker {
 			String[] arr = feed.getLinkSelf().split("/");
 			if (arr.length > 0 && !arr[arr.length - 1].isEmpty()) {
 				try {
-					pointer = Integer.parseInt(arr[arr.length - 1]);
+					int parsedPointer = Integer.parseInt(arr[arr.length - 1]);
+					pointer = parsedPointer > 0 ? parsedPointer : atomsFeedStartPage;
 				} catch (NumberFormatException e) {
 					logger.error("Invalid feed page pointer in linkSelf URL: {}", feed.getLinkSelf());
 					pointer = atomsFeedStartPage;
 				}
+			} else {
+				pointer = atomsFeedStartPage;
 			}
 
 		} else if (feed == null
@@ -210,7 +213,7 @@ public class ClinicalFeedWorker {
 					}
 				}
 
-				int tempPointer = 0;
+				int tempPointer = pointer;
 				for (SyndLink link : feedLink) {
 
 					if (link.getRel() != null && link.getHref() != null
@@ -218,10 +221,17 @@ public class ClinicalFeedWorker {
 						String[] arr = link.getHref().split("/");
 						if (arr.length > 0 && !arr[arr.length - 1].isEmpty()) {
 							try {
-								tempPointer = Integer.parseInt(arr[arr.length - 1]);
+								int parsedPointer = Integer.parseInt(arr[arr.length - 1]);
+								if (parsedPointer > 0) {
+									tempPointer = parsedPointer;
+								} else {
+									logger.error("Non-positive next-archive pointer in feed URL: {}", link.getHref());
+								}
 							} catch (NumberFormatException e) {
 								logger.error("Invalid next-archive pointer in feed URL: {}", link.getHref());
 							}
+						} else {
+							logger.error("Missing next-archive pointer in feed URL: {}", link.getHref());
 						}
 						break;
 					}

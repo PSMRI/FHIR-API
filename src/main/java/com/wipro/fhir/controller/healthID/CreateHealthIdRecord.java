@@ -49,6 +49,10 @@ public class CreateHealthIdRecord {
 			response.setError(5000, e.getMessage());
 			logger.error("NDHM_FHIR error mapping ABHA to beneficiary: {}", e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response.toString());
+		} catch (Exception e) {
+			response.setError(5000, "An unexpected error occurred");
+			logger.error("NDHM_FHIR unexpected error mapping ABHA to beneficiary", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response.toString());
 		}
 		logger.info("NDHM_FHIR Map ABHA to beneficiary API response sent successfully");
 		return ResponseEntity.ok(response.toString());
@@ -69,6 +73,10 @@ public class CreateHealthIdRecord {
 		} catch (FHIRException e) {
 			response.setError(5000, e.getMessage());
 			logger.error("NDHM_FHIR error adding health record: {}", e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response.toString());
+		} catch (Exception e) {
+			response.setError(5000, "An unexpected error occurred");
+			logger.error("NDHM_FHIR unexpected error adding health record", e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response.toString());
 		}
 		logger.info("NDHM_FHIR API to add new health record response sent successfully");
