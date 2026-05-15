@@ -35,6 +35,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.Gson;
 import com.wipro.fhir.data.healthID.BenHealthIDMapping;
@@ -89,32 +90,42 @@ public class PatientDataGatewayServiceImpl implements PatientDataGatewayService 
 	}
 
 	@Override
+	@Transactional(rollbackFor = FHIRException.class)
 	public String generatePatientProfileAMRIT_SaveTo_Mongo(String Authorization) throws FHIRException {
-		
+
 		List<PatientDemographicModel_NDHM_Patient_Profile> ppList = new ArrayList<>();
 
 		List<TRG_PatientResourceData> resultSetList = tRG_PatientResourceData_Repo
 				.getByProcessedOrderByCreatedDateLimit20();
 		ppList = generatePatientProfileFromAMRIT(Authorization, resultSetList);
 
-		ppList = feedPatientProfileToMongoDB(ppList);
+		List<PatientDemographicModel_NDHM_Patient_Profile> savedList = feedPatientProfileToMongoDB(ppList);
 
-		if (ppList != null && ppList.size() > 0) {
+		if (savedList != null && savedList.size() > 0) {
 			List<Long> ids = new ArrayList<>();
 			ids.add((long) 0);
-			for (PatientDemographicModel_NDHM_Patient_Profile pp : ppList) {
+			for (PatientDemographicModel_NDHM_Patient_Profile pp : savedList) {
 				ids.add(pp.getTriggerTableAIId());
 			}
-			tRG_PatientResourceData_Repo.updateProcessedFlagForProfileCreated(ids);
+			try {
+				tRG_PatientResourceData_Repo.updateProcessedFlagForProfileCreated(ids);
+			} catch (Exception e) {
+				// Mongo save succeeded but MySQL update failed — stores are now inconsistent.
+				// Log affected IDs so ops can manually reconcile; re-throw to signal failure.
+				logger.error("MySQL update failed after Mongo save — inconsistent state. Affected IDs: {}. Error: {}", ids, e.getMessage());
+				throw new FHIRException("Failed to update processed flag after Mongo save. " + e.getMessage());
+			}
+			ppList = savedList;
 		}
 
 		return new Gson().toJson(ppList);
 	}
 
 	@Override
+	@Transactional(rollbackFor = FHIRException.class)
 	public String generatePatientProfileAMRIT_SaveTo_Mongo(String Authorization,
 			ResourceRequestHandler resourceRequestHandler) throws FHIRException {
-		
+
 		List<PatientDemographicModel_NDHM_Patient_Profile> ppList = new ArrayList<>();
 
 		List<TRG_PatientResourceData> resultSetList = tRG_PatientResourceData_Repo
@@ -122,15 +133,23 @@ public class PatientDataGatewayServiceImpl implements PatientDataGatewayService 
 
 		ppList = generatePatientProfileFromAMRIT(Authorization, resultSetList);
 
-		ppList = feedPatientProfileToMongoDB(ppList);
+		List<PatientDemographicModel_NDHM_Patient_Profile> savedList = feedPatientProfileToMongoDB(ppList);
 
-		if (ppList != null && ppList.size() > 0) {
+		if (savedList != null && savedList.size() > 0) {
 			List<Long> ids = new ArrayList<>();
 			ids.add((long) 0);
-			for (PatientDemographicModel_NDHM_Patient_Profile pp : ppList) {
+			for (PatientDemographicModel_NDHM_Patient_Profile pp : savedList) {
 				ids.add(pp.getTriggerTableAIId());
 			}
-			tRG_PatientResourceData_Repo.updateProcessedFlagForProfileCreated(ids);
+			try {
+				tRG_PatientResourceData_Repo.updateProcessedFlagForProfileCreated(ids);
+			} catch (Exception e) {
+				// Mongo save succeeded but MySQL update failed — stores are now inconsistent.
+				// Log affected IDs so ops can manually reconcile; re-throw to signal failure.
+				logger.error("MySQL update failed after Mongo save — inconsistent state. Affected IDs: {}. Error: {}", ids, e.getMessage());
+				throw new FHIRException("Failed to update processed flag after Mongo save. " + e.getMessage());
+			}
+			ppList = savedList;
 		}
 
 		return new Gson().toJson(ppList);
@@ -291,8 +310,8 @@ public class PatientDataGatewayServiceImpl implements PatientDataGatewayService 
 				address.setState(pd.getI_bendemographics().getStateName());
 
 			if (pd.getI_bendemographics().getAddressLine1() != null
-					|| pd.getI_bendemographics().getAddressLine1() != null
-					|| pd.getI_bendemographics().getAddressLine1() != null) {
+					|| pd.getI_bendemographics().getAddressLine2() != null
+					|| pd.getI_bendemographics().getAddressLine3() != null) {
 				String address1 = (pd.getI_bendemographics().getAddressLine1() != null)
 						? pd.getI_bendemographics().getAddressLine1()
 						: "";
