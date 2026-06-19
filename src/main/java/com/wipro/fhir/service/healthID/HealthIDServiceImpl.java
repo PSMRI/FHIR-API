@@ -185,6 +185,7 @@ public class HealthIDServiceImpl implements HealthIDService {
 				.collect(Collectors.toList());
 
 		Map<String, Boolean> abhaMap = new HashMap<>();
+		Map<String, HealthIDResponse> healthIdDetailsMap = new HashMap<>();
 		if (!healthIdNumbers.isEmpty()) {
 			List<Object[]> abhaResults = benHealthIDMappingRepo.getIsNewAbhaBatch(healthIdNumbers);
 			for (Object[] row : abhaResults) {
@@ -192,11 +193,23 @@ public class HealthIDServiceImpl implements HealthIDService {
 				Boolean isNewAbha = (Boolean) row[1];
 				abhaMap.put(healthIdNumber, isNewAbha);
 			}
+			for (String hIdNumber : healthIdNumbers) {
+				ArrayList<HealthIDResponse> details = healthIDRepo.getHealthIDDetailsUsingHealthNumber(hIdNumber);
+				if (details != null && !details.isEmpty()) {
+					healthIdDetailsMap.put(hIdNumber, details.get(0));
+				}
+			}
 		}
 
 		for (BenHealthIDMapping healthDetails : healthDetailsList) {
 			Boolean isNew = abhaMap.get(healthDetails.getHealthIdNumber());
 			healthDetails.setNewAbha(Boolean.TRUE.equals(isNew));
+			HealthIDResponse hdResponse = healthIdDetailsMap.get(healthDetails.getHealthIdNumber());
+			if (hdResponse != null) {
+				healthDetails.setName(hdResponse.getName());
+				healthDetails.setGender(hdResponse.getGender());
+				healthDetails.setYearOfBirth(hdResponse.getYearOfBirth());
+			}
 		}
 
 		Map<String, Object> responseMap = new HashMap<>();
