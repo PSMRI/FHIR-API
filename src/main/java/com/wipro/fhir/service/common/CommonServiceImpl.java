@@ -232,56 +232,86 @@ public class CommonServiceImpl implements CommonService {
 				// 1. OP consult resource bundle
 				if (p.getVisitCategory().equalsIgnoreCase("General OPD")
 						|| p.getVisitCategory().equalsIgnoreCase("General OPD (QC)")) {
-					int opConsult = oPConsultResourceBundle.processOpConsultRecordBundle(resourceRequestHandler, p);
-					if (opConsult <= 0)
+					try {
+						int opConsult = oPConsultResourceBundle.processOpConsultRecordBundle(resourceRequestHandler, p);
+						if (opConsult <= 0)
+							processed = false;
+						logger.info(" The value of opConsult proceesed: " + processed);
+					} catch (Exception e) {
 						processed = false;
-					logger.info(" The value of opConsult proceesed: " + processed);
+						logger.error("Op Consult FHIR Resource Bundle failed with error - " + e.getMessage());
+					}
 				}
 
 				// 2. diagnostic report record bundle
 				int hasLabTests = careContextRepo.hasLabtestsDone(p.getVisitCode().toString());
 				if (hasLabTests > 0) {
-					int diagReport = diagnosticReportResourceBundle
-							.processDiagnosticReportRecordBundle(resourceRequestHandler, p);
-					if (diagReport <= 0)
+					try {
+						int diagReport = diagnosticReportResourceBundle
+								.processDiagnosticReportRecordBundle(resourceRequestHandler, p);
+						if (diagReport <= 0)
+							processed = false;
+						logger.info(" The value of diagReport proceesed: " + processed);
+					} catch (Exception e) {
 						processed = false;
-					logger.info(" The value of diagReport proceesed: " + processed);
+						logger.error("Diagnostic Report FHIR Resource Bundle failed with error - " + e.getMessage());
+					}
 				}
 
 				// 3. prescription Bundle
 				int hasPrescription = careContextRepo.hasPrescribedDrugs(p.getVisitCode().toString());
 				if (hasPrescription > 0) {
-					int presp = prescriptionResourceBundle.processPrescriptionRecordBundle(resourceRequestHandler, p);
-					if (presp <= 0)
+					try {
+						int presp = prescriptionResourceBundle.processPrescriptionRecordBundle(resourceRequestHandler, p);
+						if (presp <= 0)
+							processed = false;
+						logger.info(" The value of presp proceesed: " + processed);
+					} catch (Exception e) {
 						processed = false;
-					logger.info(" The value of presp proceesed: " + processed);
+						logger.error("Prescription FHIR Resource Bundle failed with error - " + e.getMessage());
+					}
 				}
 
 				// 4. wellness Bundle
 				int hasPhyVitals = careContextRepo.hasPhyVitals(p.getVisitCode().toString());
 				if (hasPhyVitals > 0) {
-					int wellness = wellnessRecordResourceBundle.processWellnessRecordBundle(resourceRequestHandler, p);
-					if (wellness <= 0)
+					try {
+						int wellness = wellnessRecordResourceBundle.processWellnessRecordBundle(resourceRequestHandler, p);
+						if (wellness <= 0)
+							processed = false;
+						logger.info(" The value of wellness proceesed: " + processed);
+					} catch (Exception e) {
 						processed = false;
-					logger.info(" The value of wellness proceesed: " + processed);
+						logger.error("Wellness FHIR Resource Bundle failed with error - " + e.getMessage());
+					}
 				}
 
 				// 5. Immunization record
 				int hasVaccineDetails = careContextRepo.hasVaccineDetails(p.getVisitCode().toString());
 				if (hasVaccineDetails > 0) {
-					int immunization = immunizationRecordResourceBundle
-							.processImmunizationRecordBundle(resourceRequestHandler, p);
-					if (immunization <= 0)
+					try {
+						int immunization = immunizationRecordResourceBundle
+								.processImmunizationRecordBundle(resourceRequestHandler, p);
+						if (immunization <= 0)
+							processed = false;
+						logger.info(" The value of immunization proceesed: " + processed);
+					} catch (Exception e) {
 						processed = false;
-					logger.info(" The value of immunization proceesed: " + processed);
+						logger.error("Immunization FHIR Resource Bundle failed with error - " + e.getMessage());
+					}
 				}
 
 				// 6. Discharge Summary
-				int dischargeSummary = dischargeSummaryResourceBundle
-						.processDischargeSummaryRecordBundle(resourceRequestHandler, p);
-				if (dischargeSummary <= 0)
+				try {
+					int dischargeSummary = dischargeSummaryResourceBundle
+							.processDischargeSummaryRecordBundle(resourceRequestHandler, p);
+					if (dischargeSummary <= 0)
+						processed = false;
+					logger.info(" The value of dischargeSummary proceesed: " + processed);
+				} catch (Exception e) {
 					processed = false;
-				logger.info(" The value of dischargeSummary proceesed: " + processed);
+					logger.error("Discharge Summary FHIR Resource Bundle failed with error - " + e.getMessage());
+				}
 
 				logger.info(" The value of final proceesed: " + processed);
 
