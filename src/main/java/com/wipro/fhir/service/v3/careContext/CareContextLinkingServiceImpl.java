@@ -129,9 +129,10 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 				generateTokenRequest.setName(careContextLinkRequest.getName());
 				generateTokenRequest.setYearOfBirth(careContextLinkRequest.getYearOfBirth());
 
-				if (careContextLinkRequest.getGender().equalsIgnoreCase("female")) {
+				String gender = careContextLinkRequest.getGender();
+				if ("female".equalsIgnoreCase(gender)) {
 					generateTokenRequest.setGender("F");
-				} else if (careContextLinkRequest.getGender().equalsIgnoreCase("male")) {
+				} else if ("male".equalsIgnoreCase(gender)) {
 					generateTokenRequest.setGender("M");
 				} else {
 					generateTokenRequest.setGender("O");
