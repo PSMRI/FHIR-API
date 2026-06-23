@@ -82,6 +82,7 @@ import com.wipro.fhir.service.bundle_creation.WellnessRecordResourceBundle;
 import com.wipro.fhir.service.ndhm.Common_NDHMService;
 import com.wipro.fhir.service.ndhm.GenerateSession_NDHMService;
 import com.wipro.fhir.service.patient_data_handler.PatientDataGatewayService;
+import com.wipro.fhir.service.v3.abha.GenerateAuthSessionService;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.http.HttpUtils;
 
@@ -151,6 +152,10 @@ public class CommonServiceImpl implements CommonService {
 
 	@Autowired
 	private GenerateSession_NDHMService generateSession_NDHM;
+
+	@Autowired
+	private GenerateAuthSessionService generateAuthSessionService;
+
 	private static int ACCEPTED = 202;
 	@Autowired
 	private PatientDemographic patientDemographic;
@@ -744,7 +749,7 @@ public class CommonServiceImpl implements CommonService {
 	 */
 	public void sendAbdmAdvSMS(String phone) throws FHIRException {
 		try {
-			String ndhmAuthToken = generateSession_NDHM.getNDHMAuthToken();
+			String ndhmAuthToken = generateAuthSessionService.getAbhaAuthToken();
 			HIP hip = new HIP("Piramal Swasthya", clientID);
 			NDHMRequest obj = common_NDHMService.getRequestIDAndTimeStamp();
 			Notification notification = new Notification(phone, hip);
