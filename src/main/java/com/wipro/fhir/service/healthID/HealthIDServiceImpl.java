@@ -209,6 +209,9 @@ public class HealthIDServiceImpl implements HealthIDService {
 				healthDetails.setName(hdResponse.getName());
 				healthDetails.setGender(hdResponse.getGender());
 				healthDetails.setYearOfBirth(hdResponse.getYearOfBirth());
+				if (hdResponse.getHealthId() != null && !hdResponse.getHealthId().isEmpty()) {
+					healthDetails.setHealthId(hdResponse.getHealthId());
+				}
 			}
 		}
 
