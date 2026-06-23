@@ -116,8 +116,11 @@ public class FacilityServiceImpl implements FacilityService{
 		String res = null;
 		try {
 			SaveFacilityIdForVisit requestObj = InputMapper.gson().fromJson(reqObj, SaveFacilityIdForVisit.class);
-			if(requestObj.getAbdmFacilityId() == null || requestObj.getAbdmFacilityId() == "") {
+			if (requestObj.getAbdmFacilityId() == null || requestObj.getAbdmFacilityId().trim().isEmpty()) {
 				requestObj.setAbdmFacilityId(abdmFacilityId);
+			}
+			if (requestObj.getAbdmFacilityId() == null || requestObj.getAbdmFacilityId().trim().isEmpty()) {
+				return "ABDM Facility ID is not configured. Please map the facility before proceeding.";
 			}
 			Integer response = benHealthIDMappingRepo.updateFacilityIdForVisit(requestObj.getVisitCode(), requestObj.getAbdmFacilityId());
 			if(response > 0 ) {

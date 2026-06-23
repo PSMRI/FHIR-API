@@ -153,9 +153,9 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 				}
 
 				String gender = careContextLinkRequest.getGender();
-				if ("female".equalsIgnoreCase(gender)) {
+				if ("female".equalsIgnoreCase(gender) || "F".equalsIgnoreCase(gender)) {
 					generateTokenRequest.setGender("F");
-				} else if ("male".equalsIgnoreCase(gender)) {
+				} else if ("male".equalsIgnoreCase(gender) || "M".equalsIgnoreCase(gender)) {
 					generateTokenRequest.setGender("M");
 				} else {
 					generateTokenRequest.setGender("O");
