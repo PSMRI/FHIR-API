@@ -268,19 +268,22 @@ public class LinkCareContext_NDHMServiceImpl implements LinkCareContext_NDHMServ
 					JsonParser jsnParser = new JsonParser();
 					JsonElement jsnElmnt = jsnParser.parse(addCareContextResponse);
 					jsnOBJ = jsnElmnt.getAsJsonObject();
-					try {
-						if (jsnOBJ.get("Acknowledgement") != null
-								&& jsnOBJ.getAsJsonObject("Acknowledgement").get("Status") != null)
-							successResponse = jsnOBJ.getAsJsonObject("Acknowledgement").get("Status").getAsString();
-						else
-							throw new FHIRException(
-									"NDHM_FHIR " + jsnOBJ.getAsJsonObject("Error").get("Message").getAsString());
-					} catch (Exception e) {
+					// v0.5 callback: {"Acknowledgement":{"Status":"SUCCESS"}}
+					// v3 callback:  {"status":"Successfully Linked care context","response":{...}}
+					if (jsnOBJ.get("Acknowledgement") != null
+							&& jsnOBJ.getAsJsonObject("Acknowledgement").get("Status") != null) {
+						successResponse = jsnOBJ.getAsJsonObject("Acknowledgement").get("Status").getAsString();
+					} else if (jsnOBJ.get("status") != null) {
+						successResponse = jsnOBJ.get("status").getAsString();
+					} else if (jsnOBJ.get("Error") != null
+							&& jsnOBJ.getAsJsonObject("Error").get("Message") != null) {
 						throw new FHIRException(
 								"NDHM_FHIR " + jsnOBJ.getAsJsonObject("Error").get("Message").getAsString());
+					} else {
+						throw new FHIRException("NDHM_FHIR Unexpected care context response: " + addCareContextResponse);
 					}
 
-					if (successResponse.equalsIgnoreCase("success")) {
+					if (successResponse != null && successResponse.toLowerCase().contains("success")) {
 						response = "Care Context added successfully";
 					}
 
