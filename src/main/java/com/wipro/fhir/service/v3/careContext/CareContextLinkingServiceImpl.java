@@ -44,6 +44,8 @@ import com.wipro.fhir.data.v3.careContext.LinkCareContextRequest;
 import com.wipro.fhir.data.v3.careContext.PatientCareContext;
 import com.wipro.fhir.repo.mongo.generateToken_response.GenerateTokenAbdmResponsesRepo;
 import com.wipro.fhir.repo.v3.careContext.CareContextRepo;
+import com.wipro.fhir.repo.healthID.HealthIDRepo;
+import com.wipro.fhir.data.healthID.HealthIDResponse;
 import com.wipro.fhir.data.v3.careContext.AddCareContextRequest;
 import com.wipro.fhir.service.ndhm.Common_NDHMService;
 import com.wipro.fhir.service.v3.abha.GenerateAuthSessionService;
@@ -76,7 +78,10 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 
 	@Autowired
 	private CareContextRepo careContextRepo;
-	
+
+	@Autowired
+	private HealthIDRepo healthIDRepo;
+
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
 	@Override
@@ -127,11 +132,30 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 
 				generateTokenRequest.setAbhaAddress(careContextLinkRequest.getAbhaAddress());
 				generateTokenRequest.setName(careContextLinkRequest.getName());
-				generateTokenRequest.setYearOfBirth(careContextLinkRequest.getYearOfBirth());
 
-				if (careContextLinkRequest.getGender().equalsIgnoreCase("female")) {
+				// Use yearOfBirth from request; fall back to DB lookup if missing/invalid
+				Integer yearOfBirth = careContextLinkRequest.getYearOfBirth();
+				if (yearOfBirth == null || yearOfBirth < 1900 || yearOfBirth > 2200) {
+					try {
+						String abhaAddr = careContextLinkRequest.getAbhaAddress();
+						if (abhaAddr != null && !abhaAddr.isEmpty()) {
+							ArrayList<HealthIDResponse> hdList = healthIDRepo.getHealthIDDetails(abhaAddr);
+							if (hdList != null && !hdList.isEmpty() && hdList.get(0).getYearOfBirth() != null) {
+								yearOfBirth = Integer.parseInt(hdList.get(0).getYearOfBirth());
+							}
+						}
+					} catch (Exception ex) {
+						logger.warn("Could not fetch yearOfBirth from DB: " + ex.getMessage());
+					}
+				}
+				if (yearOfBirth != null && yearOfBirth >= 1900 && yearOfBirth <= 2200) {
+					generateTokenRequest.setYearOfBirth(yearOfBirth);
+				}
+
+				String gender = careContextLinkRequest.getGender();
+				if ("female".equalsIgnoreCase(gender) || "F".equalsIgnoreCase(gender)) {
 					generateTokenRequest.setGender("F");
-				} else if (careContextLinkRequest.getGender().equalsIgnoreCase("male")) {
+				} else if ("male".equalsIgnoreCase(gender) || "M".equalsIgnoreCase(gender)) {
 					generateTokenRequest.setGender("M");
 				} else {
 					generateTokenRequest.setGender("O");
