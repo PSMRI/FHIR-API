@@ -15,6 +15,7 @@ import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Composition.CompositionStatus;
 import org.hl7.fhir.r4.model.Composition.SectionComponent;
 import org.hl7.fhir.r4.model.Condition;
+import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.FamilyMemberHistory;
 import org.hl7.fhir.r4.model.Identifier;
@@ -35,6 +36,7 @@ import com.wipro.fhir.repo.healthID.BenHealthIDMappingRepo;
 import com.wipro.fhir.service.common.CommonService;
 import com.wipro.fhir.service.resource_model.AllergyIntoleranceResource;
 import com.wipro.fhir.service.resource_model.ConditionResource;
+import com.wipro.fhir.service.resource_model.DocumentReferenceResource;
 import com.wipro.fhir.service.resource_model.EncounterResource;
 import com.wipro.fhir.service.resource_model.FamilyMemberHistoryResource;
 import com.wipro.fhir.service.resource_model.MedicalHistoryResource;
@@ -78,6 +80,12 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 	
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
+
+	@Autowired
+	private DocumentReferenceResource documentReferenceResource;
+
+	@Autowired
+	private RecordPdfService recordPdfService;
 	
 	@Value("${hipSystemUrl}")
 	private String systemUrl;
@@ -155,10 +163,21 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 					resourceRequestHandler);
 			
 			List<MedicationStatement> medicationStatement = medicalHistoryResource.getMedicalHistory(patient, resourceRequestHandler);
-			
+
+			// PDF of this consultation, attached as a base64 DocumentReference so the ABHA
+			// app can offer the record as a download. Null when no PDF is available, in
+			// which case the bundle is built exactly as before.
+			byte[] caseSheetPdf = recordPdfService.getOpConsultPdf(patient, organization, practitioner,
+					conditionListChiefComplaints, conditionListDiagnosis, allergyList, familyMemberHistory,
+					medicationStatement);
+			DocumentReference documentReference = documentReferenceResource.getDocumentReference(patient,
+					caseSheetPdf,
+					"Consultation Report",
+					new Coding("http://snomed.info/sct", "371530004", "Clinical consultation report"));
+
 			// composition
-			Composition composition = populateOpConsultComposition(resourceRequestHandler, p, practitioner, organization, conditionListChiefComplaints, 
-					conditionListDiagnosis, allergyList,familyMemberHistory, medicationStatement);
+			Composition composition = populateOpConsultComposition(resourceRequestHandler, p, practitioner, organization, conditionListChiefComplaints,
+					conditionListDiagnosis, allergyList,familyMemberHistory, medicationStatement, documentReference);
 			
 			List<BundleEntryComponent> bundleEnteries = new ArrayList<>();
 			
@@ -218,10 +237,18 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 				BundleEntryComponent bundleEntry9 = new BundleEntryComponent();
 				bundleEntry9.setFullUrl(medStatement.getIdElement().getValue());
 				bundleEntry9.setResource(medStatement);
-				
+
 				bundleEnteries.add(bundleEntry9);
 			}
-			
+
+			if (documentReference != null) {
+				BundleEntryComponent bundleEntry10 = new BundleEntryComponent();
+				bundleEntry10.setFullUrl(documentReference.getIdElement().getValue());
+				bundleEntry10.setResource(documentReference);
+
+				bundleEnteries.add(bundleEntry10);
+			}
+
 			opConsultBundle.setEntry(bundleEnteries);
 			
 			FhirContext ctx = FhirContext.forR4();
@@ -240,7 +267,8 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 	@Override
 	public Composition populateOpConsultComposition(ResourceRequestHandler resourceRequestHandler,PatientEligibleForResourceCreation p, 
 			Practitioner practitioner, Organization organization, List<Condition> conditionListChiefComplaints, List<Condition> conditionListDiagnosis, 
-			List<AllergyIntolerance> allergyList, FamilyMemberHistory familyMemberHistory, List<MedicationStatement> medicationStatement) {
+			List<AllergyIntolerance> allergyList, FamilyMemberHistory familyMemberHistory, List<MedicationStatement> medicationStatement,
+			DocumentReference documentReference) {
 
 		Composition composition = new Composition();
 		composition.setId("Composition/" + commonService.getUUID());
@@ -308,6 +336,19 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 					.addEntry(new Reference().setReference(familyMemberHistory.getIdElement().getValue()));
 			
 			sectionList.add(section5);
+		}
+
+		// Document Reference section — the PDF attachment. Per the ABDM OPConsultRecord
+		// profile this section carries SNOMED 371530004, the same code as Composition.type.
+		if (documentReference != null) {
+			SectionComponent section6 = new SectionComponent();
+			section6.setTitle("Document Reference");
+			section6.setCode(
+					new CodeableConcept(new Coding("http://snomed.info/sct", "371530004", "Clinical consultation report")))
+					.addEntry(new Reference().setReference(documentReference.getIdElement().getValue())
+							.setDisplay("DocumentReference"));
+
+			sectionList.add(section6);
 		}
 
 		composition.setSection(sectionList);

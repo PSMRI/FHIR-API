@@ -139,6 +139,14 @@
 			<artifactId>gson</artifactId>
 		</dependency>
 
+		<!-- Renders the printable case sheet attached to FHIR bundles as a
+		     base64 DocumentReference. Apache-2.0 licensed. -->
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>2.0.31</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.hibernate.javax.persistence</groupId>
 			<artifactId>hibernate-jpa-2.0-api</artifactId>
