@@ -34,7 +34,9 @@ import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.FamilyMemberHistory;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.MedicationStatement;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.slf4j.Logger;
@@ -55,7 +57,8 @@ public class RecordPdfServiceImpl implements RecordPdfService {
 	@Override
 	public byte[] getOpConsultPdf(Patient patient, Organization organization, Practitioner practitioner,
 			List<Condition> chiefComplaints, List<Condition> diagnoses, List<AllergyIntolerance> allergies,
-			FamilyMemberHistory familyHistory, List<MedicationStatement> medications) {
+			FamilyMemberHistory familyHistory, List<MedicationStatement> medications,
+			List<Observation> vitals) {
 
 		try (PDDocument document = new PDDocument(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			PdfWriter writer = new PdfWriter(document);
@@ -86,6 +89,7 @@ public class RecordPdfServiceImpl implements RecordPdfService {
 				writer.keyValue("Attended by", nameOf(practitioner.getNameFirstRep()));
 			}
 
+			writer.bulletSection("Vitals & Anthropometry", observationTexts(vitals));
 			writer.bulletSection("Chief Complaints", conditionTexts(chiefComplaints));
 			writer.bulletSection("Diagnosis", conditionTexts(diagnoses));
 			writer.bulletSection("Allergies", allergyTexts(allergies));
@@ -146,6 +150,41 @@ public class RecordPdfServiceImpl implements RecordPdfService {
 			}
 		}
 		return lines;
+	}
+
+	private List<String> observationTexts(List<Observation> observations) {
+		List<String> lines = new ArrayList<>();
+		if (observations == null) {
+			return lines;
+		}
+		for (Observation observation : observations) {
+			String label = textOf(observation.getCode());
+			String value = observationValue(observation);
+			if (label == null || value == null) {
+				continue;
+			}
+			lines.add(label + ": " + value);
+		}
+		return lines;
+	}
+
+	private String observationValue(Observation observation) {
+		if (observation.hasValueStringType()) {
+			return observation.getValueStringType().getValue();
+		}
+		if (observation.hasValueQuantity()) {
+			Quantity quantity = observation.getValueQuantity();
+			String value = quantity.hasValue() ? quantity.getValue().toPlainString() : null;
+			if (value == null) {
+				return null;
+			}
+			String unit = quantity.hasUnit() ? quantity.getUnit() : quantity.getCode();
+			return unit != null ? value + " " + unit : value;
+		}
+		if (observation.hasValueCodeableConcept()) {
+			return textOf(observation.getValueCodeableConcept());
+		}
+		return null;
 	}
 
 	private List<String> allergyTexts(List<AllergyIntolerance> allergies) {

@@ -8,6 +8,7 @@ import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.FamilyMemberHistory;
 import org.hl7.fhir.r4.model.MedicationStatement;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Practitioner;
 
@@ -21,7 +22,8 @@ public interface OPConsultResourceBundle {
 			PatientEligibleForResourceCreation p, Practitioner practitioner, Organization organization,
 			List<Condition> conditionListChiefComplaints, List<Condition> conditionListDiagnosis,
 			List<AllergyIntolerance> allergyList, FamilyMemberHistory familyMemberHistory,
-			List<MedicationStatement> medicationStatement, DocumentReference documentReference);
+			List<MedicationStatement> medicationStatement, List<Observation> observationVitalList,
+			DocumentReference documentReference);
 
 	int processOpConsultRecordBundle(ResourceRequestHandler resourceRequestHandler,
 			PatientEligibleForResourceCreation p) throws FHIRException;

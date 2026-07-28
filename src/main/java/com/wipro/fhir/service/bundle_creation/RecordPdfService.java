@@ -27,6 +27,7 @@ import org.hl7.fhir.r4.model.AllergyIntolerance;
 import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.FamilyMemberHistory;
 import org.hl7.fhir.r4.model.MedicationStatement;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Practitioner;
@@ -48,5 +49,6 @@ public interface RecordPdfService {
 	 */
 	byte[] getOpConsultPdf(Patient patient, Organization organization, Practitioner practitioner,
 			List<Condition> chiefComplaints, List<Condition> diagnoses, List<AllergyIntolerance> allergies,
-			FamilyMemberHistory familyHistory, List<MedicationStatement> medications);
+			FamilyMemberHistory familyHistory, List<MedicationStatement> medications,
+			List<Observation> vitals);
 }

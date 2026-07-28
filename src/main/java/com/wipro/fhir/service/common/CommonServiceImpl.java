@@ -377,6 +377,24 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	public int saveResourceToMongo(AMRIT_ResourceMongo aMRIT_Resource) throws FHIRException {
+		if (aMRIT_Resource.getVisitCode() != null && aMRIT_Resource.getResourceType() != null) {
+			List<AMRIT_ResourceMongo> existing = aMRIT_ResourceMongoRepo
+					.findByVisitCodeAndResourceType(aMRIT_Resource.getVisitCode(), aMRIT_Resource.getResourceType());
+			if (existing != null && !existing.isEmpty()) {
+				aMRIT_Resource.setId(existing.get(0).getId());
+				// Keep the original capture time — consent date ranges are matched against it.
+				if (existing.get(0).getCreateDate() != null) {
+					aMRIT_Resource.setCreateDate(existing.get(0).getCreateDate());
+				}
+				// Clean up copies stored before this became idempotent.
+				if (existing.size() > 1) {
+					logger.warn("Removing " + (existing.size() - 1) + " duplicate " + aMRIT_Resource.getResourceType()
+							+ " bundle(s) for visit " + aMRIT_Resource.getVisitCode());
+					aMRIT_ResourceMongoRepo.deleteAll(existing.subList(1, existing.size()));
+				}
+			}
+		}
+
 		AMRIT_ResourceMongo resultSet = aMRIT_ResourceMongoRepo.save(aMRIT_Resource);
 
 		if (resultSet.getId() != null)

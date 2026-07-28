@@ -19,9 +19,11 @@ import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.FamilyMemberHistory;
 import org.hl7.fhir.r4.model.MedicationStatement;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.StringType;
 import org.junit.jupiter.api.Test;
 
 import com.wipro.fhir.service.bundle_creation.RecordPdfServiceImpl;
@@ -42,6 +44,14 @@ class PdfAttachmentTest {
 		f.setAccessible(true);
 		f.set(r, stub);
 		return r;
+	}
+
+	private Observation vital(String label, String value) {
+		Observation o = new Observation();
+		o.setId("Observation/" + label.hashCode());
+		o.setCode(new CodeableConcept().setText(label));
+		o.setValue(new StringType(value));
+		return o;
 	}
 
 	private Condition condition(String text) {
@@ -72,7 +82,8 @@ class PdfAttachmentTest {
 		byte[] pdf = new RecordPdfServiceImpl().getOpConsultPdf(patient, org, doctor,
 				Collections.singletonList(condition("Fever since 3 days")),
 				Collections.singletonList(condition("Viral fever")), Collections.singletonList(allergy),
-				new FamilyMemberHistory(), Collections.singletonList(med));
+				new FamilyMemberHistory(), Collections.singletonList(med),
+				Arrays.asList(vital("Body height", "160 cm"), vital("Systolic blood pressure", "120 mm[Hg]")));
 
 		assertNotNull(pdf, "a PDF should be produced");
 		assertTrue(new String(Arrays.copyOf(pdf, 5)).startsWith("%PDF"), "must be a real PDF");
@@ -89,6 +100,8 @@ class PdfAttachmentTest {
 			assertTrue(text.contains("Viral fever"));
 			assertTrue(text.contains("Penicillin"));
 			assertTrue(text.contains("Paracetamol 500mg"));
+			assertTrue(text.contains("Body height: 160 cm"), "vitals are on the case sheet");
+			assertTrue(text.contains("Systolic blood pressure: 120 mm[Hg]"));
 			assertTrue(text.contains("Not recorded"), "empty sections are labelled");
 		}
 	}
@@ -100,7 +113,7 @@ class PdfAttachmentTest {
 		patient.setId("Patient/9");
 		patient.addName().setText("अमृत रोगी");
 
-		byte[] pdf = new RecordPdfServiceImpl().getOpConsultPdf(patient, null, null, null, null, null, null, null);
+		byte[] pdf = new RecordPdfServiceImpl().getOpConsultPdf(patient, null, null, null, null, null, null, null, null);
 
 		assertNotNull(pdf, "a non-Latin name must not prevent PDF generation");
 		try (PDDocument opened = PDDocument.load(new ByteArrayInputStream(pdf))) {

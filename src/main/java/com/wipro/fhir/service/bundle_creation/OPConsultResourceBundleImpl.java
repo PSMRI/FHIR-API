@@ -21,6 +21,7 @@ import org.hl7.fhir.r4.model.FamilyMemberHistory;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MedicationStatement;
 import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Practitioner;
@@ -40,6 +41,7 @@ import com.wipro.fhir.service.resource_model.DocumentReferenceResource;
 import com.wipro.fhir.service.resource_model.EncounterResource;
 import com.wipro.fhir.service.resource_model.FamilyMemberHistoryResource;
 import com.wipro.fhir.service.resource_model.MedicalHistoryResource;
+import com.wipro.fhir.service.resource_model.ObservationResource;
 import com.wipro.fhir.service.resource_model.OrganizationResource;
 import com.wipro.fhir.service.resource_model.PatientResource;
 import com.wipro.fhir.service.resource_model.PractitionerResource;
@@ -80,6 +82,9 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 	
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
+
+	@Autowired
+	private ObservationResource observationResource;
 
 	@Autowired
 	private DocumentReferenceResource documentReferenceResource;
@@ -164,12 +169,12 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 			
 			List<MedicationStatement> medicationStatement = medicalHistoryResource.getMedicalHistory(patient, resourceRequestHandler);
 
-			// PDF of this consultation, attached as a base64 DocumentReference so the ABHA
-			// app can offer the record as a download. Null when no PDF is available, in
-			// which case the bundle is built exactly as before.
+			List<Observation> observationVitalList = observationResource.getObservationVitals(patient,
+					resourceRequestHandler);
+
 			byte[] caseSheetPdf = recordPdfService.getOpConsultPdf(patient, organization, practitioner,
 					conditionListChiefComplaints, conditionListDiagnosis, allergyList, familyMemberHistory,
-					medicationStatement);
+					medicationStatement, observationVitalList);
 			DocumentReference documentReference = documentReferenceResource.getDocumentReference(patient,
 					caseSheetPdf,
 					"Consultation Report",
@@ -177,7 +182,8 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 
 			// composition
 			Composition composition = populateOpConsultComposition(resourceRequestHandler, p, practitioner, organization, conditionListChiefComplaints,
-					conditionListDiagnosis, allergyList,familyMemberHistory, medicationStatement, documentReference);
+					conditionListDiagnosis, allergyList,familyMemberHistory, medicationStatement, observationVitalList,
+					documentReference);
 			
 			List<BundleEntryComponent> bundleEnteries = new ArrayList<>();
 			
@@ -241,12 +247,20 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 				bundleEnteries.add(bundleEntry9);
 			}
 
-			if (documentReference != null) {
+			for (Observation obsVital : observationVitalList) {
 				BundleEntryComponent bundleEntry10 = new BundleEntryComponent();
-				bundleEntry10.setFullUrl(documentReference.getIdElement().getValue());
-				bundleEntry10.setResource(documentReference);
+				bundleEntry10.setFullUrl(obsVital.getIdElement().getValue());
+				bundleEntry10.setResource(obsVital);
 
 				bundleEnteries.add(bundleEntry10);
+			}
+
+			if (documentReference != null) {
+				BundleEntryComponent bundleEntry11 = new BundleEntryComponent();
+				bundleEntry11.setFullUrl(documentReference.getIdElement().getValue());
+				bundleEntry11.setResource(documentReference);
+
+				bundleEnteries.add(bundleEntry11);
 			}
 
 			opConsultBundle.setEntry(bundleEnteries);
@@ -268,7 +282,7 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 	public Composition populateOpConsultComposition(ResourceRequestHandler resourceRequestHandler,PatientEligibleForResourceCreation p, 
 			Practitioner practitioner, Organization organization, List<Condition> conditionListChiefComplaints, List<Condition> conditionListDiagnosis, 
 			List<AllergyIntolerance> allergyList, FamilyMemberHistory familyMemberHistory, List<MedicationStatement> medicationStatement,
-			DocumentReference documentReference) {
+			List<Observation> observationVitalList, DocumentReference documentReference) {
 
 		Composition composition = new Composition();
 		composition.setId("Composition/" + commonService.getUUID());
@@ -338,8 +352,19 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 			sectionList.add(section5);
 		}
 
-		// Document Reference section — the PDF attachment. Per the ABDM OPConsultRecord
-		// profile this section carries SNOMED 371530004, the same code as Composition.type.
+		if (observationVitalList != null && !observationVitalList.isEmpty()) {
+			SectionComponent sectionVitals = new SectionComponent();
+			sectionVitals.setTitle("Other Observations");
+			sectionVitals.setCode(
+					new CodeableConcept(new Coding("http://snomed.info/sct", "404684003", "Clinical finding")));
+			for (Observation obsVital : observationVitalList) {
+				sectionVitals.addEntry(new Reference().setReference(obsVital.getIdElement().getValue())
+						.setType("Observation"));
+			}
+
+			sectionList.add(sectionVitals);
+		}
+
 		if (documentReference != null) {
 			SectionComponent section6 = new SectionComponent();
 			section6.setTitle("Document Reference");

@@ -218,6 +218,12 @@ public class ObservationResource {
 			}
 		}
 
+		if (patient != null) {
+			for (Observation obs : observationList) {
+				obs.setSubject(new Reference(patient.getIdElement().getValue()));
+			}
+		}
+
 		return observationList;
 
 	}
