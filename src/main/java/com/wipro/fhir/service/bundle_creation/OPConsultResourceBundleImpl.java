@@ -124,7 +124,7 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 		String serializeBundle = null;
 		
 		try {
-			String id = resourceRequestHandler.getVisitCode()+ ":" + commonService.getUUID();
+			String id = resourceRequestHandler.getVisitCode() + "-" + commonService.getUUID();
 			opConsultBundle.setId(id);
 			opConsultBundle.setType(BundleType.DOCUMENT);
 			opConsultBundle.setTimestamp(new Timestamp(System.currentTimeMillis()));
@@ -232,7 +232,7 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 				bundleEnteries.add(bundleEntry7);
 			}
 			
-			if(familyMemberHistory.getId() != null) {
+			if (familyMemberHistory.hasRelationship()) {
 				BundleEntryComponent bundleEntry8 = new BundleEntryComponent();
 				bundleEntry8.setFullUrl(familyMemberHistory.getIdElement().getValue());
 				bundleEntry8.setResource(familyMemberHistory);
@@ -304,45 +304,53 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 		
 		List<SectionComponent> sectionList = new ArrayList<SectionComponent>();
 		
-		for(Condition condition: conditionListChiefComplaints) {
+		// One section per kind of content, with every resource of that kind as an entry.
+		// Emitting a fresh section per resource instead repeats the same section title,
+		// which the ABHA app renders as duplicate pages.
 		SectionComponent section1 = new SectionComponent();
-		section1.setTitle("Chief complaints");      
-		section1.setCode(new CodeableConcept(new Coding("http://snomed.info/sct", "422843007", "Chief complaint section")))
-				.addEntry(new Reference().setReference(condition.getIdElement().getValue()));
-		
-		sectionList.add(section1);
+		section1.setTitle("Chief complaints");
+		section1.setCode(new CodeableConcept(new Coding("http://snomed.info/sct", "422843007", "Chief complaint section")));
+		for(Condition condition: conditionListChiefComplaints) {
+			section1.addEntry(new Reference().setReference(condition.getIdElement().getValue()));
 		}
-		
-		for(Condition diagnosis: conditionListDiagnosis) {
+		if (section1.hasEntry()) {
+			sectionList.add(section1);
+		}
+
 		SectionComponent section2 = new SectionComponent();
 		section2.setTitle("Physical diagnosis");
-		section2.setCode(new CodeableConcept(new Coding("http://snomed.info/sct", "425044008", "Physical exam section")))
-				.addEntry(new Reference().setReference(diagnosis.getIdElement().getValue()));
-		
-		sectionList.add(section2);
+		section2.setCode(new CodeableConcept(new Coding("http://snomed.info/sct", "425044008", "Physical exam section")));
+		for(Condition diagnosis: conditionListDiagnosis) {
+			section2.addEntry(new Reference().setReference(diagnosis.getIdElement().getValue()));
+		}
+		if (section2.hasEntry()) {
+			sectionList.add(section2);
 		}
 
-		for(AllergyIntolerance allergy: allergyList) {
 		SectionComponent section3 = new SectionComponent();
-		section3.setTitle("Allergies");  
-		section3.setCode(new CodeableConcept(new Coding("http://snomed.info/sct", "722446000", "Allergy record")))
-				.addEntry(new Reference().setReference(allergy.getIdElement().getValue()));
-		
-		sectionList.add(section3);
+		section3.setTitle("Allergies");
+		section3.setCode(new CodeableConcept(new Coding("http://snomed.info/sct", "722446000", "Allergy record")));
+		for(AllergyIntolerance allergy: allergyList) {
+			section3.addEntry(new Reference().setReference(allergy.getIdElement().getValue()));
+		}
+		if (section3.hasEntry()) {
+			sectionList.add(section3);
 		}
 
-		for(MedicationStatement medStatement: medicationStatement) {
 		SectionComponent section4 = new SectionComponent();
 		section4.setTitle("Medical History");
 		section4.setCode(
-				new CodeableConcept(new Coding("http://snomed.info/sct", "371529009", "History and physical report")))
-				.addEntry(new Reference().setReference(medStatement.getIdElement().getValue()));
-		
-		sectionList.add(section4);
+				new CodeableConcept(new Coding("http://snomed.info/sct", "371529009", "History and physical report")));
+		for(MedicationStatement medStatement: medicationStatement) {
+			section4.addEntry(new Reference().setReference(medStatement.getIdElement().getValue()));
 		}
+		if (section4.hasEntry()) {
+			sectionList.add(section4);
+		}
+
+
 		
-		
-		if(familyMemberHistory.getId() != null) {
+		if (familyMemberHistory.hasRelationship()) {
 			SectionComponent section5 = new SectionComponent();
 			section5.setTitle("Family history");
 			section5.setCode(

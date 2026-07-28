@@ -221,7 +221,7 @@ public class RecordPdfServiceImpl implements RecordPdfService {
 
 	private List<String> familyHistoryTexts(FamilyMemberHistory familyHistory) {
 		List<String> lines = new ArrayList<>();
-		if (familyHistory == null || familyHistory.getId() == null) {
+		if (familyHistory == null || !familyHistory.hasRelationship()) {
 			return lines;
 		}
 		String relationship = textOf(familyHistory.getRelationship());

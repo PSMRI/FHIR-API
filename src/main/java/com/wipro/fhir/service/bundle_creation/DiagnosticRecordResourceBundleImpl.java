@@ -95,7 +95,7 @@ public class DiagnosticRecordResourceBundleImpl implements DiagnosticRecordResou
 		String serializeBundle;
 
 		try {
-			String id = resourceRequestHandler.getVisitCode() + ":" + commonService.getUUID();
+			String id = resourceRequestHandler.getVisitCode() + "-" + commonService.getUUID();
 			diagReportBundle.setId(id);
 			diagReportBundle.setType(Bundle.BundleType.DOCUMENT);
 			diagReportBundle.setTimestamp(new Timestamp(System.currentTimeMillis()));

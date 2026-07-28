@@ -88,7 +88,7 @@ public class ImmunizationRecordResourceBundleImpl implements ImmunizationRecordR
 		String serializeBundle = null;
 
 		try {
-			String id = resourceRequestHandler.getVisitCode() + ":" + commonService.getUUID();
+			String id = resourceRequestHandler.getVisitCode() + "-" + commonService.getUUID();
 			diagReportBundle.setId(id);
 			diagReportBundle.setType(Bundle.BundleType.DOCUMENT);
 			diagReportBundle.setTimestamp(new Timestamp(System.currentTimeMillis()));

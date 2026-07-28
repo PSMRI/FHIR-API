@@ -85,7 +85,7 @@ public class WellnessRecordResourceBundleImpl implements WellnessRecordResourceB
 
 		try {
 
-			String id = resourceRequestHandler.getVisitCode() + ":" + commonService.getUUID();
+			String id = resourceRequestHandler.getVisitCode() + "-" + commonService.getUUID();
 			wellnessBundle.setId(id);
 			wellnessBundle.setType(Bundle.BundleType.DOCUMENT);
 			wellnessBundle.setTimestamp(new Timestamp(System.currentTimeMillis()));

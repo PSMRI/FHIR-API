@@ -77,7 +77,7 @@ public class FamilyMemberHistoryResource {
 			List<FamilyMemberHistoryDataModel> familyMemberHistoryList) {
 		familyMemberHistory = new FamilyMemberHistory();
 		UUID = commonServiceImpl.getUUID();
-		familyMemberHistory.setId(UUID);
+		familyMemberHistory.setId("FamilyMemberHistory/" + UUID);
 
 		familyMemberHistory.setStatus(FamilyHistoryStatus.HEALTHUNKNOWN);
 
@@ -151,8 +151,10 @@ public class FamilyMemberHistoryResource {
 
 		}
 
-		ccRelation.setCoding(cRelationList);
-		familyMemberHistory.setRelationship(ccRelation);
+		if (!cRelationList.isEmpty()) {
+			ccRelation.setCoding(cRelationList);
+			familyMemberHistory.setRelationship(ccRelation);
+		}
 
 		familyMemberHistory.setCondition(fmhccList);
 

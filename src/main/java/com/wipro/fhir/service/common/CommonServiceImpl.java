@@ -83,6 +83,7 @@ import com.wipro.fhir.service.ndhm.Common_NDHMService;
 import com.wipro.fhir.service.ndhm.GenerateSession_NDHMService;
 import com.wipro.fhir.service.patient_data_handler.PatientDataGatewayService;
 import com.wipro.fhir.service.v3.abha.GenerateAuthSessionService;
+import com.wipro.fhir.utils.VisitCategory;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.http.HttpUtils;
 
@@ -235,8 +236,7 @@ public class CommonServiceImpl implements CommonService {
 				boolean processed = true;
 
 				// 1. OP consult resource bundle
-				if (p.getVisitCategory().equalsIgnoreCase("General OPD")
-						|| p.getVisitCategory().equalsIgnoreCase("General OPD (QC)")) {
+				if (VisitCategory.isOpConsult(p.getVisitCategory())) {
 					try {
 						int opConsult = oPConsultResourceBundle.processOpConsultRecordBundle(resourceRequestHandler, p);
 						if (opConsult <= 0)

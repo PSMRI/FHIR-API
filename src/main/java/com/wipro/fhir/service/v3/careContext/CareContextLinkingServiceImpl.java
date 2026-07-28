@@ -49,6 +49,7 @@ import com.wipro.fhir.data.healthID.HealthIDResponse;
 import com.wipro.fhir.data.v3.careContext.AddCareContextRequest;
 import com.wipro.fhir.service.ndhm.Common_NDHMService;
 import com.wipro.fhir.service.v3.abha.GenerateAuthSessionService;
+import com.wipro.fhir.utils.VisitCategory;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.mapper.InputMapper;
 
@@ -391,9 +392,7 @@ public class CareContextLinkingServiceImpl implements CareContextLinkingService 
 	public String[] findHiTypes(String visitCode, String visitCategory) {
 
 		List<String> hiTypes = new ArrayList<>();
-		if (visitCategory.equalsIgnoreCase("General OPD")) {
-			hiTypes.add("OPConsultation");
-		} else if (visitCategory.equalsIgnoreCase("General OPD (QC)")) {
+		if (VisitCategory.isOpConsult(visitCategory)) {
 			hiTypes.add("OPConsultation");
 		}
 		hiTypes.add("DischargeSummary");

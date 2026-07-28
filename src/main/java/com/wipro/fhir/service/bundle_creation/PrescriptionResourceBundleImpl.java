@@ -90,7 +90,7 @@ public class PrescriptionResourceBundleImpl implements PrescriptionResourceBundl
 		String serializeBundle = null;
 		
 		try {
-			String id = resourceRequestHandler.getVisitCode()+ ":" + commonService.getUUID();
+			String id = resourceRequestHandler.getVisitCode() + "-" + commonService.getUUID();
 			prescriptionBundle.setId(id);
 			prescriptionBundle.setType(BundleType.DOCUMENT);
 			prescriptionBundle.setTimestamp(new Timestamp(System.currentTimeMillis()));

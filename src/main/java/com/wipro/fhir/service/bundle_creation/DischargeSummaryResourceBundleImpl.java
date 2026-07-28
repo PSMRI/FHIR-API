@@ -128,7 +128,7 @@ public class DischargeSummaryResourceBundleImpl implements DischargeSummaryResou
 		
 		
 		try {
-			String id = resourceRequestHandler.getVisitCode()+ ":" + commonService.getUUID();
+			String id = resourceRequestHandler.getVisitCode() + "-" + commonService.getUUID();
 			dischargeSummaryBundle.setId(id);
 			dischargeSummaryBundle.setType(BundleType.DOCUMENT);
 			dischargeSummaryBundle.setTimestamp(new Timestamp(System.currentTimeMillis()));
@@ -235,7 +235,7 @@ public class DischargeSummaryResourceBundleImpl implements DischargeSummaryResou
 				bundleEnteries.add(bundleEntry7);
 			}
 			
-			if(familyMemberHistory.getId() != null) {
+			if (familyMemberHistory.hasRelationship()) {
 				BundleEntryComponent bundleEntry8 = new BundleEntryComponent();
 				bundleEntry8.setFullUrl(familyMemberHistory.getIdElement().getValue());
 				bundleEntry8.setResource(familyMemberHistory);
@@ -328,40 +328,40 @@ public class DischargeSummaryResourceBundleImpl implements DischargeSummaryResou
 
 		List<SectionComponent> sectionList = new ArrayList<>();
 
-		// 1) Chief complaints (Condition) – SNOMED 422843007
-		if (chiefComplaints != null) {
+			// 1) Chief complaints (Condition) – SNOMED 422843007
+		if (chiefComplaints != null && !chiefComplaints.isEmpty()) {
+			SectionComponent s = new SectionComponent();
+			s.setTitle("Chief complaints");
+			s.setCode(new CodeableConcept().addCoding(
+					new Coding("http://snomed.info/sct", "422843007", "Chief complaint section")));
 			for (Condition condition : chiefComplaints) {
-				SectionComponent s = new SectionComponent();
-				s.setTitle("Chief complaints");
-				s.setCode(new CodeableConcept().addCoding(
-						new Coding("http://snomed.info/sct", "422843007", "Chief complaint section")));
 				s.addEntry(new Reference(condition.getIdElement().getValue()));
-				sectionList.add(s);
 			}
+			sectionList.add(s);
 		}
 
 		// 2) Physical examination (Observation) – SNOMED 425044008
-		if (physicalExam != null) {
+		if (physicalExam != null && !physicalExam.isEmpty()) {
+			SectionComponent s = new SectionComponent();
+			s.setTitle("Physical examination");
+			s.setCode(new CodeableConcept().addCoding(
+					new Coding("http://snomed.info/sct", "425044008", "Physical exam section")));
 			for (Condition obs : physicalExam) {
-				SectionComponent s = new SectionComponent();
-				s.setTitle("Physical examination");
-				s.setCode(new CodeableConcept().addCoding(
-						new Coding("http://snomed.info/sct", "425044008", "Physical exam section")));
 				s.addEntry(new Reference(obs.getIdElement().getValue()));
-				sectionList.add(s);
 			}
+			sectionList.add(s);
 		}
 
 		// 3) Allergies (AllergyIntolerance) – SNOMED 722446000
-		if (allergyList != null) {
+		if (allergyList != null && !allergyList.isEmpty()) {
+			SectionComponent s = new SectionComponent();
+			s.setTitle("Allergies");
+			s.setCode(new CodeableConcept().addCoding(
+					new Coding("http://snomed.info/sct", "722446000", "Allergy record")));
 			for (AllergyIntolerance allergy : allergyList) {
-				SectionComponent s = new SectionComponent();
-				s.setTitle("Allergies");
-				s.setCode(new CodeableConcept().addCoding(
-						new Coding("http://snomed.info/sct", "722446000", "Allergy record")));
 				s.addEntry(new Reference(allergy.getIdElement().getValue()));
-				sectionList.add(s);
 			}
+			sectionList.add(s);
 		}
 
 		// 4) Past medical history (Condition|Procedure) – SNOMED 1003642006
@@ -380,7 +380,7 @@ public class DischargeSummaryResourceBundleImpl implements DischargeSummaryResou
 		}
 
 		// 5) Family history (FamilyMemberHistory) – SNOMED 422432008
-		if (familyMemberHistory != null && familyMemberHistory.getId() != null) {
+		if (familyMemberHistory != null && familyMemberHistory.hasRelationship()) {
 			SectionComponent s = new SectionComponent();
 			s.setTitle("Family history");
 			s.setCode(new CodeableConcept().addCoding(
@@ -405,15 +405,15 @@ public class DischargeSummaryResourceBundleImpl implements DischargeSummaryResou
 		}
 
 		// 7) Medications (MedicationRequest) – SNOMED 1003606003
-		if (medicationRequests != null) {
+		if (medicationRequests != null && !medicationRequests.isEmpty()) {
+			SectionComponent s = new SectionComponent();
+			s.setTitle("Medications");
+			s.setCode(new CodeableConcept().addCoding(
+					new Coding("http://snomed.info/sct", "1003606003", "Medication history section")));
 			for (MedicationRequest mr : medicationRequests) {
-				SectionComponent s = new SectionComponent();
-				s.setTitle("Medications");
-				s.setCode(new CodeableConcept().addCoding(
-						new Coding("http://snomed.info/sct", "1003606003", "Medication history section")));
 				s.addEntry(new Reference(mr.getIdElement().getValue()));
-				sectionList.add(s);
 			}
+			sectionList.add(s);
 		}
 
   
