@@ -15,6 +15,7 @@ import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Composition.CompositionStatus;
 import org.hl7.fhir.r4.model.Composition.SectionComponent;
 import org.hl7.fhir.r4.model.Condition;
+import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.FamilyMemberHistory;
 import org.hl7.fhir.r4.model.Identifier;
@@ -78,7 +79,10 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 	
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
-	
+
+	@Autowired
+	private ConsultationReportPdfService consultationReportPdfService;
+
 	@Value("${hipSystemUrl}")
 	private String systemUrl;
 	
@@ -157,9 +161,14 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 			List<MedicationStatement> medicationStatement = medicalHistoryResource.getMedicalHistory(patient, resourceRequestHandler);
 			
 			// composition
-			Composition composition = populateOpConsultComposition(resourceRequestHandler, p, practitioner, organization, conditionListChiefComplaints, 
+			Composition composition = populateOpConsultComposition(resourceRequestHandler, p, practitioner, organization, conditionListChiefComplaints,
 					conditionListDiagnosis, allergyList,familyMemberHistory, medicationStatement);
-			
+
+			// consolidated consultation report, as a downloadable PDF attachment
+			DocumentReference documentReference = consultationReportPdfService
+					.getConsultationReportDocumentReference(resourceRequestHandler, patient);
+			consultationReportPdfService.addDocumentReferenceSection(composition, documentReference);
+
 			List<BundleEntryComponent> bundleEnteries = new ArrayList<>();
 			
 			BundleEntryComponent bundleEntry1 = new BundleEntryComponent();
@@ -221,7 +230,15 @@ public class OPConsultResourceBundleImpl implements OPConsultResourceBundle {
 				
 				bundleEnteries.add(bundleEntry9);
 			}
-			
+
+			if (documentReference != null) {
+				BundleEntryComponent bundleEntry10 = new BundleEntryComponent();
+				bundleEntry10.setFullUrl(documentReference.getIdElement().getValue());
+				bundleEntry10.setResource(documentReference);
+
+				bundleEnteries.add(bundleEntry10);
+			}
+
 			opConsultBundle.setEntry(bundleEnteries);
 			
 			FhirContext ctx = FhirContext.forR4();

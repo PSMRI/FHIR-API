@@ -13,6 +13,7 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Composition.CompositionStatus;
 import org.hl7.fhir.r4.model.Composition.SectionComponent;
+import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Meta;
@@ -55,7 +56,10 @@ public class PrescriptionResourceBundleImpl implements PrescriptionResourceBundl
 	private OrganizationResource organizationResource;
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
-	
+
+	@Autowired
+	private ConsultationReportPdfService consultationReportPdfService;
+
 	@Value("${hipSystemUrl}")
 	private String systemUrl;
 	
@@ -118,7 +122,14 @@ public class PrescriptionResourceBundleImpl implements PrescriptionResourceBundl
 					resourceRequestHandler, practitioner, null);
 			// composition
 			Composition composition = populatePrescriptionComposition(resourceRequestHandler, p, medicationRequest, practitioner, organization);
-			
+
+			// consolidated consultation report, as a downloadable PDF attachment. The
+			// PrescriptionRecord profile defines a single section, so the document goes in
+			// as an entry of that section rather than as a section of its own.
+			DocumentReference documentReference = consultationReportPdfService
+					.getConsultationReportDocumentReference(resourceRequestHandler, patient);
+			consultationReportPdfService.addDocumentReferenceEntry(composition, documentReference);
+
 			List<BundleEntryComponent> bundleEnteries = new ArrayList<>();
 			
 			BundleEntryComponent bundleEntry1 = new BundleEntryComponent();
@@ -149,7 +160,15 @@ public class PrescriptionResourceBundleImpl implements PrescriptionResourceBundl
 
 				bundleEnteries.add(bundleEntry5);
 			}
-			
+
+			if (documentReference != null) {
+				BundleEntryComponent bundleEntry6 = new BundleEntryComponent();
+				bundleEntry6.setFullUrl(documentReference.getIdElement().getValue());
+				bundleEntry6.setResource(documentReference);
+
+				bundleEnteries.add(bundleEntry6);
+			}
+
 			prescriptionBundle.setEntry(bundleEnteries);
 			
 			FhirContext ctx = FhirContext.forR4();

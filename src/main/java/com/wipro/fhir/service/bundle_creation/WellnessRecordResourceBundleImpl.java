@@ -11,6 +11,7 @@ import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
+import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Observation;
@@ -55,6 +56,9 @@ public class WellnessRecordResourceBundleImpl implements WellnessRecordResourceB
 
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
+
+	@Autowired
+	private ConsultationReportPdfService consultationReportPdfService;
 
 	@Value("${hipSystemUrl}")
 	private String systemUrl;
@@ -113,6 +117,11 @@ public class WellnessRecordResourceBundleImpl implements WellnessRecordResourceB
 			Composition composition = populateWellnessRecordComposition(resourceRequestHandler, p, practitioner,
 					organization, observationVitalList);
 
+			// consolidated consultation report, as a downloadable PDF attachment
+			DocumentReference documentReference = consultationReportPdfService
+					.getConsultationReportDocumentReference(resourceRequestHandler, patient);
+			consultationReportPdfService.addDocumentReferenceSection(composition, documentReference);
+
 			List<BundleEntryComponent> bundleEnteries = new ArrayList<>();
 
 			BundleEntryComponent bundleEntry1 = new BundleEntryComponent();
@@ -142,6 +151,14 @@ public class WellnessRecordResourceBundleImpl implements WellnessRecordResourceB
 				bundleEntry5.setResource(obsVital);
 
 				bundleEnteries.add(bundleEntry5);
+			}
+
+			if (documentReference != null) {
+				BundleEntryComponent bundleEntry6 = new BundleEntryComponent();
+				bundleEntry6.setFullUrl(documentReference.getIdElement().getValue());
+				bundleEntry6.setResource(documentReference);
+
+				bundleEnteries.add(bundleEntry6);
 			}
 
 			wellnessBundle.setEntry(bundleEnteries);

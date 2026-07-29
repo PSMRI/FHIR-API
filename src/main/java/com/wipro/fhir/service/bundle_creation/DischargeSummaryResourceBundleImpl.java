@@ -17,6 +17,7 @@ import org.hl7.fhir.r4.model.Composition.CompositionStatus;
 import org.hl7.fhir.r4.model.Composition.SectionComponent;
 import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.FamilyMemberHistory;
 import org.hl7.fhir.r4.model.Identifier;
@@ -94,7 +95,10 @@ public class DischargeSummaryResourceBundleImpl implements DischargeSummaryResou
 	
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
-	
+
+	@Autowired
+	private ConsultationReportPdfService consultationReportPdfService;
+
 	@Value("${hipSystemUrl}")
 	private String systemUrl;
 	
@@ -185,9 +189,14 @@ public class DischargeSummaryResourceBundleImpl implements DischargeSummaryResou
 					new Encounter(), resourceRequestHandler, observationMap);
 			
 			// composition
-			Composition composition = populateDischargeSummaryComposition(resourceRequestHandler, p, practitioner, organization, patient, encounter, conditionListChiefComplaints, 
+			Composition composition = populateDischargeSummaryComposition(resourceRequestHandler, p, practitioner, organization, patient, encounter, conditionListChiefComplaints,
 					conditionListDiagnosis, allergyList, familyMemberHistory, medicationStatement, medicationRequest, diagnosticResourceList);
-			
+
+			// consolidated consultation report, as a downloadable PDF attachment
+			DocumentReference documentReference = consultationReportPdfService
+					.getConsultationReportDocumentReference(resourceRequestHandler, patient);
+			consultationReportPdfService.addDocumentReferenceSection(composition, documentReference);
+
 			List<BundleEntryComponent> bundleEnteries = new ArrayList<>();
 			
 			BundleEntryComponent bundleEntry1 = new BundleEntryComponent();
@@ -273,7 +282,15 @@ public class DischargeSummaryResourceBundleImpl implements DischargeSummaryResou
 					}
 				}
 			}
-			
+
+			if (documentReference != null) {
+				BundleEntryComponent entryDocumentReference = new BundleEntryComponent();
+				entryDocumentReference.setFullUrl(documentReference.getIdElement().getValue());
+				entryDocumentReference.setResource(documentReference);
+
+				bundleEnteries.add(entryDocumentReference);
+			}
+
 			dischargeSummaryBundle.setEntry(bundleEnteries);
 			
 			FhirContext ctx = FhirContext.forR4();

@@ -10,6 +10,7 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Composition.SectionComponent;
+import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Meta;
@@ -55,6 +56,9 @@ public class ImmunizationRecordResourceBundleImpl implements ImmunizationRecordR
 	
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
+
+	@Autowired
+	private ConsultationReportPdfService consultationReportPdfService;
 
 	@Value("${hipSystemUrl}")
 	private String systemUrl;
@@ -118,6 +122,11 @@ public class ImmunizationRecordResourceBundleImpl implements ImmunizationRecordR
 
 			Composition composition = populateImmunizationComposition(patient, practitioner, organization, immunizationList);
 
+			// consolidated consultation report, as a downloadable PDF attachment
+			DocumentReference documentReference = consultationReportPdfService
+					.getConsultationReportDocumentReference(resourceRequestHandler, patient);
+			consultationReportPdfService.addDocumentReferenceSection(composition, documentReference);
+
 			List<BundleEntryComponent> bundleEntries = new ArrayList<>();
 
 			BundleEntryComponent entryComposition = new BundleEntryComponent();
@@ -147,6 +156,13 @@ public class ImmunizationRecordResourceBundleImpl implements ImmunizationRecordR
 	            beImm.setResource(imm);
 	            bundleEntries.add(beImm);
 	        }
+
+			if (documentReference != null) {
+				BundleEntryComponent entryDocumentReference = new BundleEntryComponent();
+				entryDocumentReference.setFullUrl(documentReference.getIdElement().getValue());
+				entryDocumentReference.setResource(documentReference);
+				bundleEntries.add(entryDocumentReference);
+			}
 
 			diagReportBundle.setEntry(bundleEntries);
 

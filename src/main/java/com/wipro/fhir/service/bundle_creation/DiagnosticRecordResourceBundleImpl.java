@@ -12,6 +12,7 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Meta;
@@ -62,6 +63,9 @@ public class DiagnosticRecordResourceBundleImpl implements DiagnosticRecordResou
 	
 	@Autowired
 	private BenHealthIDMappingRepo benHealthIDMappingRepo;
+
+	@Autowired
+	private ConsultationReportPdfService consultationReportPdfService;
 
 	@Value("${hipSystemUrl}")
 	private String systemUrl;
@@ -132,6 +136,13 @@ public class DiagnosticRecordResourceBundleImpl implements DiagnosticRecordResou
 			Composition composition = populateDiagnosticReportComposition(resourceRequestHandler, p,
 					diagnosticResourceList, practitioner, organization);
 
+			// consolidated consultation report, as a downloadable PDF attachment. The
+			// DiagnosticReportRecord profile models it as an entry of the diagnostic
+			// section rather than as a section of its own.
+			DocumentReference documentReference = consultationReportPdfService
+					.getConsultationReportDocumentReference(resourceRequestHandler, patient);
+			consultationReportPdfService.addDocumentReferenceEntry(composition, documentReference);
+
 			List<BundleEntryComponent> bundleEntries = new ArrayList<>();
 
 			BundleEntryComponent entryComposition = new BundleEntryComponent();
@@ -177,6 +188,13 @@ public class DiagnosticRecordResourceBundleImpl implements DiagnosticRecordResou
 						bundleEntries.add(entryObs);
 					}
 				}
+			}
+
+			if (documentReference != null) {
+				BundleEntryComponent entryDocumentReference = new BundleEntryComponent();
+				entryDocumentReference.setFullUrl(documentReference.getIdElement().getValue());
+				entryDocumentReference.setResource(documentReference);
+				bundleEntries.add(entryDocumentReference);
 			}
 
 			diagReportBundle.setEntry(bundleEntries);
