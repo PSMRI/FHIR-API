@@ -91,8 +91,11 @@ import com.wipro.fhir.service.resource_model.PractitionerResource;
  * The report is a single document per visit covering every record type AMRIT
  * shares - vitals and anthropometry (BP, pulse, temperature, height, weight,
  * BMI), chief complaints, diagnosis, allergies, medical and family history,
- * prescribed medications, lab results and immunizations - so the same PDF is
- * attached to whichever bundles are created for that visit.
+ * prescribed medications, lab results and immunizations.
+ *
+ * It is attached to the OPConsultation bundle only. Attaching it to every bundle
+ * of a visit made the ABHA app show the same "Consultation Report" download on
+ * each record page, and the other bundles are left exactly as they were.
  *
  * Everything the feature needs lives in this one class on purpose: the bundle
  * builders only ask for a DocumentReference, so the file can be dropped into
@@ -212,10 +215,9 @@ public class ConsultationReportPdfService {
 	/***
 	 * Wires the document into a Composition as its own "Document Reference" section.
 	 *
-	 * A document Bundle must have every entry reachable from the Composition, so
-	 * whichever way a bundle carries the report it has to be referenced. Used by the
-	 * record types whose NDHM profile defines a Document Reference section -
-	 * OPConsultRecord, DischargeSummaryRecord, WellnessRecord, ImmunizationRecord.
+	 * A document Bundle must have every entry reachable from the Composition, so the
+	 * report has to be referenced as well as carried. The OPConsultRecord profile
+	 * defines a Document Reference section for exactly this.
 	 *
 	 * Does nothing when there is no document, leaving the Composition untouched.
 	 ***/
@@ -230,26 +232,6 @@ public class ConsultationReportPdfService {
 				.setDisplay(REPORT_TITLE));
 
 		composition.addSection(section);
-	}
-
-	/***
-	 * Appends the document to the Composition's existing section instead of adding a
-	 * new one - for the profiles that model a DocumentReference as an entry of the
-	 * single section they define (DiagnosticReportRecord, PrescriptionRecord) rather
-	 * than as a section of its own.
-	 ***/
-	public void addDocumentReferenceEntry(Composition composition, DocumentReference documentReference) {
-		if (composition == null || documentReference == null)
-			return;
-
-		if (!composition.hasSection()) {
-			addDocumentReferenceSection(composition, documentReference);
-			return;
-		}
-
-		composition.getSection().get(composition.getSection().size() - 1)
-				.addEntry(new Reference(documentReference.getIdElement().getValue()).setType("DocumentReference")
-						.setDisplay(REPORT_TITLE));
 	}
 
 	/*** Renders the report, reusing the last one when it is for the same visit. ***/
