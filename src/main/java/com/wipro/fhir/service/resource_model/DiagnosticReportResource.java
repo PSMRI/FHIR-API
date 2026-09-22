@@ -22,7 +22,6 @@
 package com.wipro.fhir.service.resource_model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -83,53 +82,43 @@ public class DiagnosticReportResource {
 
 		List<DiagnosticReport> diagnosticReportList = new ArrayList<>();
 
-		Map<Integer, Boolean> testMap = new HashMap<Integer, Boolean>();
-
-		CodeableConcept cc;
-		Reference observationRef;
-		List<Reference> observationListRef;
-
-		for (DiagnosticReportDataModel d : diagnosticList) {
-			if (d.getProcedureID() != null && testMap != null && !testMap.containsKey(d.getProcedureID())) {
-
-				diagnosticReport = new DiagnosticReport();
-				UUID = commonService.getUUID();
-				diagnosticReport.setId("DiagnosticReport/" + UUID);
-
-				DateTimeType dtt = new DateTimeType(d.getCreatedDate());
-				diagnosticReport.setEffective(dtt);
-
-				diagnosticReport.setStatus(DiagnosticReportStatus.FINAL);
-
-				cc = new CodeableConcept();
-				cc.setText(d.getProcedureName());
-
-				diagnosticReport.setCode(cc);
-
-				// referance - patient
-				diagnosticReport.setSubject(new Reference(patient.getIdElement().getValue()));
-
-				if (observationMap != null && observationMap.size() > 0) {
-					List<Observation> observationList = observationMap.get(d.getProcedureID());
-
-					if (observationList != null && observationList.size() > 0) {
-						observationListRef = new ArrayList<>();
-						for (Observation o : observationList) {
-							observationRef = new Reference(o.getIdElement().getValue());
-							observationListRef.add(observationRef);
-						}
-
-						diagnosticReport.setResult(observationListRef);
+		// Collect all observation references across all procedures into one report.
+		// Previously one DiagnosticReport was created per procedure, causing the ABHA
+		// app to render both the DiagnosticReport (name only, no value) and each
+		// Observation (name + value) — producing duplicate entries when the procedure
+		// name matched the component name.
+		List<Reference> allObservationRefs = new ArrayList<>();
+		if (observationMap != null) {
+			for (List<Observation> obsList : observationMap.values()) {
+				if (obsList != null) {
+					for (Observation o : obsList) {
+						allObservationRefs.add(new Reference(o.getIdElement().getValue()));
 					}
 				}
-
-				diagnosticReport.setConclusion("");
-
-				diagnosticReportList.add(diagnosticReport);
-
-				testMap.put(d.getProcedureID(), true);
 			}
 		}
+
+		if (!allObservationRefs.isEmpty()) {
+			diagnosticReport = new DiagnosticReport();
+			UUID = commonService.getUUID();
+			diagnosticReport.setId("DiagnosticReport/" + UUID);
+			diagnosticReport.setStatus(DiagnosticReportStatus.FINAL);
+
+			CodeableConcept cc = new CodeableConcept();
+			cc.setText("Laboratory Report");
+			diagnosticReport.setCode(cc);
+
+			diagnosticReport.setSubject(new Reference(patient.getIdElement().getValue()));
+
+			if (!diagnosticList.isEmpty() && diagnosticList.get(0).getCreatedDate() != null) {
+				diagnosticReport.setEffective(new DateTimeType(diagnosticList.get(0).getCreatedDate()));
+			}
+
+			diagnosticReport.setResult(allObservationRefs);
+			diagnosticReport.setConclusion("");
+			diagnosticReportList.add(diagnosticReport);
+		}
+
 		return diagnosticReportList;
 
 	}

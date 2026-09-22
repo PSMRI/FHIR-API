@@ -9,6 +9,6 @@ public class GenerateCareContextTokenRequest {
 	private String abhaAddress;
 	private String name;
 	private String gender;
-	private int yearOfBirth;
+	private Integer yearOfBirth;
 
 }

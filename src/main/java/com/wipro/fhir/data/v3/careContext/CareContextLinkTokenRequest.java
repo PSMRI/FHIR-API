@@ -9,7 +9,7 @@ public class CareContextLinkTokenRequest {
 	private String abhaAddress;
 	private String name;
 	private String gender;
-	private int yearOfBirth;
+	private Integer yearOfBirth;
 	private String abdmFacilityId;
 
 }

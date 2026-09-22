@@ -82,6 +82,7 @@ import com.wipro.fhir.service.bundle_creation.WellnessRecordResourceBundle;
 import com.wipro.fhir.service.ndhm.Common_NDHMService;
 import com.wipro.fhir.service.ndhm.GenerateSession_NDHMService;
 import com.wipro.fhir.service.patient_data_handler.PatientDataGatewayService;
+import com.wipro.fhir.service.v3.abha.GenerateAuthSessionService;
 import com.wipro.fhir.utils.exception.FHIRException;
 import com.wipro.fhir.utils.http.HttpUtils;
 
@@ -151,6 +152,10 @@ public class CommonServiceImpl implements CommonService {
 
 	@Autowired
 	private GenerateSession_NDHMService generateSession_NDHM;
+
+	@Autowired
+	private GenerateAuthSessionService generateAuthSessionService;
+
 	private static int ACCEPTED = 202;
 	@Autowired
 	private PatientDemographic patientDemographic;
@@ -232,56 +237,86 @@ public class CommonServiceImpl implements CommonService {
 				// 1. OP consult resource bundle
 				if (p.getVisitCategory().equalsIgnoreCase("General OPD")
 						|| p.getVisitCategory().equalsIgnoreCase("General OPD (QC)")) {
-					int opConsult = oPConsultResourceBundle.processOpConsultRecordBundle(resourceRequestHandler, p);
-					if (opConsult <= 0)
+					try {
+						int opConsult = oPConsultResourceBundle.processOpConsultRecordBundle(resourceRequestHandler, p);
+						if (opConsult <= 0)
+							processed = false;
+						logger.info(" The value of opConsult proceesed: " + processed);
+					} catch (Exception e) {
 						processed = false;
-					logger.info(" The value of opConsult proceesed: " + processed);
+						logger.error("Op Consult FHIR Resource Bundle failed with error - " + e.getMessage());
+					}
 				}
 
 				// 2. diagnostic report record bundle
 				int hasLabTests = careContextRepo.hasLabtestsDone(p.getVisitCode().toString());
 				if (hasLabTests > 0) {
-					int diagReport = diagnosticReportResourceBundle
-							.processDiagnosticReportRecordBundle(resourceRequestHandler, p);
-					if (diagReport <= 0)
+					try {
+						int diagReport = diagnosticReportResourceBundle
+								.processDiagnosticReportRecordBundle(resourceRequestHandler, p);
+						if (diagReport <= 0)
+							processed = false;
+						logger.info(" The value of diagReport proceesed: " + processed);
+					} catch (Exception e) {
 						processed = false;
-					logger.info(" The value of diagReport proceesed: " + processed);
+						logger.error("Diagnostic Report FHIR Resource Bundle failed with error - " + e.getMessage());
+					}
 				}
 
 				// 3. prescription Bundle
 				int hasPrescription = careContextRepo.hasPrescribedDrugs(p.getVisitCode().toString());
 				if (hasPrescription > 0) {
-					int presp = prescriptionResourceBundle.processPrescriptionRecordBundle(resourceRequestHandler, p);
-					if (presp <= 0)
+					try {
+						int presp = prescriptionResourceBundle.processPrescriptionRecordBundle(resourceRequestHandler, p);
+						if (presp <= 0)
+							processed = false;
+						logger.info(" The value of presp proceesed: " + processed);
+					} catch (Exception e) {
 						processed = false;
-					logger.info(" The value of presp proceesed: " + processed);
+						logger.error("Prescription FHIR Resource Bundle failed with error - " + e.getMessage());
+					}
 				}
 
 				// 4. wellness Bundle
 				int hasPhyVitals = careContextRepo.hasPhyVitals(p.getVisitCode().toString());
 				if (hasPhyVitals > 0) {
-					int wellness = wellnessRecordResourceBundle.processWellnessRecordBundle(resourceRequestHandler, p);
-					if (wellness <= 0)
+					try {
+						int wellness = wellnessRecordResourceBundle.processWellnessRecordBundle(resourceRequestHandler, p);
+						if (wellness <= 0)
+							processed = false;
+						logger.info(" The value of wellness proceesed: " + processed);
+					} catch (Exception e) {
 						processed = false;
-					logger.info(" The value of wellness proceesed: " + processed);
+						logger.error("Wellness FHIR Resource Bundle failed with error - " + e.getMessage());
+					}
 				}
 
 				// 5. Immunization record
 				int hasVaccineDetails = careContextRepo.hasVaccineDetails(p.getVisitCode().toString());
 				if (hasVaccineDetails > 0) {
-					int immunization = immunizationRecordResourceBundle
-							.processImmunizationRecordBundle(resourceRequestHandler, p);
-					if (immunization <= 0)
+					try {
+						int immunization = immunizationRecordResourceBundle
+								.processImmunizationRecordBundle(resourceRequestHandler, p);
+						if (immunization <= 0)
+							processed = false;
+						logger.info(" The value of immunization proceesed: " + processed);
+					} catch (Exception e) {
 						processed = false;
-					logger.info(" The value of immunization proceesed: " + processed);
+						logger.error("Immunization FHIR Resource Bundle failed with error - " + e.getMessage());
+					}
 				}
 
 				// 6. Discharge Summary
-				int dischargeSummary = dischargeSummaryResourceBundle
-						.processDischargeSummaryRecordBundle(resourceRequestHandler, p);
-				if (dischargeSummary <= 0)
+				try {
+					int dischargeSummary = dischargeSummaryResourceBundle
+							.processDischargeSummaryRecordBundle(resourceRequestHandler, p);
+					if (dischargeSummary <= 0)
+						processed = false;
+					logger.info(" The value of dischargeSummary proceesed: " + processed);
+				} catch (Exception e) {
 					processed = false;
-				logger.info(" The value of dischargeSummary proceesed: " + processed);
+					logger.error("Discharge Summary FHIR Resource Bundle failed with error - " + e.getMessage());
+				}
 
 				logger.info(" The value of final proceesed: " + processed);
 
@@ -714,7 +749,7 @@ public class CommonServiceImpl implements CommonService {
 	 */
 	public void sendAbdmAdvSMS(String phone) throws FHIRException {
 		try {
-			String ndhmAuthToken = generateSession_NDHM.getNDHMAuthToken();
+			String ndhmAuthToken = generateAuthSessionService.getAbhaAuthToken();
 			HIP hip = new HIP("Piramal Swasthya", clientID);
 			NDHMRequest obj = common_NDHMService.getRequestIDAndTimeStamp();
 			Notification notification = new Notification(phone, hip);

@@ -78,4 +78,16 @@ public class BenHealthIDMapping {
 	@Transient
 	private boolean isNewAbha;
 
+	@Expose
+	@Transient
+	private String name;
+
+	@Expose
+	@Transient
+	private String gender;
+
+	@Expose
+	@Transient
+	private String yearOfBirth;
+
 }
